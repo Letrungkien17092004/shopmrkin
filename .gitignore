@@ -1,6 +1,17 @@
+# Bỏ qua thư mục node_modules
 node_modules/
+
+# Bỏ qua thư mục src (nếu không muốn push code nguồn)
 src/
+
+# Bỏ qua các file cấu hình cá nhân và cache
 .babelrc
+.DS_Store
 LICENSE
-package.json
 package-lock.json
+package.json
+webpack.config.js
+
+
+# Bỏ qua các tệp hệ thống
+Thumbs.db
