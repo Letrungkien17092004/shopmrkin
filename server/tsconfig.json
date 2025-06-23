@@ -5,6 +5,7 @@
     /* Modules */
     "module": "es2022",
     "esModuleInterop": true,
+    "baseUrl": "./src",
     "forceConsistentCasingInFileNames": true,
     /* Type Checking */
     "strict": true,
