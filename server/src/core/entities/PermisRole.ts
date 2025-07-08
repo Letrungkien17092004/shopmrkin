@@ -1,5 +1,5 @@
 
-type PermisRoleConstructorParam = {
+export type PermisRoleConstructorParam = {
     permissionId: number
     roleId: number
 }

@@ -1,6 +1,6 @@
 
 
-type RoleConstructorParam = {
+export type RoleConstructorParam = {
     id: number
     roleName: string
     description: string | null

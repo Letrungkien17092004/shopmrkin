@@ -1,5 +1,5 @@
 
-type PermissionConstructorParam = {
+export type PermissionConstructorParam = {
     id: number
     perName: string
     description: string | null
