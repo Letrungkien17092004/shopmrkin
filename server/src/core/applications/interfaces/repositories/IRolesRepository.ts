@@ -6,4 +6,5 @@ export default interface IRolesRepository {
     getById(): Promise<Role>
     update(attributes: Omit<Partial<Role>, 'id'>): Promise<Role>
     deleteById(id: number): Promise<boolean>
+    associateWithPer(roleId: number, perId: number): Promise<Role>
 }
