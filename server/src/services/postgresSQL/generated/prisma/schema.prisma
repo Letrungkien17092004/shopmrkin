@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Roles {
+  id          Int                 @id @default(autoincrement())
+  roleName    String              @unique @db.VarChar(30)
+  description String              @db.VarChar(255)
+  permissions Roles_Permissions[]
+  users       Users[]
+
+  @@map("roles")
+}
+
+model Permissions {
+  id          Int                 @id @default(autoincrement())
+  perName     String              @unique @db.VarChar(30)
+  description String              @db.VarChar(255)
+  roles       Roles_Permissions[]
+
+  @@map("permission")
+}
+
+model Roles_Permissions {
+  role       Roles       @relation(fields: [roleId], references: [id])
+  roleId     Int
+  permission Permissions @relation(fields: [permisId], references: [id])
+  permisId   Int
+
+  @@id([roleId, permisId])
+  @@map("roles_permission")
+}
+
+model Users {
+  id            Int      @id @default(autoincrement())
+  username      String   @db.VarChar(50)
+  account       String   @db.VarChar(50)
+  password_hash String   @db.VarChar(255)
+  email         String   @db.VarChar(255)
+  role          Roles    @relation(fields: [roleId], references: [id])
+  roleId        Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("users")
+}
