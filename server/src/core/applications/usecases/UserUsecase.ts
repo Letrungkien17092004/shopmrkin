@@ -1,11 +1,11 @@
 import IUserUsecase from "../interfaces/usecases/IUserUsecase.js";
-import IUserRepository from "../interfaces/repositories/IUserRepository.js";
+import IUsersRepository from "../interfaces/repositories/IUsersRepository.js";
 import { User, UserConstructorParam } from "core/entities/index.js";
 
 export default class UserUsecase implements IUserUsecase {
-    private repository: IUserRepository
+    private repository: IUsersRepository
 
-    constructor(repo: IUserRepository) {
+    constructor(repo: IUsersRepository) {
         this.repository = repo;
     }
 
@@ -13,15 +13,6 @@ export default class UserUsecase implements IUserUsecase {
         try {
             const newUser = await this.repository.create(options)
             return newUser
-        } catch (error) {
-            throw new Error("User usecase error!")
-        }
-    }
-
-    async getAll(): Promise<User[]> {
-        try {
-            const users = await this.repository.getAll()
-            return users
         } catch (error) {
             throw new Error("User usecase error!")
         }
