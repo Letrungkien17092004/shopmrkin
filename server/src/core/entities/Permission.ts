@@ -2,13 +2,13 @@
 export type PermissionConstructorParam = {
     id: number
     perName: string
-    description: string | null
+    description?: string
 }
 
 export default class Permission {
     id: number
     perName: string
-    description: string | null
+    description?: string
 
     constructor(options: PermissionConstructorParam) {
         this.id = options.id
