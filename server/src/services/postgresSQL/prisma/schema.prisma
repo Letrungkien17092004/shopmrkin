@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  output   = "../generated/prisma/client"
 }
 
 datasource db {
@@ -17,7 +17,7 @@ datasource db {
 model Roles {
   id Int @id @default(autoincrement())
   roleName String @unique @db.VarChar(30)
-  description String @db.VarChar(255)
+  description String? @db.VarChar(255)
   permissions Roles_Permissions[]
   users Users[]
   @@map("roles")
@@ -26,7 +26,7 @@ model Roles {
 model Permissions {
   id Int @id @default(autoincrement())
   perName String @unique @db.VarChar(30)
-  description String @db.VarChar(255)
+  description String? @db.VarChar(255)
   roles Roles_Permissions[]
   @@map("permission")
 }

@@ -3,6 +3,6 @@ server/dist/
 client/node_modules/
 # Keep environment variables out of version control
 .env
-
-server/src/generated/prisma
+tasks.md
+server/src/services/postgresSQL/generated/prisma/client/
 
