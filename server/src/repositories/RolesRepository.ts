@@ -1,5 +1,5 @@
 import IRolesRepository from "core/applications/interfaces/repositories/IRolesRepository.js";
-import Role from "core/entities/Role";
+import { Role } from "core/entities/index.js";
 import { PrismaClient } from "services/postgresSQL/generated/prisma/client/client";
 
 const prisma = new PrismaClient()
@@ -74,7 +74,7 @@ export default class RolesRepository implements IRolesRepository {
                     id: attributes.id
                 },
                 data: {
-                    roleName: attributes.roleName, 
+                    roleName: attributes.roleName,
                     description: attributes.description
                 }
             })
