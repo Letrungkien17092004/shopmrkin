@@ -21,7 +21,16 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
             const newRole = await this.roleRepo.create(attributes)
             return newRole
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw new Error(`Error in AdminSystemUsecase: ${error}`)
+        }
+    }
+
+    async getRoleById(id: number): Promise<Role | null> {
+        try {
+            const role = await this.roleRepo.getById(id)
+            return role
+        } catch (error) {
+            throw new Error(`Error in AdminSystemUsecase: ${error}`)
         }
     }
 
@@ -30,7 +39,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
             const updatedRole = await this.roleRepo.update(attributes)
             return updatedRole
          } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw new Error(`Error in AdminSystemUsecase: ${error}`)
          }
     }
 
@@ -39,7 +48,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
             const newPer = await this.perRepo.create(attributes)
             return newPer
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw new Error(`Error in AdminSystemUsecase: ${error}`)
         }
     }
 
@@ -48,7 +57,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
             const updatedPer = await this.perRepo.update(attributes)
             return updatedPer
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw new Error(`Error in AdminSystemUsecase: ${error}`)
         }
     }
     
@@ -59,7 +68,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
             const rolePer = await this.rolePer.create({roleId: newRole.id, permisId: newPer.id})
             return rolePer
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw new Error(`Error in AdminSystemUsecase: ${error}`)
         }
     }
 
@@ -71,7 +80,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
             })
             return rolePer
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw new Error(`Error in AdminSystemUsecase: ${error}`)
         }
     }
 }

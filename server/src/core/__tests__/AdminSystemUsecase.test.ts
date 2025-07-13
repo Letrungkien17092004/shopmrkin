@@ -39,7 +39,7 @@ const rawPers: Pick<Permission, "perName" | "description">[] = [
     }
 ]
 
-async function main() {
+async function create() {
     const roles = []
     for (let i = 0; i < rawRoles.length; i++) {
         roles.push(await adminSystem.createRole(rawRoles[i]))
@@ -64,8 +64,25 @@ async function main() {
 
     console.log("\n==== ROLE <-> PER ====")
     console.table(rolePers)
+}
 
+async function read() {
+    const role = await adminSystem.getRoleById(1)
+    console.log(role)
+}
 
+async function update() {
+    const role = await adminSystem.updateRole({
+        id: 10,
+        roleName: "admin_changed 2"
+    })
+
+    console.log(role)
+}
+async function main() {
+    // await create()
+    // await read()
+    await update()
 }
 
 main()

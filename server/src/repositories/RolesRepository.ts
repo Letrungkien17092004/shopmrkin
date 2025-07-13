@@ -1,7 +1,8 @@
 import IRolesRepository from "core/applications/interfaces/repositories/IRolesRepository.js";
-import { Role } from "core/entities/index.js";
+import { Role, Permission } from "core/entities/index.js";
 import { PrismaClient } from "services/postgresSQL/generated/prisma/client/client";
 import { PrismaClientKnownRequestError } from "services/postgresSQL/generated/prisma/client/runtime/library";
+import { REPO_ERROR_NOT_FOUND, REPO_UNKNOW_ERROR } from "./errors.js";
 
 const prisma = new PrismaClient()
 
@@ -51,14 +52,30 @@ export default class RolesRepository implements IRolesRepository {
             const getResult = await prisma.roles.findUnique({
                 where: {
                     id: id
+                },
+                relationLoadStrategy: 'join',
+                include: {
+                    permissions: {
+                        include: {
+                            permission: true
+                        }
+                    }
                 }
             })
 
             if (getResult) {
+                const permissions = getResult.permissions.map(per => {
+                    return new Permission({
+                        id: per.permission.id,
+                        perName: per.permission.perName,
+                        description: per.permission.description
+                    })
+                })
                 return new Role({
                     id: getResult.id,
                     roleName: getResult.roleName,
                     description: getResult.description,
+                    permissions: permissions
                 })
             }
             return null
@@ -77,16 +94,39 @@ export default class RolesRepository implements IRolesRepository {
                 data: {
                     roleName: attributes.roleName,
                     description: attributes.description
+                },
+                include: {
+                    permissions: {
+                        include: {
+                            permission: true
+                        }
+                    }
                 }
+            })
+
+            // convert prisma data to entity
+            const permissions = updatedRole.permissions.map(per => {
+                return new Permission({
+                    id: per.permission.id,
+                    perName: per.permission.perName,
+                    description: per.permission.description
+                })
             })
 
             return new Role({
                 id: updatedRole.id,
                 roleName: updatedRole.roleName,
-                description: updatedRole.description
+                description: updatedRole.description,
+                permissions: permissions
             })
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            if (error instanceof PrismaClientKnownRequestError) {
+                switch (error.code) {
+                    case "P2025": // not found
+                        throw new REPO_ERROR_NOT_FOUND(error.message)
+                }
+            }
+            throw new REPO_UNKNOW_ERROR(`${error}`)
         }
     }
 
