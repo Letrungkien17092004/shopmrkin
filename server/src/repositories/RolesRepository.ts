@@ -1,6 +1,7 @@
 import IRolesRepository from "core/applications/interfaces/repositories/IRolesRepository.js";
 import { Role } from "core/entities/index.js";
 import { PrismaClient } from "services/postgresSQL/generated/prisma/client/client";
+import { PrismaClientKnownRequestError } from "services/postgresSQL/generated/prisma/client/runtime/library";
 
 const prisma = new PrismaClient()
 
