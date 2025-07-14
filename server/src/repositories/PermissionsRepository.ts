@@ -1,5 +1,6 @@
 import IPermissionsRepository from "core/applications/interfaces/repositories/IPermissionsRepository.js";
 import { Permission } from "core/entities/index.js";
+import { baseExceptionHandler } from "./errors.js"
 import { PrismaClient } from "services/postgresSQL/generated/prisma/client/client";
 
 const prisma = new PrismaClient()
@@ -19,7 +20,7 @@ export default class PermissionsRepository implements IPermissionsRepository {
                 description: createdPer.description
             })
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw baseExceptionHandler(error)
         }
     }
     async getById(id: number): Promise<Permission | null> {
@@ -37,7 +38,7 @@ export default class PermissionsRepository implements IPermissionsRepository {
                 })
             } return null
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw baseExceptionHandler(error)
         }
     }
     async update(options: Omit<Partial<Permission>, "id"> & Pick<Permission, "id">): Promise<Permission> {
@@ -57,7 +58,7 @@ export default class PermissionsRepository implements IPermissionsRepository {
                 description: updatedPer.description
             })
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw baseExceptionHandler(error)
         }
     }
     async deleteById(id: number): Promise<boolean> {
@@ -69,8 +70,8 @@ export default class PermissionsRepository implements IPermissionsRepository {
             })
             return true
         } catch (error) {
-           console.log(`Error: ${error}`)
-           return false
+            throw baseExceptionHandler(error)
+            return false
         }
     }
 }

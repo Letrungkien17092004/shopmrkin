@@ -1,13 +1,22 @@
 import IRolesRepository from "core/applications/interfaces/repositories/IRolesRepository.js";
 import { Role, Permission } from "core/entities/index.js";
 import { PrismaClient } from "services/postgresSQL/generated/prisma/client/client";
-import { PrismaClientKnownRequestError } from "services/postgresSQL/generated/prisma/client/runtime/library";
-import { REPO_ERROR_NOT_FOUND, REPO_UNKNOW_ERROR } from "./errors.js";
+import { baseExceptionHandler } from "./errors.js"
 
 const prisma = new PrismaClient()
 
+
 export default class RolesRepository implements IRolesRepository {
 
+    /**
+     * Creates a new role in the database with the specified role name and description.
+     *
+     * @param {Pick<Role, "roleName" | "description">} param0 - An object containing the role's name and description.
+     * @param {string} param0.roleName - The name of the role to be created.
+     * @param {string} param0.description - The description of the role.
+     * @returns {Promise<Role>} A promise that resolves to the newly created Role instance.
+     * @throws {Error} Throws an error if the role creation fails.
+     */
     async create({ roleName, description }: Pick<Role, "roleName" | "description">): Promise<Role> {
         try {
             const role = await prisma.roles.create({
@@ -22,7 +31,7 @@ export default class RolesRepository implements IRolesRepository {
                 description: role.description
             })
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw baseExceptionHandler(error)
         }
     }
 
@@ -42,7 +51,7 @@ export default class RolesRepository implements IRolesRepository {
             return roles
 
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw baseExceptionHandler(error)
         }
     }
 
@@ -80,7 +89,7 @@ export default class RolesRepository implements IRolesRepository {
             }
             return null
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw baseExceptionHandler(error)
         }
     }
 
@@ -120,16 +129,9 @@ export default class RolesRepository implements IRolesRepository {
                 permissions: permissions
             })
         } catch (error) {
-            if (error instanceof PrismaClientKnownRequestError) {
-                switch (error.code) {
-                    case "P2025": // not found
-                        throw new REPO_ERROR_NOT_FOUND(error.message)
-                }
-            }
-            throw new REPO_UNKNOW_ERROR(`${error}`)
+            throw baseExceptionHandler(error)
         }
     }
-
 
     async deleteById(id: number): Promise<boolean> {
         try {
@@ -140,8 +142,7 @@ export default class RolesRepository implements IRolesRepository {
             })
             return true
         } catch (error) {
-            console.log(`Error: ${error}`)
-            return false
+            throw baseExceptionHandler(error)
         }
     }
 }

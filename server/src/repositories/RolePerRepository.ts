@@ -1,5 +1,6 @@
 import IRolePerRepository from "core/applications/interfaces/repositories/IRolePerRepository.js";
 import { RolePermission } from "core/entities/index.js"
+import { baseExceptionHandler } from "./errors.js"
 import { PrismaClient } from "services/postgresSQL/generated/prisma/client/client";
 const prisma = new PrismaClient()
 
@@ -17,7 +18,7 @@ export default class RolePerRepository implements IRolePerRepository {
                 permisId: createdRolePer.permisId
             })
         } catch (error) {
-            throw new Error(`Error: ${error}`)
+            throw baseExceptionHandler(error)
         }
     }
     async deleteWithPair(attributes: Pick<RolePermission, "roleId" | "permisId">): Promise<boolean> {
@@ -32,8 +33,7 @@ export default class RolePerRepository implements IRolePerRepository {
             })
             return true
         } catch (error) {
-            console.log(`Error: ${error}`)
-            return false
+            throw baseExceptionHandler(error)
         }
     }
 }
