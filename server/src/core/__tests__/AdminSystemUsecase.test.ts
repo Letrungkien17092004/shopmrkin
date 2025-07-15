@@ -24,65 +24,64 @@ const rawRoles: Pick<Role, "roleName" | "description">[] = [
     }
 ]
 
-const rawPers: Pick<Permission, "perName" | "description">[] = [
-    {
-        perName: "delete all",
-        description: "delete all data"
-    },
-    {
-        perName: "create all",
-        description: "create all data"
-    },
-    {
-        perName: "modify all",
-        description: "modify all data"
-    }
-]
+/**
+ * Test Role
+ * @remarks test create, read, update, delete
+ */
+async function testRole() {
+    const rawRoles: Pick<Role, "roleName" | "description">[] = [
+        {
+            roleName: "Admin",
+            description: "do anything"
+        },
+        {
+            roleName: "customer",
+            description: "buy items",
+        },
+        {
+            roleName: "manager",
+            description: "add items, remove items,..."
+        }
+    ]
 
-async function create() {
+    // ==== Create section ====
     const roles = []
+    console.log("========== CREATE ROLE ============")
     for (let i = 0; i < rawRoles.length; i++) {
-        roles.push(await adminSystem.createRole(rawRoles[i]))
+        roles.push(await adminSystem.createRole({
+            roleName: rawRoles[i].roleName,
+            description: rawRoles[i].description,
+        }))
     }
 
-    const pers = []
-
-    for (let i = 0; i < rawPers.length; i++) {
-        pers.push(await adminSystem.createPermission(rawPers[i]))
-    }
-
-    console.log("==== ROLES ====")
+    // log result
     console.table(roles)
 
-    console.log("\n==== PERMISSIONS ====")
-    console.table(pers)
+    // loop for check values
+    let createOk = true
+    for (let i = 0; i < roles.length; i++) {
+        const condition = (
+            typeof roles[i].id == "number" ||
+            roles[i].roleName == rawRoles[i].roleName ||
+            roles[i].description == rawRoles[i].description
+        )
 
-    const rolePers = []
-    rolePers.push(await adminSystem.createRelationships(roles[0].id, pers[0].id))
-    rolePers.push(await adminSystem.createRelationships(roles[0].id, pers[1].id))
-    rolePers.push(await adminSystem.createRelationships(roles[0].id, pers[2].id))
+        if (!condition) {
+            createOk = false
+            console.log("value is not match at: testRole - create")
+        }
+    }
 
-    console.log("\n==== ROLE <-> PER ====")
-    console.table(rolePers)
+    // ==== Create when existed section ====
+
+
+
+    console.log("==== RESULT ====")
+    console.log("CREATE: " + createOk)
 }
 
-async function read() {
-    const role = await adminSystem.getRoleById(1)
-    console.log(role)
-}
-
-async function update() {
-    const role = await adminSystem.updateRole({
-        id: 10,
-        roleName: "admin_changed 2"
-    })
-
-    console.log(role)
-}
 async function main() {
-    // await create()
-    // await read()
-    await update()
+    await testRole()
 }
 
 main()
