@@ -1,11 +1,11 @@
 import Role from "./Role.js"
 
 export type UserConstructorParam = {
-    id: string | null
+    id: number
     username: string
     account: string
     password_hash: string
-    email: string | null
+    email: string
     roleId: number
     role?: Role
 }
@@ -21,7 +21,7 @@ export default class User {
      * @remarks
      * May be null if the user has not been persisted yet.
      */
-    id: string | null
+    id: number
 
     /**
      * The display name of the user.
@@ -43,7 +43,7 @@ export default class User {
      * @remarks
      * May be null if not provided.
      */
-    email: string | null
+    email: string
 
     /**
      * The identifier of the role assigned to the user.

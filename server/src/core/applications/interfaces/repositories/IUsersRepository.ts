@@ -1,8 +1,8 @@
 import { User } from "core/entities/index.js"
 
 export default interface IUsersRepository {
-    create(newUser: User): Promise<User>
-    getById(id: string): Promise<User | null>
-    update(user: Partial<User>): Promise<User>
-    deleteById(id: string): Promise<boolean>
+    create(attributes: User): Promise<User>
+    getById(id: number): Promise<User | null>
+    update(attributes: Partial<User>): Promise<User>
+    deleteById(id: number): Promise<boolean>
 }

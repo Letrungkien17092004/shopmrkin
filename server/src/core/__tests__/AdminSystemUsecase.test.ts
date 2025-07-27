@@ -14,7 +14,7 @@ const adminSystem = new AdminSystemUsecase(roleRepo, perRepo, rolePerRepo)
  * Test Role
  * @remarks test create, read, update, delete
  */
-async function testRole() {
+async function roleTesting() {
     const rawRoles: Pick<Role, "roleName" | "description">[] = [
         {
             roleName: "admin",
@@ -149,7 +149,7 @@ async function testRole() {
  * Test Permission
  * @remarks test create, read, update, delete
  */
-async function testPermission() {
+async function permissionTesting() {
     const rawPers: Pick<Permission, "perName" | "description">[] = [
         {
             perName: "create admin",
@@ -235,7 +235,7 @@ async function testPermission() {
     }
     const updatedPer = await adminSystem.updatePermission({
         id: newData.id,
-        perName: newData.perName 
+        perName: newData.perName
     })
 
     if (updatedPer.perName != newData.perName || updatedPer.id != newData.id) {
@@ -291,9 +291,56 @@ async function testPermission() {
     console.log("Find not exist: " + (findNotExistOk && "✅"))
 }
 
+async function combinedFunctionTesting() {
+    // ==== Create then Link
+    let createOk = true
+    const rolePer = await adminSystem.createAndLink(
+        {
+            roleName: "createAndLinkTesting-role",
+            description: "test"
+        },
+        {
+            perName: "createAndLinkTesting-permission",
+            description: "test"
+        }
+    )
+
+    if (typeof rolePer.roleId != "number" || typeof rolePer.permisId != "number") {
+        createOk = false
+    }
+
+    // ==== Create then Link when existed ====
+    let createWhenExistedOk = true
+    try {
+        const rolePer = await adminSystem.createAndLink(
+            {
+                roleName: "createAndLinkTesting-role",
+                description: "test"
+            },
+            {
+                perName: "createAndLinkTesting-permission",
+                description: "test"
+            }
+        )
+        createWhenExistedOk = false
+    } catch (error) {
+        if (error instanceof USECASE_ERROR) {
+            if (error.code != USECASE_ERROR_CODE.EXIST) {
+                createWhenExistedOk = false
+            }
+        }
+        // when error is not instance of USECASE_ERROR
+        else {
+            createWhenExistedOk = false
+        }
+    }
+
+
+}
+
 async function main() {
-    await testRole()
-    await testPermission()
+    await roleTesting()
+    await permissionTesting()
 }
 
 main()

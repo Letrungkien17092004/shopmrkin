@@ -150,7 +150,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "resoucre already exist",
-                            code: USECASE_ERROR_CODE.NOTFOUND
+                            code: USECASE_ERROR_CODE.EXIST
                         })
                 }
             }
@@ -174,7 +174,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "resoucre already exist",
-                            code: USECASE_ERROR_CODE.NOTFOUND
+                            code: USECASE_ERROR_CODE.EXIST
                         })
                 }
             }
