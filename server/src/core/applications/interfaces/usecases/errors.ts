@@ -12,9 +12,10 @@
  */
 export enum USECASE_ERROR_CODE {
     ENGINE = "UC_000", // engine error, prisma client, initial database
-    UNKNOW = "UC_001", // unknow error(connection, internet, ...)
-    NOTFOUND = "UC_002", // resource not found
-    EXIST = "UC_003", // resource already exist
+    UNDEFINED = "UC_001", // this error only occurs when it does not belong to the remaining errors
+    UNKNOW = "UC_002", // unknow error(connection, internet, ...)
+    NOTFOUND = "UC_003", // resource not found
+    EXISTED = "UC_004", // resource already exist
 }
 
 

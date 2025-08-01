@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx tsx ./src/core/__tests__/AdminSystemUsecase.test.ts"
+    "test": "npx tsx ./src/core/__tests__/AdminSystemUsecase.test.ts",
+    "test2": "npx tsx ./src/core/__tests__/draft_test.test.ts"
   },
   "keywords": [],
   "author": "",

@@ -1,13 +1,13 @@
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js"
 import { PrismaClient } from "services/postgresSQL/generated/prisma/client/client";
-import { User } from "core/entities/index.js"
+import { User, Role, Permission } from "core/entities/index.js"
 import IUsersRepository from "core/applications/interfaces/repositories/IUsersRepository.js";
 
 
 const prisma = new PrismaClient()
 
 export default class UserRepository implements IUsersRepository {
-    async create(attributes: User): Promise<User> {
+    async create(attributes: Omit<User, "id" | "roleId">): Promise<User> {
         try {
             const createdUser = await prisma.users.create({
                 data: {
@@ -16,11 +16,16 @@ export default class UserRepository implements IUsersRepository {
                     password_hash: attributes.password_hash,
                     email: attributes.email,
                     roleId: 1
+                },
+                include: {
+                    role: true
                 }
             })
 
             return new User(createdUser)
         } catch (error) {
+            console.log("log in Repo")
+            console.table(error)
             throw baseExceptionHandler(error)
         }
     }
@@ -29,10 +34,38 @@ export default class UserRepository implements IUsersRepository {
             const findResult = await prisma.users.findUnique({
                 where: {
                     id: id
+                },
+                relationLoadStrategy: 'join',
+                include: {
+                    role: {
+                        include: {
+                            permissions: {
+                                include: {
+                                    permission: true
+                                }
+                            }
+                        }
+                    }
                 }
             })
             if (findResult) {
-                return new User(findResult)
+                const pers = findResult.role.permissions.map(per => new Permission({
+                    id: per.permission.id,
+                    perName: per.permission.perName,
+                    description: per.permission.description
+                }))
+                const role = new Role({
+                    id: findResult.role.id,
+                    roleName: findResult.role.roleName,
+                    description: findResult.role.description,
+                    permissions: pers
+                })
+
+                const finalCombine = {
+                    ...findResult,
+                    role: role
+                }
+                return new User(finalCombine)
             } 
             return null
         } catch (error) {
