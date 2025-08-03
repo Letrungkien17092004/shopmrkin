@@ -53,3 +53,38 @@ model Users {
   updatedAt DateTime @updatedAt
   @@map("users")
 }
+
+model Categories {
+  id Int @id @default(autoincrement())
+  name String
+  slug String @unique
+  products Products[]
+}
+
+model Products {
+  id String @id @default(uuid(7))
+  product_code Int @unique @default(autoincrement())
+  name String
+  description String
+  // relation
+  categoryId Int 
+  category Categories @relation(fields: [categoryId], references: [id]) 
+  variants Variants[]
+
+  // time
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model Variants {
+  id String @id @default(uuid(7))
+  name String @unique
+  sku String @unique
+  productId String
+  product Products @relation(fields: [productId], references: [id])
+  price Decimal
+  stock Int
+  createdAt DateTime @default(now())  
+  updatedAt DateTime @updatedAt
+}

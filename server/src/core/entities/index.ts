@@ -1,11 +1,15 @@
-import User, { UserConstructorParam } from "./User.js";
-import Role, { RoleConstructorParam } from "./Role.js";
-import Permission, { PermissionConstructorParam } from "./Permission.js";
-import RolePermission, {RolePermissionParam} from "./RolePermission.js";
+import User from "./User.js";
+import Role from "./Role.js";
+import Permission from "./Permission.js";
+import RolePermission from "./RolePermission.js";
+import Category from "./Category.js";
+import Product from "./Product.js";
 
 export {
-    User, UserConstructorParam,
-    Role, RoleConstructorParam,
-    Permission, PermissionConstructorParam,
-    RolePermission, RolePermissionParam
+    User,
+    Role,
+    Permission,
+    RolePermission,
+    Category,
+    Product
 }
