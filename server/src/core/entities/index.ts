@@ -4,6 +4,7 @@ import Permission from "./Permission.js";
 import RolePermission from "./RolePermission.js";
 import Category from "./Category.js";
 import Product from "./Product.js";
+import Variant from "./Variant.js";
 
 export {
     User,
@@ -11,5 +12,6 @@ export {
     Permission,
     RolePermission,
     Category,
-    Product
+    Product,
+    Variant
 }

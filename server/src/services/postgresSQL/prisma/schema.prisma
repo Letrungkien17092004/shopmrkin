@@ -49,6 +49,7 @@ model Users {
   email String @db.VarChar(255) @unique
   role Roles @relation(fields: [roleId], references: [id])
   roleId Int 
+  products Products[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("users")
@@ -66,6 +67,8 @@ model Products {
   product_code Int @unique @default(autoincrement())
   name String
   description String
+  authorId Int
+  author Users @relation(fields: [authorId], references: [id])
   // relation
   categoryId Int 
   category Categories @relation(fields: [categoryId], references: [id]) 
