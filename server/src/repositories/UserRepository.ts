@@ -80,6 +80,7 @@ export default class UserRepository implements IUsersRepository {
                 },
                 data: {
                     username: attributes.username,
+                    account: attributes.account,
                     email: attributes.email,
                     password_hash: attributes.password_hash,
                     roleId: attributes.roleId

@@ -3,10 +3,11 @@
     /* Language and Environment */
     "target": "es2016",
     /* Modules */
-    "module": "es2022",
+    "module": "nodenext",
     "esModuleInterop": true,
     "baseUrl": "./src",
     "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "nodenext",
     /* Type Checking */
     "strict": true,
     "skipLibCheck": true

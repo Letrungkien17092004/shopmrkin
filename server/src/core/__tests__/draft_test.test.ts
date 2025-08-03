@@ -16,18 +16,18 @@ async function main() {
     const userRepo = new UserRepository()
     const userUsecase = new UserUsecase(userRepo)
 
-    // const adminRole = await adminSystemUsecase.createRole({
-    //     roleName: "admin",
-    //     description: "can do anything"
-    // })
+    const adminRole = await adminSystemUsecase.createRole({
+        roleName: "admin",
+        description: "can do anything"
+    })
 
     // ==== Create new user ====
     // try {
     //     const createdUser = await userUsecase.create({
-    //         username: "Mr kin 001",
-    //         account: "admin01@gmail23.com",
+    //         username: "Mr kin 3",
+    //         account: "admin03@gmail.com", 
     //         password_hash: "12345678",
-    //         email: "admin01@gmail.com"
+    //         email: "admin03@gmail.com"
     //     })
 
     //     console.table(createdUser)
@@ -35,9 +35,17 @@ async function main() {
     //     console.log(error)
     // }
 
-    // ==== find user ====
-    const userA = await userUsecase.getById(3)
-    console.log(userA)
+    // === Update ====
+    // const updatedUser = await userUsecase.update({
+    //     id: 3,
+    //     account: "admin01@gmail.com"
+    // })
+
+    // console.log(updatedUser)
+
+    // // ==== find user ====
+    // const userA = await userUsecase.getById(3)
+    // console.log(userA)
 }
 
 main()
