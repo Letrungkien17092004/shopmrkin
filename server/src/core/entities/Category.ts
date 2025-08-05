@@ -2,17 +2,17 @@
 
 
 type CategoriesConstructorParam = {
-    id: String
-    name: String
-    slug: String
-    products?: String[]
+    id: number
+    name: string
+    slug: string
+    products?: string[]
 }
 
 export default class Category {
-    id: String
-    name: String
-    slug: String
-    products?: String[]
+    id: number
+    name: string
+    slug: string
+    products?: string[]
 
     constructor(options: CategoriesConstructorParam) {
         this.id = options.id

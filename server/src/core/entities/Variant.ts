@@ -1,11 +1,13 @@
-import Product from "./Product.js"
+import { Product, User } from "./index.js"
 
 type VariantConstructorParam = {
     id: string,
     name: string,
     sku: string,
     productId: string,
-    product: Product,
+    product?: Product,
+    authorId: number
+    author?: User
     price: number,
     stock: number,
     createdAt: Date,
@@ -17,21 +19,25 @@ export default class Variant {
     name: string
     sku: string
     productId: string
-    product: Product
+    product?: Product
+    authorId: number
+    author?: User
     price: number
     stock: number
     createdAt: Date
     updatedAt: Date
 
     constructor(options: VariantConstructorParam) {
-    this.id = options.id
-    this.name = options.name
-    this.sku = options.sku
-    this.productId = options.productId
-    this.product = options.product
-    this.price = options.price
-    this.stock = options.stock
-    this.createdAt = options.createdAt
-    this.updatedAt = options.updatedAt
+        this.id = options.id
+        this.name = options.name
+        this.sku = options.sku
+        this.productId = options.productId
+        this.product = options.product
+        this.authorId = options.authorId
+        this.author = options.author
+        this.price = options.price
+        this.stock = options.stock
+        this.createdAt = options.createdAt
+        this.updatedAt = options.updatedAt
     }
 }

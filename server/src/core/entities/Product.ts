@@ -1,14 +1,15 @@
-import Category from "./Category.js"
-
+import { User, Category, Variant } from "core/entities/index.js"
 type ProductConstructorParam = {
     id: string,
     product_code: number,
-    name: String,
+    name: string,
     description: string,
     // relation
+    authorId: number,
+    author?: User,
     categoryId: number,
     category?: Category,
-    //   variants Variants[]
+    variants?: Variant[]
 
     // time
     createdAt: Date,
@@ -17,12 +18,14 @@ type ProductConstructorParam = {
 
 export default class Product {
     id: string
-    product_code: number 
-    name: String
+    product_code: number
+    name: string
     description: string
+    authorId: number
+    author?: User
     categoryId: number
     category?: Category
-    //   variants Variants[]
+    variants?: Variant[]
     createdAt: Date
     updatedAt: Date
 
@@ -31,9 +34,11 @@ export default class Product {
         this.product_code = options.product_code
         this.name = options.name
         this.description = options.description
+        this.authorId = options.authorId
+        this.author = options.author
         this.categoryId = options.categoryId
         this.category = options.category
-        //   variants Variants[]
+        this.variants = options.variants
         this.createdAt = options.createdAt
         this.updatedAt = options.updatedAt
     }
