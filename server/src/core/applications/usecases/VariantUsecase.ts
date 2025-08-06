@@ -1,22 +1,21 @@
-import ICategoryUsecase from "../interfaces/usecases/ICategoryUsecase.js";
-import ICategoryRepository from "../interfaces/repositories/ICategoryRepository.js";
-import { USECASE_ERROR, USECASE_ERROR_CODE } from "../interfaces/usecases/errors.js";
-import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.js";
-import { Category } from "core/entities/index.js"
+import { Variant } from "core/entities/index.js"
+import IVariantRepository from "../interfaces/repositories/IVariantRepository.js"
+import IVariantUsecase from "../interfaces/usecases/IVariantUsecase.js"
+import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.js"
+import { USECASE_ERROR, USECASE_ERROR_CODE } from "../interfaces/usecases/errors.js"
 
 
-export default class CategoryUsecase implements ICategoryUsecase {
-    private categoryRepo: ICategoryRepository
+export default class VariantUsecase {
+    private repo: IVariantRepository
 
-    constructor(categoryRepo: ICategoryRepository) {
-        this.categoryRepo = categoryRepo
+    constructor(repo: IVariantRepository) {
+        this.repo = repo
     }
 
-
-    async create(options: Omit<Category, "id">): Promise<Category> {
+    async create(options: Omit<Variant, "id">): Promise<Variant> {
         try {
-            const createdCategory = await this.categoryRepo.create(options)
-            return createdCategory
+            const createdVariant = await this.repo.create(options)
+            return createdVariant
         } catch (error) {
             if (error instanceof REPO_ERROR) {
                 switch (error.code) {
@@ -27,7 +26,61 @@ export default class CategoryUsecase implements ICategoryUsecase {
                         })
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
-                            message: "category already exist",
+                            message: "Variant already exist",
+                            code: USECASE_ERROR_CODE.EXISTED
+                        })
+                    
+                    case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
+                        throw new USECASE_ERROR({
+                            message: "author or parent product is wrong",
+                            code: USECASE_ERROR_CODE.CONSTRAINT
+                        })
+
+                }
+            }
+            throw new USECASE_ERROR({
+                message: (error as Error).message || "",
+                code: USECASE_ERROR_CODE.UNDEFINED
+            })
+        }
+    }
+
+    async getById(id: string): Promise<Variant | null> {
+        try {
+            const searchedVariant = await this.repo.getById(id)
+            return searchedVariant
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.ENGINE
+                        })
+                }
+            }
+            throw new USECASE_ERROR({
+                message: (error as Error).message || "",
+                code: USECASE_ERROR_CODE.UNDEFINED
+            })
+        }
+    }
+
+    async updateById(id: string, authorId: number, options: Omit<Partial<Variant>, "id">): Promise<Variant> {
+        try {
+            const updatedVariant = await this.repo.updateById(id, authorId, options)
+            return updatedVariant
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.ENGINE
+                        })
+                    case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
+                        throw new USECASE_ERROR({
+                            message: "Variant already exist",
                             code: USECASE_ERROR_CODE.EXISTED
                         })
 
@@ -39,57 +92,10 @@ export default class CategoryUsecase implements ICategoryUsecase {
             })
         }
     }
-    async getBySlug(slug: string): Promise<Category | null> {
-        try {
-            const searchedCategory = await this.categoryRepo.getBySlug(slug)
-            return searchedCategory
-        } catch (error) {
-            if (error instanceof REPO_ERROR) {
-                switch (error.code) {
-                    case REPO_ERROR_CODE.INITIAL:
-                        throw new USECASE_ERROR({
-                            message: error.message,
-                            code: USECASE_ERROR_CODE.ENGINE
-                        })
-                }
-            }
-            
-            throw new USECASE_ERROR({
-                message: (error as Error).message || "",
-                code: USECASE_ERROR_CODE.UNDEFINED
-            })
-        }
-    }
-    async updateById(id: number, options: Omit<Partial<Category>, "id">): Promise<Category> {
-        try {
-            const updatedCategory = await this.categoryRepo.updateById(id, options)
-            return updatedCategory
-        } catch (error) {
-            if (error instanceof REPO_ERROR) {
-                switch (error.code) {
-                    case REPO_ERROR_CODE.INITIAL:
-                        throw new USECASE_ERROR({
-                            message: error.message,
-                            code: USECASE_ERROR_CODE.ENGINE
-                        })
 
-                    case REPO_ERROR_CODE.NOTFOUND:
-                        throw new USECASE_ERROR({
-                            message: "Category is not found",
-                            code: USECASE_ERROR_CODE.NOTFOUND
-                        })
-                }
-            }
-            
-            throw new USECASE_ERROR({
-                message: (error as Error).message || "",
-                code: USECASE_ERROR_CODE.UNDEFINED
-            })
-        }
-    }
-    async deleteById(id: number): Promise<void> {
+    async deleteByID(id: string, authorId: number): Promise<void> {
         try {
-            const status = await this.categoryRepo.deleteById(id)
+            const status = await this.repo.deleteById(id, authorId)
         } catch (error) {
             if (error instanceof REPO_ERROR) {
                 switch (error.code) {
@@ -98,18 +104,18 @@ export default class CategoryUsecase implements ICategoryUsecase {
                             message: error.message,
                             code: USECASE_ERROR_CODE.ENGINE
                         })
-
-                    case REPO_ERROR_CODE.NOTFOUND:
+                    case REPO_ERROR_CODE.NOTFOUND: 
                         throw new USECASE_ERROR({
-                            message: "Category is not found",
+                            message: error.message,
                             code: USECASE_ERROR_CODE.NOTFOUND
                         })
                 }
             }
             throw new USECASE_ERROR({
-                message: (error as Error).message || "",
+                message: "Undefined error object",
                 code: USECASE_ERROR_CODE.UNDEFINED
             })
         }
     }
 }
+

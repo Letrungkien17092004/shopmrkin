@@ -63,7 +63,7 @@ export default class VariantRepository implements IVariantRepository {
             throw baseExceptionHandler(error)
         }
     }
-    async deleteByID(id: string, authorId: number): Promise<void> {
+    async deleteById(id: string, authorId: number): Promise<void> {
         try {
             const status = await prisma.variants.delete({
                 where: {

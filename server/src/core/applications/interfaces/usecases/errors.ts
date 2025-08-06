@@ -16,6 +16,7 @@ export enum USECASE_ERROR_CODE {
     UNKNOW = "UC_002", // unknow error(connection, internet, ...)
     NOTFOUND = "UC_003", // resource not found
     EXISTED = "UC_004", // resource already exist
+    CONSTRAINT = "UC_005", // foreign key error
 }
 
 
