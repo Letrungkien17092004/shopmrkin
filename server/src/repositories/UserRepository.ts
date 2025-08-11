@@ -29,7 +29,7 @@ export default class UserRepository implements IUsersRepository {
             throw baseExceptionHandler(error)
         }
     }
-    async getById(id: number): Promise<User | null> {
+    async getById(id: string): Promise<User | null> {
         try {
             const findResult = await prisma.users.findUnique({
                 where: {
@@ -91,7 +91,7 @@ export default class UserRepository implements IUsersRepository {
             throw baseExceptionHandler(error)
         }
     }
-    async deleteById(id: number): Promise<boolean> {
+    async deleteById(id: string): Promise<boolean> {
         try {
             const deleteStatus = await prisma.users.delete({
                 where: {

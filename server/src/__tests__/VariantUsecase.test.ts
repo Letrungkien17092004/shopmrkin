@@ -12,7 +12,7 @@ describe("Variant usecase testing", () => {
         name: "product 1 Variant",
         sku: "A01",
         productId: "01988015-fdf0-7072-940c-259e594f37dd",
-        authorId: 1,
+        authorId: "ac",
         price: 100000,
         stock: 1000
     }
@@ -51,7 +51,7 @@ describe("Variant usecase testing", () => {
 
     test("Update a wrong variant", async () => {
         try {
-            await usecase.updateById("abc", 1000, {
+            await usecase.updateById("abc", "abc", {
                 name: "demo"
             })
             throw new Error("Expected USECASE_ERROR but nothing was thrown");
@@ -66,7 +66,7 @@ describe("Variant usecase testing", () => {
             name: "product 2 Variant",
             sku: "A02",
             productId: "01988015-fdf0-7072-940c-259e594f37dd",
-            authorId: 1,
+            authorId: "abcs",
             price: 100000,
             stock: 1000
         }

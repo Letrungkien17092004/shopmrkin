@@ -42,7 +42,7 @@ export default class VariantRepository implements IVariantRepository {
             throw baseExceptionHandler(error)
         }
     }
-    async updateById(id: string, authorId: number, options: Omit<Partial<Variant>, "id">): Promise<Variant> {
+    async updateById(id: string, authorId: string, options: Omit<Partial<Variant>, "id">): Promise<Variant> {
         try {
             const updatedVariant = await prisma.variants.update({
                 where: {
@@ -63,7 +63,7 @@ export default class VariantRepository implements IVariantRepository {
             throw baseExceptionHandler(error)
         }
     }
-    async deleteById(id: string, authorId: number): Promise<void> {
+    async deleteById(id: string, authorId: string): Promise<void> {
         try {
             const status = await prisma.variants.delete({
                 where: {

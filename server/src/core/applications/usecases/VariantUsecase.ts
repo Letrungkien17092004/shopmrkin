@@ -66,7 +66,7 @@ export default class VariantUsecase implements IVariantUsecase {
         }
     }
 
-    async updateById(id: string, authorId: number, options: Omit<Partial<Variant>, "id">): Promise<Variant> {
+    async updateById(id: string, authorId: string, options: Omit<Partial<Variant>, "id">): Promise<Variant> {
         try {
             const updatedVariant = await this.repo.updateById(id, authorId, options)
             return updatedVariant
@@ -98,7 +98,7 @@ export default class VariantUsecase implements IVariantUsecase {
         }
     }
 
-    async deleteByID(id: string, authorId: number): Promise<void> {
+    async deleteByID(id: string, authorId: string): Promise<void> {
         try {
             const status = await this.repo.deleteById(id, authorId)
         } catch (error) {

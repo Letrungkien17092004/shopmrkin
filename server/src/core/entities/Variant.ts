@@ -6,7 +6,7 @@ type VariantConstructorParam = {
     sku: string,
     productId: string,
     product?: Product,
-    authorId: number
+    authorId: string
     author?: User
     price: number,
     stock: number,
@@ -20,7 +20,7 @@ export default class Variant {
     sku: string
     productId: string
     product?: Product
-    authorId: number
+    authorId: string
     author?: User
     price: number
     stock: number

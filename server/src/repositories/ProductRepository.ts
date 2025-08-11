@@ -117,7 +117,7 @@ export default class ProductRepository implements IProductRepository {
      * @returns The updated Product entity.
      * @throws Throws if an error occurs during update.
      */
-    async updateById(id: string, authorId: number, options: Omit<Partial<Product>, "id">): Promise<Product> {
+    async updateById(id: string, authorId: string, options: Omit<Partial<Product>, "id">): Promise<Product> {
         try {
             const updatedProduct = await prisma.products.update({
                 where: {
@@ -162,7 +162,7 @@ export default class ProductRepository implements IProductRepository {
     * @returns void
     * @throws Throws if an error occurs during deletion.
     */
-    async deleteById(id: string, authorId: number): Promise<void> {
+    async deleteById(id: string, authorId: string): Promise<void> {
         try {
             const status = await prisma.products.delete({
                 where: {

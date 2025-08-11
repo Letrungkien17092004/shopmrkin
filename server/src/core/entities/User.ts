@@ -1,7 +1,7 @@
 import Role from "./Role.js"
 
 export type UserConstructorParam = {
-    id: number
+    id: string
     username: string
     account: string
     password_hash: string
@@ -21,7 +21,7 @@ export default class User {
      * @remarks
      * May be null if the user has not been persisted yet.
      */
-    id: number
+    id: string
 
     /**
      * The display name of the user.

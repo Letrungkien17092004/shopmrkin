@@ -5,7 +5,7 @@ type ProductConstructorParam = {
     name: string,
     description: string,
     // relation
-    authorId: number,
+    authorId: string,
     author?: User,
     categoryId: number,
     category?: Category,
@@ -21,7 +21,7 @@ export default class Product {
     productCode: number
     name: string
     description: string
-    authorId: number
+    authorId: string
     author?: User
     categoryId: number
     category?: Category
