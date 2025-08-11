@@ -1,7 +1,7 @@
 import { User, Category, Variant } from "core/entities/index.js"
 type ProductConstructorParam = {
     id: string,
-    product_code: number,
+    productCode: number,
     name: string,
     description: string,
     // relation
@@ -18,7 +18,7 @@ type ProductConstructorParam = {
 
 export default class Product {
     id: string
-    product_code: number
+    productCode: number
     name: string
     description: string
     authorId: number
@@ -31,7 +31,7 @@ export default class Product {
 
     constructor(options: ProductConstructorParam) {
         this.id = options.id
-        this.product_code = options.product_code
+        this.productCode = options.productCode
         this.name = options.name
         this.description = options.description
         this.authorId = options.authorId

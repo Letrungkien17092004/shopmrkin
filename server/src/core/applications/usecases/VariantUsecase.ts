@@ -1,18 +1,18 @@
 import { Variant } from "core/entities/index.js"
-import IVariantRepository from "../interfaces/repositories/IVariantRepository.js"
-import IVariantUsecase from "../interfaces/usecases/IVariantUsecase.js"
-import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.js"
-import { USECASE_ERROR, USECASE_ERROR_CODE } from "../interfaces/usecases/errors.js"
+import IVariantRepository from "core/applications/interfaces/repositories/IVariantRepository.js"
+import IVariantUsecase from "core/applications/interfaces/usecases/IVariantUsecase.js"
+import { REPO_ERROR, REPO_ERROR_CODE } from "core/applications/interfaces/repositories/errors.js"
+import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js"
 
 
-export default class VariantUsecase {
+export default class VariantUsecase implements IVariantUsecase {
     private repo: IVariantRepository
 
     constructor(repo: IVariantRepository) {
         this.repo = repo
     }
 
-    async create(options: Omit<Variant, "id">): Promise<Variant> {
+    async create(options: Omit<Variant, "id" | "createdAt" | "updatedAt">): Promise<Variant> {
         try {
             const createdVariant = await this.repo.create(options)
             return createdVariant
@@ -82,6 +82,11 @@ export default class VariantUsecase {
                         throw new USECASE_ERROR({
                             message: "Variant already exist",
                             code: USECASE_ERROR_CODE.EXISTED
+                        })
+                    case REPO_ERROR_CODE.NOTFOUND:
+                        throw new USECASE_ERROR({
+                            message: "No variant was found for update",
+                            code: USECASE_ERROR_CODE.NOTFOUND
                         })
 
                 }

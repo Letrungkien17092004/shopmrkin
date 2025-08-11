@@ -6,7 +6,7 @@ import IVariantRepository from "core/applications/interfaces/repositories/IVaria
 const prisma = new PrismaClient()
 
 export default class VariantRepository implements IVariantRepository {
-    async create(options: Omit<Variant, "id">): Promise<Variant> {
+    async create(options: Omit<Variant, "id" | "createdAt" | "updatedAt">): Promise<Variant> {
         try {
             const createdVariant = await prisma.variants.create({
                 data: {

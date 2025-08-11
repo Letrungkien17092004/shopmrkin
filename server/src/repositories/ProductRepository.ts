@@ -13,11 +13,10 @@ export default class ProductRepository implements IProductRepository {
      * @returns The created Product entity.
      * @throws Throws if an error occurs during creation.
      */
-    async create(options: Omit<Product, "id">): Promise<Product> {
+    async create(options: Omit<Product, "id" | "productCode" | "createdAt" | "updatedAt">): Promise<Product> {
         try {
             const createdProduct = await prisma.products.create({
                 data: {
-                    product_code: options.product_code,
                     name: options.name,
                     description: options.description,
                     categoryId: options.categoryId,
@@ -25,7 +24,7 @@ export default class ProductRepository implements IProductRepository {
                 }
             })
 
-            return new Product(createdProduct)
+            return new Product({ ...createdProduct, productCode: createdProduct.product_code })
         } catch (error) {
             throw baseExceptionHandler(error)
         }
@@ -53,7 +52,6 @@ export default class ProductRepository implements IProductRepository {
             if (!searchedProduct) {
                 return null
             }
-
             const author = new User(searchedProduct.author)
             const variants = searchedProduct.variants.map((variant) => {
                 const convertedPrice = Number(variant.price)
@@ -63,7 +61,8 @@ export default class ProductRepository implements IProductRepository {
             return new Product({
                 ...searchedProduct,
                 author: author,
-                variants: variants
+                variants: variants,
+                productCode: searchedProduct.product_code
             })
         } catch (error) {
             throw baseExceptionHandler(error)
@@ -102,7 +101,8 @@ export default class ProductRepository implements IProductRepository {
             return new Product({
                 ...searchedProduct,
                 author: author,
-                variants: variants
+                variants: variants,
+                productCode: searchedProduct.product_code
             })
         } catch (error) {
             throw baseExceptionHandler(error)
@@ -147,20 +147,21 @@ export default class ProductRepository implements IProductRepository {
                 ...updatedProduct,
                 author: author,
                 variants: variants,
-                category: category
+                category: category,
+                productCode: updatedProduct.product_code
             })
         } catch (error) {
             throw baseExceptionHandler(error)
         }
     }
 
-     /**
-     * Deletes a product by its id and authorId.
-     * @param id The id of the product to delete.
-     * @param authorId The id of the product's author.
-     * @returns void
-     * @throws Throws if an error occurs during deletion.
-     */
+    /**
+    * Deletes a product by its id and authorId.
+    * @param id The id of the product to delete.
+    * @param authorId The id of the product's author.
+    * @returns void
+    * @throws Throws if an error occurs during deletion.
+    */
     async deleteById(id: string, authorId: number): Promise<void> {
         try {
             const status = await prisma.products.delete({

@@ -78,6 +78,11 @@ export default class CategoryUsecase implements ICategoryUsecase {
                             message: "Category is not found",
                             code: USECASE_ERROR_CODE.NOTFOUND
                         })
+                    case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
+                        throw new USECASE_ERROR({
+                            message: "data existed",
+                            code: USECASE_ERROR_CODE.EXISTED
+                        })
                 }
             }
             

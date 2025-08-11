@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx tsx ./src/core/__tests__/AdminSystemUsecase.test.ts",
-    "test2": "npx tsx ./src/core/__tests__/draft_test.test.ts"
+    "test": "jest",
+    "test2": "npx tsx ./src/__tests__/draft_test.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -16,9 +16,12 @@
   "dependencies": {
     "@prisma/client": "^6.11.1",
     "@types/bcrypt": "^6.0.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.1.0",
     "bcrypt": "^6.0.0",
+    "jest": "^30.0.5",
     "prisma": "^6.11.1",
+    "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

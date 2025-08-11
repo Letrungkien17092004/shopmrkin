@@ -11,7 +11,7 @@ export default class ProductUsecase implements IProductUsecase {
         this.productRepo = productRepo
     }
 
-    async create(options: Omit<Product, "id">): Promise<Product> {
+    async create(options: Omit<Product, "id" | "productCode" | "createdAt" | "updatedAt">): Promise<Product> {
         try {
             const createdProduct = await this.productRepo.create(options)
             return createdProduct
@@ -102,6 +102,11 @@ export default class ProductUsecase implements IProductUsecase {
                         throw new USECASE_ERROR({
                             message: "Product already exist",
                             code: USECASE_ERROR_CODE.EXISTED
+                        })
+                    case REPO_ERROR_CODE.NOTFOUND:
+                        throw new USECASE_ERROR({
+                            message: "No product was found for an update",
+                            code: USECASE_ERROR_CODE.NOTFOUND
                         })
 
                 }
