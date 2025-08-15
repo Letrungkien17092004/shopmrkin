@@ -1,6 +1,6 @@
 import { Router } from "express";
 import AuthorController from "adapter/controllers/AuthorController.js";
-
+import { authorRefeshToken, authorAccessToken } from "expressApp/middlewares/author.middlewares.js";
 import UserRepository from "repositories/UserRepository.js";
 import RolesRepository from "repositories/RolesRepository.js";
 import PermissionsRepository from "repositories/PermissionsRepository.js";
@@ -21,5 +21,7 @@ const authorRouter = Router()
 
 authorRouter.post("/registor", authorController.register)
 authorRouter.post("/login", authorController.login)
-authorRouter.post("/access-token", authorController.generateAccessToken)
+authorRouter.get("/access-token", [authorRefeshToken, authorController.generateAccessToken])
+authorRouter.get("/verify-access-token", [authorAccessToken, authorController.verifyAccessToken])
+
 export default authorRouter

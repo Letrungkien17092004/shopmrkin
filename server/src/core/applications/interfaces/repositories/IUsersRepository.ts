@@ -5,4 +5,5 @@ export default interface IUsersRepository {
     getById(id: string): Promise<User | null>
     update(attributes: Partial<User> & Pick<User, "id">): Promise<User>
     deleteById(id: string): Promise<boolean>
+    findWithAccount({ account }: Pick<User, "account">): Promise<User | null>
 }

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     /* Language and Environment */
-    "target": "es2016",
+    "target": "esnext",
     /* Modules */
     "module": "nodenext",
     "esModuleInterop": true,
@@ -13,8 +13,8 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "typeRoots": [
-      "./src/types",
-      "./node_modules/@types"
+      "./src/types/",
+      "./node_modules/@types/"
     ]
   },
   "include": ["src"],

@@ -3,6 +3,7 @@ import { USECASE_ERROR, USECASE_ERROR_CODE } from "../interfaces/usecases/errors
 import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.js";
 import IUsersRepository from "../interfaces/repositories/IUsersRepository.js";
 import { User } from "core/entities/index.js";
+import bcrypt from 'bcrypt';
 
 export default class UserUsecase implements IUserUsecase {
     private repository: IUsersRepository
@@ -13,11 +14,15 @@ export default class UserUsecase implements IUserUsecase {
 
     async create(options: Omit<User, "id" | "roleId">): Promise<User> {
         try {
+            // hash password
+            const password_hashed = await bcrypt.hash(options.password_hash, 10)
+            
+            // asign hashed password
+            options.password_hash = password_hashed
+
             const newUser = await this.repository.create(options)
             return newUser
         } catch (error) {
-            console.log("Log in Usecase")
-            console.log(error)
             if (error instanceof REPO_ERROR) {
                 switch (error.code) {
                     case REPO_ERROR_CODE.DATABASE_NOT_EXIST:
@@ -27,7 +32,12 @@ export default class UserUsecase implements IUserUsecase {
                         })
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
                         throw new USECASE_ERROR({
-                            message: "user already exist",
+                            message: "role is invalid",
+                            code: USECASE_ERROR_CODE.CONSTRAINT
+                        })
+                    case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
+                        throw new USECASE_ERROR({
+                            message: "User is already exist",
                             code: USECASE_ERROR_CODE.EXISTED
                         })
                 }
@@ -38,7 +48,7 @@ export default class UserUsecase implements IUserUsecase {
         }
     }
 
-    async getById(id: number): Promise<User | null> {
+    async getById(id: string): Promise<User | null> {
         try {
             const user = await this.repository.getById(id)
             return user
@@ -93,7 +103,7 @@ export default class UserUsecase implements IUserUsecase {
         }
     }
 
-    async deleteById(id: number): Promise<boolean> {
+    async deleteById(id: string): Promise<boolean> {
         try {
             return this.repository.deleteById(id)
         } catch (error) {
@@ -116,6 +126,32 @@ export default class UserUsecase implements IUserUsecase {
             })
         }
 
+    }
+
+    async login({account, password}: { account: string; password: string; }): Promise<User | null> {
+        try {
+            const searchedUser = await this.repository.findWithAccount({
+                account: account
+            })
+            if (!searchedUser) return null
+            let isMatch = await bcrypt.compare(password, searchedUser.password_hash)
+            if (!isMatch) return null
+            return searchedUser
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.ENGINE
+                        })
+                }
+            }
+            throw new USECASE_ERROR({
+                message: (error as Error).message,
+                code: USECASE_ERROR_CODE.UNDEFINED
+            })
+        }
     }
 
 }

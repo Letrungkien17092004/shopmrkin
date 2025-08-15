@@ -1,8 +1,9 @@
-import e, { Request, Response } from "express";
+import { Request, Response } from "express";
 import IUserUsecase from "core/applications/interfaces/usecases/IUserUsecase.js";
 import IAdminSystemUsecase from "core/applications/interfaces/usecases/IAdminSystemUsecase.js";
-import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors";
-
+import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
+import jwt from "jsonwebtoken";
+import { ENV } from "config/env.js";
 export default class AuthorController {
 
     private userUsecase: IUserUsecase
@@ -11,6 +12,10 @@ export default class AuthorController {
     constructor(userUsecase: IUserUsecase, adminSystemUsecase: IAdminSystemUsecase) {
         this.userUsecase = userUsecase
         this.adminSystemUsecase = adminSystemUsecase
+
+        this.register = this.register.bind(this)
+        this.login = this.login.bind(this)
+        this.generateAccessToken = this.generateAccessToken.bind(this)
     }
 
 
@@ -19,14 +24,11 @@ export default class AuthorController {
             let username = req.body['username']
             let account = req.body['account']
             let password = req.body['password']
-            let email = req.body['password']
+            let email = req.body['email']
 
-            console.log({
-                username,
-                account,
-                password,
-                email
-            })
+            if (!(username && account && password && email)) {
+                throw new TypeError("can't read username, account, password, email")
+            }
             const createdUser = await this.userUsecase.create({
                 username: username,
                 account: account,
@@ -43,6 +45,7 @@ export default class AuthorController {
                 res.status(400).json({
                     message: "Missing data",
                 })
+                return
             }
 
             if (error instanceof USECASE_ERROR) {
@@ -62,14 +65,121 @@ export default class AuthorController {
     }
 
     async login(req: Request, res: Response): Promise<void> {
-        throw new Error("No code!")
+        try {
+            const account = req.body['account']
+            const password = req.body['password']
+
+            if (!account || !password) {
+                throw new TypeError("Can't read account or password")
+            }
+            const user = await this.userUsecase.login({ account, password })
+            // no match
+            if (!user) {
+                res.status(404).json({
+                    messsage: "wrong account or password"
+                })
+                return
+            }
+            const payload = {
+                id: user.id,
+                account: user.account,
+                username: user.username,
+                email: user.email,
+                role: user.role?.roleName,
+                permissions: user.role?.permissions?.map(per => per.perName)
+            }
+            const token = jwt.sign(
+                payload,
+                ENV.JWT_SECRET,
+                {
+                    expiresIn: ENV.REFESH_EXPRISES_IN
+                }
+            )
+
+            res.cookie("refesh_token", token, {
+                httpOnly: true
+            })
+            res.status(200).json({
+                message: "OK"
+            })
+            return
+        } catch (error) {
+            console.log(error)
+            if (error instanceof TypeError) {
+                res.status(400).json({
+                    message: "Missing data, require account and password"
+                })
+                return
+            }
+            res.status(500).json({
+                message: "somgthings wrong"
+            })
+
+        }
     }
 
     async generateAccessToken(req: Request, res: Response): Promise<void> {
-        throw new Error("No code!")
+        try {
+            // there isn't author property
+            if (!req.author) {
+                res.status(401).json({
+                    message: "Unauthorized"
+                })
+                return
+            }
+
+            const user = await this.userUsecase.getById(req.author.id)
+
+            // user not found
+            if (!user) {
+                res.status(404).json({
+                    message: "User not found"
+                })
+                return
+            }
+
+            const payload = {
+                id: user.id,
+                account: user.account,
+                username: user.username,
+                email: user.email,
+                role: user.role?.roleName,
+                permissions: user.role?.permissions?.map(per => per.perName)
+            }
+
+            const accessToken = jwt.sign(payload, ENV.JWT_SECRET, {
+                expiresIn: ENV.ACCESS_EXPRISES_IN
+            })
+
+            res.cookie("access_token", accessToken, {
+                httpOnly: true
+            })
+            res.status(200).json({
+                message: "OK"
+            })
+
+        } catch (error) {
+            res.status(500).json({
+                message: "Internal server error"
+            })
+        }
     }
 
-    async getRefreshToken(req: Request, res: Response): Promise<void> {
-        throw new Error("No code!")
+    async verifyAccessToken(req: Request, res: Response): Promise<void> {
+        try {
+            if (!req.author) {
+                res.status(401).json({
+                    message: "Unauthorized"
+                })
+                return
+            }
+            res.status(200).json({
+                message: "AccessToken excepted"
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: "Server internal error!"
+            })
+        }
     }
 }
