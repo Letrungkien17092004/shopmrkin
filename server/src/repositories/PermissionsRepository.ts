@@ -1,7 +1,7 @@
 import IPermissionsRepository from "core/applications/interfaces/repositories/IPermissionsRepository.js";
 import { Permission } from "core/entities/index.js";
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js"
-import { PrismaClient } from "services/postgresSQL/generated/prisma/client/client";
+import { PrismaClient } from "services/postgresSQL/generated/prisma/client/index.js";
 
 const prisma = new PrismaClient()
 

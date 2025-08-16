@@ -1,7 +1,7 @@
 import { baseExceptionHandler } from "core/applications/interfaces/repositories/errors.js";
-import { PrismaClient } from "services/postgresSQL/generated/prisma/client";
+import { PrismaClient } from "services/postgresSQL/generated/prisma/client/index.js";
 import { Variant } from "core/entities/index.js";
-import IVariantRepository from "core/applications/interfaces/repositories/IVariantRepository";
+import IVariantRepository from "core/applications/interfaces/repositories/IVariantRepository.js";
 
 const prisma = new PrismaClient()
 
