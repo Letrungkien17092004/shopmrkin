@@ -86,7 +86,7 @@ export default class ProductUsecase implements IProductUsecase {
         }
     }
 
-    async updateById(id: string, authorId: number, options: Omit<Partial<Product>, "id">): Promise<Product> {
+    async updateById(id: string, authorId: string, options: Omit<Partial<Product>, "id">): Promise<Product> {
         try {
             const updatedProduct = await this.productRepo.updateById(id, authorId, options)
             return updatedProduct
@@ -108,6 +108,11 @@ export default class ProductUsecase implements IProductUsecase {
                             message: "No product was found for an update",
                             code: USECASE_ERROR_CODE.NOTFOUND
                         })
+                    case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
+                        throw new USECASE_ERROR({
+                            message: "User or Category not found",
+                            code: USECASE_ERROR_CODE.CONSTRAINT
+                        })
 
                 }
             }
@@ -118,7 +123,7 @@ export default class ProductUsecase implements IProductUsecase {
         }
     }
 
-    async deleteById(id: string, authorId: number): Promise<void> {
+    async deleteById(id: string, authorId: string): Promise<void> {
         try {
             const status = await this.productRepo.deleteById(id, authorId)
         } catch (error) {

@@ -1,7 +1,7 @@
 import { Category, Product, User, Variant } from "core/entities/index.js";
 import IProductRepository from "core/applications/interfaces/repositories/IProductRepository.js";
 import { baseExceptionHandler } from "core/applications/interfaces/repositories/errors.js";
-import { PrismaClient } from "services/postgresSQL/generated/prisma/client";
+import { PrismaClient } from "services/postgresSQL/generated/prisma/client/index.js";
 
 const prisma = new PrismaClient()
 

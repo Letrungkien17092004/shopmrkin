@@ -58,7 +58,7 @@ export class REPO_ERROR extends Error {
  * - string REPO_ERROR.code: error code
  */
 export function baseExceptionHandler(error: unknown) {
-    // console.log(error)
+    console.log(error)
     if (error instanceof PrismaClientKnownRequestError) {
         switch (error.code) {
             case "P1003":

@@ -20,7 +20,7 @@ const authorController = new AuthorController(userUsecase, adminUsecase)
 const authorRouter = Router()
 
 authorRouter.post("/registor", authorController.register)
-authorRouter.post("/login", authorController.login)
+authorRouter.get("/login", authorController.login)
 authorRouter.get("/access-token", [authorRefeshToken, authorController.generateAccessToken])
 authorRouter.get("/verify-access-token", [authorAccessToken, authorController.verifyAccessToken])
 

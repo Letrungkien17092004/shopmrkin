@@ -87,12 +87,11 @@ export async function authorAccessToken(req: Request, res: Response, next: NextF
 
         // token is invalid
         if (
-            error instanceof jwt.JsonWebTokenError ||
             error instanceof jwt.TokenExpiredError ||
             error instanceof jwt.NotBeforeError
         ) {
-            res.status(403).json({
-                message: "Forbidden"
+            res.status(401).json({
+                message: "JWT token has expired"
             })
             return
         }
