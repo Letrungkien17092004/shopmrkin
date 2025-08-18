@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import IProductUsecase from "core/applications/interfaces/usecases/IProductUsecase.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
-import { ToOutputSafe } from "adapter/mappers/ProductMapper.js";
+import { ProductMapper } from "adapter/mappers/ProductMapper.js";
 import { z } from "zod"
 
 
@@ -30,7 +30,7 @@ export default class ProductController {
             // not an admin
             if (req.author.role.toLowerCase() != "administrator") {
                 res.status(403).json({
-                    message: "Forbidden"
+                    message: "require administrator role"
                 })
                 return
             }
@@ -103,7 +103,7 @@ export default class ProductController {
             }
 
             res.status(200).json({
-                product: ToOutputSafe(searchedProduct)
+                product: ProductMapper.toOutputSafe(searchedProduct)
             })
             return
         } catch (error) {
@@ -138,7 +138,7 @@ export default class ProductController {
             }
 
             res.status(200).json({
-                product: ToOutputSafe(searchedProduct)
+                product: ProductMapper.toOutputSafe(searchedProduct)
             })
             return
         } catch (error) {
@@ -171,7 +171,7 @@ export default class ProductController {
 
             if (req.author.role.toLowerCase() != "administrator") {
                 res.status(403).json({
-                    message: "Forbidden"
+                    message: "require administrator role"
                 })
                 return
             }
@@ -193,7 +193,7 @@ export default class ProductController {
 
             res.status(200).json({
                 message: "OK",
-                product: ToOutputSafe(updatedProduct)
+                product: ProductMapper.toOutputSafe(updatedProduct)
             })
             return
         } catch (error) {
@@ -240,7 +240,7 @@ export default class ProductController {
 
             if (req.author.role.toLowerCase() != "administrator")  {
                 res.status(403).json({
-                    message: "Forbidden"
+                    message: "require administrator role"
                 })
                 return
             }
