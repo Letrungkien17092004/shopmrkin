@@ -5,4 +5,5 @@ client/node_modules/
 .env
 tasks.md
 server/src/services/postgresSQL/generated/prisma/client/
+dist/
 
