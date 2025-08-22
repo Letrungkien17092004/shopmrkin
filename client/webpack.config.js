@@ -34,6 +34,10 @@ const config = {
                 directory: path.join(__dirname, "dist/public/svg"),
                 publicPath: "/public/svg"
             },
+            {
+                directory: path.join(__dirname, "dist/public/image"),
+                publicPath: "/public/image"
+            },
         ],
         compress: false,
         port: 8001,
