@@ -1,16 +1,9 @@
 import React from "react";
+import HomePage from "./pages/home/Home.tsx";
 
-function MyButton({ title }: { title: string }) {
-  return (
-    <button>{title}</button>
-  );
-}
 
 export default function MyApp() {
-  return (
-    <div>
-      <h1>Welcome to my app</h1>
-      <MyButton title="I'm a button" />
-    </div>
-  );
+	return (<>
+		<HomePage />
+	</>)
 }

@@ -25,9 +25,16 @@ const config = {
         })
     ],
     devServer: {
-        static: {
-            directory: path.join(__dirname, "dist/public")
-        },
+        static: [
+            {
+                directory: path.join(__dirname, "dist/public/css"),
+                publicPath: "/public/css"
+            },
+            {
+                directory: path.join(__dirname, "dist/public/svg"),
+                publicPath: "/public/svg"
+            },
+        ],
         compress: false,
         port: 8001,
         historyApiFallback: true
