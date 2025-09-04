@@ -1,7 +1,31 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import ProductService from "../../services/ProductService.ts";
+import type { Product } from "../../services/ProductService.ts";
+import { NormalButton, DangerButton } from "../../components/buttons/Button.tsx";
 
-
+const productService = new ProductService()
 export default function ProductManager() {
+    const [products, setProducts] = useState<Product[]>([])
+    console.log(products)
+
+    // initial data
+    useEffect(() => {
+        const controller = new AbortController()
+        const fetch = async () => {
+            setProducts(await productService.getData())
+        }
+
+        fetch()
+        return () => controller.abort()
+    }, [])
+
+    const OnDeleteItem = useCallback((id: string) => {
+        return async (e: React.MouseEvent) => {
+            e.stopPropagation()
+            await productService.deleteById(id)
+            setProducts(prev => prev.filter(prod => prod.id !== id))
+        }
+    }, [])
     return (<>
         <div className="pad-24px h-full-vh">
             <div className="h-10pt">
@@ -18,108 +42,27 @@ export default function ProductManager() {
                             <th>Ảnh</th>
                             <th>Tên SP</th>
                             <th>Khoảng giá</th>
-                            <th>Mô tả</th>
                             <th>Stock</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td className="product-image">
-                                <img src="/public/image/van_hi.jpg" alt="Tên SP" />
-                            </td>
-                            <td>Lorem ipsum dolor sit amet consectetur adipisicing elit. lo</td>
-                            <td className="price">100.000</td>
-                            <td>
-                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam, omnis? Quam, doloribus eveniet quae veritatis provident delectus a explicabo cum eum libero voluptatum reiciendis. Ab dolore maxime illum suscipit nihil.
-                            </td>
-                            <td className="stock">100</td>
-                            <td className="actions">
-                                <button className="btn btn-blue">Chi tiết</button>
-                                <button className="btn btn-danger">Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td className="product-image">
-                                <img src="/public/image/van_hi.jpg" alt="Tên SP" />
-                            </td>
-                            <td>Lorem ipsum dolor sit amet consectetur adipisicing elit. lo</td>
-                            <td className="price">100.000</td>
-                            <td>
-                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam, omnis? Quam, doloribus eveniet quae veritatis provident delectus a explicabo cum eum libero voluptatum reiciendis. Ab dolore maxime illum suscipit nihil.
-                            </td>
-                            <td className="stock">100</td>
-                            <td className="actions">
-                                <button className="btn btn-blue">Chi tiết</button>
-                                <button className="btn btn-danger">Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td className="product-image">
-                                <img src="/public/image/van_hi.jpg" alt="Tên SP" />
-                            </td>
-                            <td>Lorem ipsum dolor sit amet consectetur adipisicing elit. lo</td>
-                            <td className="price">100.000</td>
-                            <td>
-                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam, omnis? Quam, doloribus eveniet quae veritatis provident delectus a explicabo cum eum libero voluptatum reiciendis. Ab dolore maxime illum suscipit nihil.
-                            </td>
-                            <td className="stock">100</td>
-                            <td className="actions">
-                                <button className="btn btn-blue">Chi tiết</button>
-                                <button className="btn btn-danger">Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td className="product-image">
-                                <img src="/public/image/van_hi.jpg" alt="Tên SP" />
-                            </td>
-                            <td>Lorem ipsum dolor sit amet consectetur adipisicing elit. lo</td>
-                            <td className="price">100.000</td>
-                            <td>
-                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam, omnis? Quam, doloribus eveniet quae veritatis provident delectus a explicabo cum eum libero voluptatum reiciendis. Ab dolore maxime illum suscipit nihil.
-                            </td>
-                            <td className="stock">100</td>
-                            <td className="actions">
-                                <button className="btn btn-blue">Chi tiết</button>
-                                <button className="btn btn-danger">Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td className="product-image">
-                                <img src="/public/image/van_hi.jpg" alt="Tên SP" />
-                            </td>
-                            <td>Lorem ipsum dolor sit amet consectetur adipisicing elit. lo</td>
-                            <td className="price">100.000</td>
-                            <td>
-                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam, omnis? Quam, doloribus eveniet quae veritatis provident delectus a explicabo cum eum libero voluptatum reiciendis. Ab dolore maxime illum suscipit nihil.
-                            </td>
-                            <td className="stock">100</td>
-                            <td className="actions">
-                                <button className="btn btn-blue">Chi tiết</button>
-                                <button className="btn btn-danger">Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td className="product-image">
-                                <img src="/public/image/van_hi.jpg" alt="Tên SP" />
-                            </td>
-                            <td>Lorem ipsum dolor sit amet consectetur adipisicing elit. lo</td>
-                            <td className="price">100.000</td>
-                            <td>
-                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ipsam, omnis? Quam, doloribus eveniet quae veritatis provident delectus a explicabo cum eum libero voluptatum reiciendis. Ab dolore maxime illum suscipit nihil.
-                            </td>
-                            <td className="stock">100</td>
-                            <td className="actions">
-                                <button className="btn btn-blue">Chi tiết</button>
-                                <button className="btn btn-danger">Xóa</button>
-                            </td>
-                        </tr>
+                        {products.map(prod => (
+                            <tr key={prod.id}>
+                                <td title={prod.id} className="product-table-id">{prod.id}</td>
+                                <td className="product-image">
+                                    <img src={prod.imgUrl} alt="Tên SP" />
+                                </td>
+                                <td>{prod.productName}</td>
+                                <td className="price">{prod.minPrice} - {prod.maxPrice}</td>
+                                <td className="stock">{prod.stock}</td>
+                                <td className="actions">
+                                    <NormalButton>Chi tiết</NormalButton>
+                                    <DangerButton onClick={OnDeleteItem(prod.id)}>Xóa</DangerButton>
+                                </td>
+                            </tr>
+                        ))}
+
                     </tbody>
                 </table>
             </div>
