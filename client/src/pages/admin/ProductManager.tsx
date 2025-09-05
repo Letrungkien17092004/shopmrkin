@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import ProductService from "../../services/ProductService.ts";
 import type { Product } from "../../services/ProductService.ts";
 import { NormalButton, DangerButton } from "../../components/buttons/Button.tsx";
@@ -28,10 +29,13 @@ export default function ProductManager() {
     }, [])
     return (<>
         <div className="pad-24px h-full-vh">
-            <div className="h-10pt">
+            <div className="h-5pt">
                 <span className="text-3xl font-normal">
                     Danh sách sản phẩm
                 </span>
+            </div>
+            <div className="h-5pt flex justify-end">
+                <NormalButton>Thêm mới</NormalButton>
             </div>
             <div className="dash-dark"></div>
             <div className="h-90pt product-table-wrapper overflow-scroll-y">
@@ -57,7 +61,19 @@ export default function ProductManager() {
                                 <td className="price">{prod.minPrice} - {prod.maxPrice}</td>
                                 <td className="stock">{prod.stock}</td>
                                 <td className="actions">
-                                    <NormalButton>Chi tiết</NormalButton>
+                                    <NormalButton>
+                                        <Link
+                                        style={
+                                            {
+                                                fontSize: 'inherit', 
+                                                textDecoration: "none", 
+                                                color: "inherit"
+                                            }}
+                                        to={prod.id}
+                                        >
+                                            Chi tiết
+                                        </Link>
+                                        </NormalButton>
                                     <DangerButton onClick={OnDeleteItem(prod.id)}>Xóa</DangerButton>
                                 </td>
                             </tr>
