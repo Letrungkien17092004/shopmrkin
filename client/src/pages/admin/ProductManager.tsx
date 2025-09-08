@@ -35,7 +35,9 @@ export default function ProductManager() {
                 </span>
             </div>
             <div className="h-5pt flex justify-end">
-                <NormalButton>Thêm mới</NormalButton>
+                <NormalButton>
+                    <Link className="disable-link" to="new">Thêm mới</Link>
+                </NormalButton>
             </div>
             <div className="dash-dark"></div>
             <div className="h-90pt product-table-wrapper overflow-scroll-y">

@@ -5,7 +5,7 @@ import Login from "./pages/auth/Login.tsx"
 import Register from "./pages/auth/Register.tsx"
 
 // manager
-import { Manager, Dashboard, ProductManager, OrderManager, ProductDetail } from "./pages/admin/index.tsx"
+import { Manager, Dashboard, ProductManager, OrderManager, ProductDetail, CreateProduct } from "./pages/admin/index.tsx"
 
 export default function Router() {
     return (<>
@@ -20,6 +20,7 @@ export default function Router() {
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="products" element={<ProductManager />} />
                     <Route path="products/:id" element={<ProductDetail />} />
+                    <Route path="products/new" element={<CreateProduct />} />
                     <Route path="orders" element={<OrderManager />} />
                 </Route>
             </Routes>
