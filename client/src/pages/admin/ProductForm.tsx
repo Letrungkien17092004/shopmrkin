@@ -1,44 +1,75 @@
-import React, { useCallback, useReducer, useState, type ChangeEvent } from "react";
+import React, { useCallback, useEffect, useReducer, useState, type ChangeEvent } from "react";
 import VariantForm from "./VariantForm.tsx";
 import { NormalButton } from "../../components/buttons/Button.tsx";
+import ProductService, { Variant } from "../../services/ProductService.ts";
+
+type VariantReducerAction = (
+    | {
+        type: "add",
+        data: Variant,
+        sku?: never
+    }
+
+    | {
+        type: "delete",
+        sku: string,
+        data?: never,
+    }
+)
 
 
-type Variant = {
-    name: string,
-    sku: string,
-    price: number,
-    stock: number
-}
-
-type VariantReducerAction = {
-    type: string,
-    data?: Variant
-}
 function variantReducer(state: Variant[], action: VariantReducerAction) {
     switch (action.type) {
         case "add":
-            if (action.data) {
-                return [action.data, ...state]
-            }
-            throw new Error("No data provide")
+            return [action.data, ...state]
+        case "delete":
+            return state.filter(s => s.sku !== action.sku)
     }
-
-    throw new Error("Unknow actions: " + action.type)
 }
 
+
+const productService = new ProductService()
 export default function ProductForm() {
     const [productName, setProductName] = useState<string>("")
     const [productDescription, setProductDescription] = useState<string>("")
     const [variants, variantDispatch] = useReducer(variantReducer, [])
+    const [isSaving, setIsSaving] = useState<boolean>(false)
 
+    useEffect(() => {
+        if (!isSaving) return
+        const createData = async () => {
+            try {
+                const newProduct = await productService.createData({
+                    productName: productName,
+                    description: productDescription,
+                    category: "Demo category",
+                    imgUrl: "",
+                    variants: variants
+
+                })
+                window.alert("Xong")
+                setIsSaving(false)
+                return newProduct
+            } catch (error) {
+                window.alert("có lỗi xảy ra")
+                console.error("Can't create product: ", error)
+            }
+        }
+        createData()
+    }, [productName, productDescription, variants, isSaving])
 
     const onChangeName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target.value)
+        setProductName(e.target.value)
     }, [productName])
 
     const onChangeDescription = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        console.log(e.target.value)
+        setProductDescription(e.target.value)
     }, [productDescription])
+
+    const onClickSave = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation()
+        setIsSaving(true)
+    }, [])
 
     return (<>
         <link rel="stylesheet" href="/public/css/product-form.css" />
@@ -72,12 +103,15 @@ export default function ProductForm() {
 
             <div className="product-form-field w-full">
                 <h3>Thêm phân loại</h3>
-                <VariantForm variants={variants} variantsDispatch={variantDispatch}/>
+                <VariantForm variants={variants} variantsDispatch={variantDispatch} />
             </div>
-            
+
             <div className="dash-dark"></div>
             <div className="w-full">
-                <NormalButton>Lưu</NormalButton>
+                {isSaving
+                    ? <NormalButton>Đang xử lý</NormalButton>
+                    : <NormalButton onClick={onClickSave}>Lưu</NormalButton>
+                }
             </div>
         </section>
     </>)

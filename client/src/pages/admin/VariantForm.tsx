@@ -1,20 +1,20 @@
 import React, { useCallback, useState } from "react";
 import { NormalButton, DangerButton } from "../../components/buttons/Button.tsx";
+import { Variant } from "../../services/ProductService.ts";
 
+type VariantReducerAction = (
+    | {
+        type: "add",
+        data?: Variant,
+        sku?: never
+    }
 
-
-type Variant = {
-    name: string,
-    sku: string,
-    price: number,
-    stock: number
-}
-
-
-type VariantReducerAction = {
-    type: string,
-    data?: Variant
-}
+    | {
+        type: "delete",
+        sku: string,
+        data?: never,
+    }
+)
 export default function VariantForm({ variants, variantsDispatch }: { variants: Variant[], variantsDispatch: React.ActionDispatch<[action: VariantReducerAction]> }) {
     const [name, setName] = useState<string>("")
     const [sku, setSku] = useState<string>("")
@@ -48,6 +48,7 @@ export default function VariantForm({ variants, variantsDispatch }: { variants: 
             variantsDispatch({
                 type: "add",
                 data: {
+                    id: "NOID",
                     name: name,
                     sku: sku,
                     price: Number(price),
@@ -59,6 +60,17 @@ export default function VariantForm({ variants, variantsDispatch }: { variants: 
         }
 
     }, [name, sku, price, stock])
+
+    const onDeleteBySku = useCallback((sku: string) => {
+        return (e: React.MouseEvent) => {
+            e.stopPropagation()
+            variantsDispatch({
+                type: "delete",
+                sku: sku
+            })
+        }
+    }, [])
+
     return (<>
         <section className="w-full">
             {/* variant input */}
@@ -104,7 +116,9 @@ export default function VariantForm({ variants, variantsDispatch }: { variants: 
                                 <td>{v.sku}</td>
                                 <td className="vt-price">{v.price}đ</td>
                                 <td>{v.stock}</td>
-                                <td className="vt-actions"><DangerButton>Xóa</DangerButton></td>
+                                <td className="vt-actions">
+                                    <DangerButton onClick={onDeleteBySku(v.sku)}>Xóa</DangerButton>
+                                    </td>
                             </tr>
                         ))}
                     </tbody>

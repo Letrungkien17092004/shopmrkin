@@ -7,7 +7,6 @@ import { NormalButton, DangerButton } from "../../components/buttons/Button.tsx"
 const productService = new ProductService()
 export default function ProductManager() {
     const [products, setProducts] = useState<Product[]>([])
-    console.log(products)
 
     // initial data
     useEffect(() => {
