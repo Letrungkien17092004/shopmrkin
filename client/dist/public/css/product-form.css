@@ -1,0 +1,69 @@
+
+.product-form-field:not(:first-child)  {
+    margin-top: 24px;
+}
+
+/* ==== Variant Form ==== */
+.variant-form {
+    width: 100%;
+    display: flex;
+}
+
+.variant-form .vf-inp {
+    padding: 4px 6px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    outline: none;
+}
+
+.variant-form .vf-inp:focus {
+    border-color: var(--primary-color);
+}
+
+
+.variant-table-wrapper {
+    width: 100%;
+    padding: 16px;
+    padding-left: 0;
+}
+
+.variant-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.variant-table thead {
+    background: #f5f6f8;
+    text-transform: uppercase;
+    color: #555;
+}
+
+.variant-table thead th:first-child {
+    padding-left: 12px;
+}
+.variant-table thead th:not(:last-child) {
+    text-align: left;
+}
+
+.variant-table tbody tr {
+    border-top: 1px solid #eee;
+    transition: background 0.2s ease-in;
+}
+
+.variant-table tbody tr:hover {
+    background: #c8c8c8;
+}
+
+.variant-table td:first-child {
+    padding-left: 12px;
+}
+.variant-table .vt-price {
+    color: #0f9d58;
+}
+.variant-table .vt-actions {
+    text-align: center;
+}

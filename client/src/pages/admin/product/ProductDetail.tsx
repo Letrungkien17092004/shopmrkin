@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { NormalButton, DangerButton } from "../../components/buttons/Button.tsx";
-import ProductService from "../../services/ProductService.ts";
-import type { Product } from "../../services/ProductService.ts";
+import { Link, useParams } from "react-router-dom";
+import { NormalButton, DangerButton } from "../../../components/buttons/Button.tsx";
+import ProductService from "../../../services/ProductService.ts";
+import type { Product } from "../../../services/ProductService.ts";
 
 const productService = new ProductService()
 export default function ProductDetail() {
@@ -59,7 +59,19 @@ export default function ProductDetail() {
                                             <div className="w-full font-bold pad-bot-12px">Stock: {product.stock}</div>
                                             {/* actions */}
                                             <div className="w-full">
-                                                <NormalButton>Chỉnh sửa</NormalButton>
+                                                <NormalButton>
+                                                    <Link
+                                                    style={
+                                                        {
+                                                            fontSize: 'inherit',
+                                                            textDecoration: "none",
+                                                            color: "inherit"
+                                                        }}
+                                                    to={`/manager/products/modify/${product.id}`}
+                                                    >
+                                                            Chỉnh sửa
+                                                    </Link>
+                                                </NormalButton>
                                                 <DangerButton>Xóa</DangerButton>
                                             </div>
                                         </div>

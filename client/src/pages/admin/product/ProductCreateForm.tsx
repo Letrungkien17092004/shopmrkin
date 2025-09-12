@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useReducer, useState, type ChangeEvent } from "react";
 import VariantForm from "./VariantForm.tsx";
-import { NormalButton } from "../../components/buttons/Button.tsx";
-import ProductService, { Variant } from "../../services/ProductService.ts";
+import { NormalButton } from "../../../components/buttons/Button.tsx";
+import ProductService, { Variant, Product } from "../../../services/ProductService.ts";
+import TextAreaInput from "../../../components/TextAreaInput.tsx";
+
 
 type VariantReducerAction = (
     | {
@@ -16,8 +18,7 @@ type VariantReducerAction = (
         data?: never,
     }
 )
-
-
+// variantReducer
 function variantReducer(state: Variant[], action: VariantReducerAction) {
     switch (action.type) {
         case "add":
@@ -26,15 +27,15 @@ function variantReducer(state: Variant[], action: VariantReducerAction) {
             return state.filter(s => s.sku !== action.sku)
     }
 }
-
-
 const productService = new ProductService()
-export default function ProductForm() {
+
+// Product form component
+export default function ProductCreateForm() {
     const [productName, setProductName] = useState<string>("")
     const [productDescription, setProductDescription] = useState<string>("")
     const [variants, variantDispatch] = useReducer(variantReducer, [])
     const [isSaving, setIsSaving] = useState<boolean>(false)
-
+    // click save
     useEffect(() => {
         if (!isSaving) return
         const createData = async () => {
@@ -58,7 +59,7 @@ export default function ProductForm() {
         createData()
     }, [productName, productDescription, variants, isSaving])
 
-    const onChangeName = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeName = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setProductName(e.target.value)
     }, [productName])
 
@@ -92,13 +93,28 @@ export default function ProductForm() {
             </div>
 
             <div className="product-form-field w-full">
-                <h3>Tên sản phẩm</h3>
-                <input onChange={onChangeName} id="product-form-name-inp" className="text-lg font-light" type="search" />
-            </div>
-
-            <div className="product-form-field w-full">
-                <h3>Mô tả sản phẩm</h3>
-                <textarea onChange={onChangeDescription} name="product-description" id="product-description" className="text-base font-normal"></textarea>
+                <div className="grid">
+                    <div className="row">
+                        <div className="col l-6">
+                            <TextAreaInput
+                            labelName="Tên sản phẩm"
+                            textareaName="name"
+                            textareaId="product-name"
+                            placeholder="Tên sản phẩm không quá 50 kí tự"
+                            onChange={onChangeName}
+                            />
+                        </div>
+                        <div className="col l-6">
+                            <TextAreaInput
+                            labelName="Mô tả"
+                            textareaName="description"
+                            textareaId="product-description"
+                            placeholder="viết mô tả sản phẩm ở đây"
+                            onChange={onChangeDescription}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className="product-form-field w-full">

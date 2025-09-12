@@ -1,11 +1,11 @@
 import React, { useCallback, useState } from "react";
-import { NormalButton, DangerButton } from "../../components/buttons/Button.tsx";
-import { Variant } from "../../services/ProductService.ts";
+import { NormalButton, DangerButton } from "../../../components/buttons/Button.tsx";
+import { Variant } from "../../../services/ProductService.ts";
 
 type VariantReducerAction = (
     | {
         type: "add",
-        data?: Variant,
+        data: Variant,
         sku?: never
     }
 

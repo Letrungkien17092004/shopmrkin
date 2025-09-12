@@ -1,11 +1,12 @@
 import React from "react"
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
-import HomePage from "./pages/home/Home.tsx"
+import HomePage from "./pages/customer/Home.tsx"
 import Login from "./pages/auth/Login.tsx"
 import Register from "./pages/auth/Register.tsx"
 
 // manager
-import { Manager, Dashboard, ProductManager, OrderManager, ProductDetail, CreateProduct } from "./pages/admin/index.tsx"
+import { Manager, Dashboard, OrderManager } from "./pages/admin/index.tsx"
+import {ProductManager, ProductDetail, CreateProduct, ModifyProduct} from "./pages/admin/product/index.ts"
 
 export default function Router() {
     return (<>
@@ -21,6 +22,7 @@ export default function Router() {
                     <Route path="products" element={<ProductManager />} />
                     <Route path="products/:id" element={<ProductDetail />} />
                     <Route path="products/new" element={<CreateProduct />} />
+                    <Route path="products/modify/:id" element={<ModifyProduct />} />
                     <Route path="orders" element={<OrderManager />} />
                 </Route>
             </Routes>
