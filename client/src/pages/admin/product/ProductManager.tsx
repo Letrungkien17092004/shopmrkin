@@ -12,7 +12,7 @@ export default function ProductManager() {
     useEffect(() => {
         const controller = new AbortController()
         const fetch = async () => {
-            setProducts(await productService.getData())
+            setProducts(await productService.getAll())
         }
 
         fetch()

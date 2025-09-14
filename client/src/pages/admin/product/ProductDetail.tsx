@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { NormalButton, DangerButton } from "../../../components/buttons/Button.tsx";
-import ProductService from "../../../services/ProductService.ts";
-import type { Product } from "../../../services/ProductService.ts";
+import ProductService, { Product } from "../../../services/ProductService.ts";
+import VariantService, { Variant } from "../../../services/VariantService.ts";
 
 const productService = new ProductService()
+const variantService = new VariantService()
+
+
 export default function ProductDetail() {
     const { id } = useParams()
     const [product, setProduct] = useState<Product | null>(null)
+    const [variants, setVariants] = useState<Variant[]>([])
 
     useEffect(() => {
         const fetdata = async () => {
             if (id) {
                 const searchProduct = await productService.findById(id)
+                if (searchProduct) {
+                    const variants_ = await variantService.getManyByProductId(searchProduct.id)
+                    setVariants(variants_)
+                }
                 setProduct(searchProduct)
             } else {
                 throw new Error("id param is not found")
@@ -61,15 +69,15 @@ export default function ProductDetail() {
                                             <div className="w-full">
                                                 <NormalButton>
                                                     <Link
-                                                    style={
-                                                        {
-                                                            fontSize: 'inherit',
-                                                            textDecoration: "none",
-                                                            color: "inherit"
-                                                        }}
-                                                    to={`/manager/products/modify/${product.id}`}
+                                                        style={
+                                                            {
+                                                                fontSize: 'inherit',
+                                                                textDecoration: "none",
+                                                                color: "inherit"
+                                                            }}
+                                                        to={`/manager/products/modify/${product.id}`}
                                                     >
-                                                            Chỉnh sửa
+                                                        Chỉnh sửa
                                                     </Link>
                                                 </NormalButton>
                                                 <DangerButton>Xóa</DangerButton>
@@ -95,48 +103,22 @@ export default function ProductDetail() {
                                 </div>
                                 <div className="dash-dark"></div>
                                 <div className="flex-flex-col">
-                                    <div className="cursor-pointer w-full">
-                                        <div className="grid">
-                                            <div className="row no-gutters">
-                                                <div className="col l-3">
-                                                    <img className="image-contain" src="/public/image/van_hi.jpg" alt="van hi" />
-                                                </div>
-                                                <div className="col l-9">
-                                                    <div className="flex align-center  h-full">
-                                                        AKSNC-129
+                                    {variants.map(v => (
+                                        <div className="cursor-pointer w-full">
+                                            <div className="grid">
+                                                <div className="row no-gutters">
+                                                    <div className="col l-3">
+                                                        <img className="image-contain" src="/public/image/van_hi.jpg" alt="van hi" />
+                                                    </div>
+                                                    <div className="col l-9">
+                                                        <div className="flex align-center  h-full">
+                                                            {v.sku}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="cursor-pointer w-full">
-                                        <div className="grid">
-                                            <div className="row no-gutters">
-                                                <div className="col l-3">
-                                                    <img className="image-contain" src="/public/image/van_hi.jpg" alt="van hi" />
-                                                </div>
-                                                <div className="col l-9">
-                                                    <div className="flex align-center  h-full">
-                                                        AKSNC-130
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="cursor-pointer w-full">
-                                        <div className="grid">
-                                            <div className="row no-gutters">
-                                                <div className="col l-3">
-                                                    <img className="image-contain" src="/public/image/van_hi.jpg" alt="van hi" />
-                                                </div>
-                                                <div className="col l-9">
-                                                    <div className="flex align-center  h-full">
-                                                        AKSNC-131
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
                         </div>
