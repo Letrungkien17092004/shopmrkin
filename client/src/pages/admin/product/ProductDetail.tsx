@@ -18,8 +18,7 @@ export default function ProductDetail() {
             if (id) {
                 const searchProduct = await productService.findById(id)
                 if (searchProduct) {
-                    const variants_ = await variantService.getManyByProductId(searchProduct.id)
-                    setVariants(variants_)
+                    setVariants(searchProduct.variants)
                 }
                 setProduct(searchProduct)
             } else {
@@ -62,7 +61,7 @@ export default function ProductDetail() {
                                                 </p>
                                             </div>
                                             {/* price */}
-                                            <div className="w-full text-color-price font-medium pad-bot-12px">{product.minPrice}đ - {product.maxPrice}đ</div>
+                                            <div className="w-full text-color-price font-medium pad-bot-12px">{product.minPrice}đ - {product.maxPrice}đ </div>
                                             {/* stock */}
                                             <div className="w-full font-bold pad-bot-12px">Stock: {product.stock}</div>
                                             {/* actions */}
@@ -104,7 +103,7 @@ export default function ProductDetail() {
                                 <div className="dash-dark"></div>
                                 <div className="flex-flex-col">
                                     {variants.map(v => (
-                                        <div className="cursor-pointer w-full">
+                                        <div key={v.sku} className="cursor-pointer w-full">
                                             <div className="grid">
                                                 <div className="row no-gutters">
                                                     <div className="col l-3">

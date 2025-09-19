@@ -7,6 +7,13 @@ type VariantConstructorParam = {
     stock: number
     productId: string,
 }
+export function validVariant(variant: Variant): boolean {
+    if (variant.name.length < 5) return false
+    if (variant.sku.length < 5) return false
+    if (variant.price < 0) return false
+    if (variant.stock < 0) return false
+    return true
+}
 
 export class Variant {
     id: string
@@ -84,7 +91,7 @@ export default class VariantService {
                 productId: options.productId
             })
             demoRepo.push(newVariant)
-            return newVariant
+            return { ...newVariant }
         } catch (error) {
             throw error
         }
@@ -93,7 +100,7 @@ export default class VariantService {
     async getManyByProductId(productId: string): Promise<Variant[]> {
         try {
             const variants: Variant[] = demoRepo.filter(v => v.productId === productId)
-            return variants
+            return [...variants]
         } catch (error) {
             throw error
         }
@@ -107,7 +114,7 @@ export default class VariantService {
             variant.sku = options.sku || variant.sku
             variant.price = options.price || variant.price
             variant.stock = options.stock || variant.stock
-            return variant
+            return { ...variant }
         } catch (error) {
             throw error
         }
@@ -116,7 +123,7 @@ export default class VariantService {
     async deleteById(id: string): Promise<void> {
         try {
             const isExist = demoRepo.find(v => v.id == id)
-            if (!isExist) {throw new Error("not found")}
+            if (!isExist) { throw new Error("not found") }
             demoRepo = demoRepo.filter(v => v.id !== id)
         } catch (error) {
             throw error

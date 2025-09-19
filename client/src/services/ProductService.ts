@@ -42,23 +42,23 @@ export class Product {
 
     public get minPrice(): number {
         let min_ = this.variants[0]?.price || 0
-
-        this.variants.forEach((variant) => {
-            if (variant.price < min_) {
-                min_ = variant.price
-            }
-        })
+        console.log(this.variants)
+        // this.variants.forEach((variant) => {
+        //     if (variant.price < min_) {
+        //         min_ = variant.price
+        //     }
+        // })
         return min_
     }
 
     public get maxPrice(): number {
         let max_ = this.variants[0]?.price || 999999999999
 
-        this.variants.forEach((variant) => {
-            if (variant.price > max_) {
-                max_ = variant.price
-            }
-        })
+        // this.variants.forEach((variant) => {
+        //     if (variant.price > max_) {
+        //         max_ = variant.price
+        //     }
+        // })
         return max_
     }
 
@@ -98,6 +98,9 @@ let demoProductData: Product[] = [
     }),
 ]
 
+function wait(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 export default class ProductService {
     async create(options: Omit<Product, "id" | "variants" | "createdAt" | "updatedAt" | "stock" | "minPrice" | "maxPrice">): Promise<Product> {
         try {
@@ -113,7 +116,7 @@ export default class ProductService {
 
             })
             demoProductData.push(newProduct)
-            return newProduct
+            return structuredClone(newProduct)
         } catch (error) {
             throw new Error("ProductService Error: createData")
         }
@@ -122,7 +125,7 @@ export default class ProductService {
     async updateById(id: string, options: Partial<Omit<Product, "id" | "variants">>): Promise<Product> {
         try {
             const prod = demoProductData.find(p => p.id === id)
-            if (!prod) {throw new Error("not found")}
+            if (!prod) { throw new Error("not found") }
             prod.productName = options.productName || prod.productName
             prod.description = options.description || prod.description
             prod.category = options.category || prod.category
@@ -135,11 +138,12 @@ export default class ProductService {
     }
     async getAll(): Promise<Product[]> {
         try {
-            for(let i=0; i<demoProductData.length; i++) {
-                const prod = demoProductData[i]!
+            const temp = [...demoProductData]
+            for (let i = 0; i < temp.length; i++) {
+                const prod = temp[i]!
                 prod.variants = await variantService.getManyByProductId(prod.id)
             }
-            return demoProductData
+            return temp
         } catch (error) {
             throw new Error("ProductService Error: getData")
         }
@@ -157,10 +161,14 @@ export default class ProductService {
     }
 
     async findById(id: string): Promise<Product | null> {
-        const prod = demoProductData.find(prod => prod.id === id)
+        let prod = demoProductData.find(prod => prod.id === id)
         if (prod) {
+            prod = new Product({
+                ...prod
+            })
             const variants = await variantService.getManyByProductId(prod.id)
-            prod.variants = variants
+            prod.variants = [...variants]
+            await wait(500)
             return prod
         }
         return null
