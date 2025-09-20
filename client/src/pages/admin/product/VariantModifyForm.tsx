@@ -5,7 +5,7 @@ import VariantService, { Variant, validVariant } from "../../../services/Variant
 const variantService = new VariantService()
 
 type ExtendedVariant = Variant & {
-    state: "not_modify" | "modified" | "delete"
+    state: "original" | "modified" | "delete" | "new"
 }
 
 type VariantReducerAction = (
@@ -81,13 +81,14 @@ export default function VariantModifyForm({ id, isSaving }: { id: string, isSavi
     const [variants, variantsDispatch] = useReducer(variantsReducer, [])
     const [markedSku, setMarkedSku] = useState<string | null>(null)
     const [varForRender, setVarForRender] = useState<ExtendedVariant[]>([])
+
     // init variant
     useEffect(() => {
         const fetdata = async () => {
             const variants_ = await variantService.getManyByProductId(id)
             const _: ExtendedVariant[] = variants_.map(v => ({
                 ...v,
-                state: "not_modify"
+                state: "original"
             }))
             variantsDispatch({
                 type: "init",
@@ -104,6 +105,58 @@ export default function VariantModifyForm({ id, isSaving }: { id: string, isSavi
         setVarForRender(filted)
     }, [variants])
 
+    // on saving
+    useEffect(() => {
+        if (!isSaving) return
+        const forUpdate = variants.filter(v => v.state === "modified")
+        const forCreate = variants.filter(v => v.state === "new")
+        const forDelete = variants.filter(v => v.state === "delete")
+
+        const updateData = async () => {
+            for (let i = 0; i < forUpdate.length; i++) {
+                try {
+                    const item = forUpdate[i]!
+                    await variantService.updateById(item.id, {
+                        ...item
+                    })
+                    console.log("Update variant successfully")
+                } catch (error) {
+                    console.error("Error when update variant: ", error)
+                }
+            }
+        }
+
+        const createData = async () => {
+            for (let i = 0; i < forCreate.length; i++) {
+                try {
+                    const item = forCreate[i]!
+                    await variantService.create({
+                        ...item
+                    })
+                    console.log("Create variant successfully")
+                } catch (error) {
+                    console.error("Error when create variant: ", error)
+                }
+            }
+        }
+
+        const deleteData = async () => {
+            for (let i = 0; i < forDelete.length; i++) {
+                try {
+                    const item = forDelete[i]!
+                    await variantService.deleteById(item.id)
+                    console.log("Delete variant successfully")
+                } catch (error) {
+                    console.error("Error when delete variant: ", error)
+                }
+            }
+        }
+
+        updateData()
+        createData()
+        deleteData()
+
+    }, [isSaving])
 
     // auto generate onChange handler by key of FieldData
     const generateOnChangeForm = useCallback((fieldToChange: keyof FieldData) => {
@@ -134,7 +187,7 @@ export default function VariantModifyForm({ id, isSaving }: { id: string, isSavi
                 type: "add",
                 variant: {
                     ...newVariant,
-                    state: "not_modify"
+                    state: "new"
                 }
             })
         }
@@ -215,7 +268,7 @@ export default function VariantModifyForm({ id, isSaving }: { id: string, isSavi
             stock: "",
         })
         setMarkedSku(null)
-    }, [updateData])
+    }, [])
     return (<>
         <section className="w-full">
             {/* variant input */}

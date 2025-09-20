@@ -42,23 +42,22 @@ export class Product {
 
     public get minPrice(): number {
         let min_ = this.variants[0]?.price || 0
-        console.log(this.variants)
-        // this.variants.forEach((variant) => {
-        //     if (variant.price < min_) {
-        //         min_ = variant.price
-        //     }
-        // })
+        this.variants.forEach((variant) => {
+            if (variant.price < min_) {
+                min_ = variant.price
+            }
+        })
         return min_
     }
 
     public get maxPrice(): number {
         let max_ = this.variants[0]?.price || 999999999999
 
-        // this.variants.forEach((variant) => {
-        //     if (variant.price > max_) {
-        //         max_ = variant.price
-        //     }
-        // })
+        this.variants.forEach((variant) => {
+            if (variant.price > max_) {
+                max_ = variant.price
+            }
+        })
         return max_
     }
 

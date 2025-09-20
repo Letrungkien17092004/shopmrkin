@@ -40,7 +40,7 @@ export default function ProductModifyForm({ id }: { id: string }) {
     useEffect(() => {
         if (!isSaving) return
         if (!prod) return
-        const createData = async () => {
+        const modifyData = async () => {
             try {
                 const updated = await productService.updateById(prod.id, {
                     productName: prodName,
@@ -50,9 +50,11 @@ export default function ProductModifyForm({ id }: { id: string }) {
             } catch (error) {
                 window.alert("có lỗi xảy ra")
                 console.error("Can't create product: ", error)
+            } finally {
+                setIsSaving(false)
             }
         }
-        createData()
+        modifyData()
     }, [prodName, prodDescription, isSaving])
 
     const onChangeName = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
