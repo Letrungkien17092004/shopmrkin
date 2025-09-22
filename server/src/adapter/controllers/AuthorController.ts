@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
+import axios from "axios"
 import IUserUsecase from "core/applications/interfaces/usecases/IUserUsecase.js";
 import IAdminSystemUsecase from "core/applications/interfaces/usecases/IAdminSystemUsecase.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
 import jwt from "jsonwebtoken";
 import { ENV } from "config/env.js";
+
+
+
 export default class AuthorController {
 
     private userUsecase: IUserUsecase
@@ -182,4 +186,75 @@ export default class AuthorController {
             })
         }
     }
+
+    // generate URL Google OAuth2
+    async generateOauth2RedirectUrl(req: Request, res: Response): Promise<void> {
+        try {
+            const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth"
+            const options = {
+                redirect_uri: ENV.REDIRECT_URI,
+                client_id: ENV.GOOGLE_CLIENT_ID,
+                state: ENV.GOOGLE_OAUTH_STATE_STRING,
+                response_type: "token",
+                prompt: "consent",
+                scope: [
+                    "profile",
+                    "email"
+                ].join(" "),
+            };
+
+            const qs = new URLSearchParams(options).toString();
+            res.status(200).json({
+                url: `${rootUrl}?${qs}`
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: "Something went wrong"
+            })
+        }
+    }
+
+    // receive access_token (google token) from request, then abtain profile from Google API
+    async authGoogleCallBack(req: Request, res: Response): Promise<void> {
+        try {
+            const access_token = req.query["access_token"] as string
+            const state = req.query["state"] as string
+            console.log(req.query)
+            if (!state || state !== ENV.GOOGLE_OAUTH_STATE_STRING) {
+                res.status(400).json({
+                    message: "Invalid state string"
+                })
+                return
+            }
+            if (!access_token || access_token === "") {
+                res.status(400).json({
+                    message: "Missing access_token"
+                })
+                return
+            }
+
+            try {
+                // get profile from google
+                const userRes = await axios.get<{ string: any }>(
+                    `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`
+                )
+
+                console.log("profile: ", userRes.data)
+                res.status(200).json({
+                    profile: userRes.data
+                })
+                return
+            } catch (error) {
+                res.status(500).json({
+                    message: "Something went wrong"
+                })
+                return
+            }
+        } catch (error) {
+            res.status(500).json({
+                message: "Something went wrong"
+            })
+        }
+    }
+
 }
