@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser"
 import { Request, Response, NextFunction } from "express";
-
+import cors from "cors"
 // import router
 import authorRouter from "expressApp/routers/AuthorRouter.js";
 import productRouter from "./routers/ProductRouter.js";
@@ -14,6 +14,7 @@ function logRequest(req: Request, res: Response, next: NextFunction) {
 }
 const app = express()
 
+app.use(cors())
 app.use(logRequest)
 app.use(cookieParser())
 
