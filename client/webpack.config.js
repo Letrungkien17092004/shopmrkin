@@ -1,7 +1,14 @@
-import path from "path"
+import path, { join } from "path"
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import webpack from "webpack";
+import dotenv from "dotenv"
 
 const __dirname = import.meta.dirname
+
+dotenv.config({
+    path: path.resolve(__dirname, ".env")
+})
+
 
 const config = {
     mode: "development",
@@ -23,7 +30,14 @@ const config = {
     plugins: [
         new HtmlWebpackPlugin({
             template: "./dist/index.html"
-        })
+        }),
+        new webpack.DefinePlugin({
+            'process.env': {
+                // Định nghĩa các biến môi trường
+                GENERATE_OAUTH_URL: JSON.stringify(process.env.GENERATE_OAUTH_URL),
+                GOOGLE_CALLBACK_BE_URL: JSON.stringify(process.env.GOOGLE_CALLBACK_BE_URL),
+            },
+        }),
     ],
     devServer: {
         static: [
@@ -41,7 +55,7 @@ const config = {
             },
         ],
         compress: false,
-        port: 8001,
+        port: 9000,
         historyApiFallback: true
     }
 };

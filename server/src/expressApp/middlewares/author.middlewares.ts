@@ -59,8 +59,8 @@ export async function authorRefeshToken(req: Request, res: Response, next: NextF
 
 export async function authorAccessToken(req: Request, res: Response, next: NextFunction) {
     try {
-        const authorToken = req.cookies["access_token"]
-
+        const authorToken = req.headers["authorization"]?req.headers["authorization"].split(" ")[1]:undefined
+        console.log("authorToken: ", authorToken)
         if (!authorToken) {
             res.status(401).json({
                 message: "Unauthorized "
@@ -90,6 +90,7 @@ export async function authorAccessToken(req: Request, res: Response, next: NextF
             error instanceof jwt.TokenExpiredError ||
             error instanceof jwt.NotBeforeError
         ) {
+            console.log("JWT token has expired")
             res.status(401).json({
                 message: "JWT token has expired"
             })

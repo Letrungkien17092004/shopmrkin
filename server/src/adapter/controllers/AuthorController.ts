@@ -6,6 +6,25 @@ import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/
 import jwt from "jsonwebtoken";
 import { ENV } from "config/env.js";
 
+type GoogleUserProfile = {
+    email: string,
+    family_name: string,
+    given_name: string,
+    id: string,
+    name: string,
+    picture: string,
+    verified_email: boolean,
+}
+
+type JWTPayload = {
+    id: string,
+    account: string,
+    username: string,
+    email: string,
+    role: string,
+    permissions: string[]
+
+}
 
 
 export default class AuthorController {
@@ -20,6 +39,9 @@ export default class AuthorController {
         this.register = this.register.bind(this)
         this.login = this.login.bind(this)
         this.generateAccessToken = this.generateAccessToken.bind(this)
+        this.verifyAccessToken = this.verifyAccessToken.bind(this)
+        this.generateOauth2RedirectUrl = this.generateOauth2RedirectUrl.bind(this)
+        this.authGoogleCallBack = this.authGoogleCallBack.bind(this)
     }
 
 
@@ -84,13 +106,13 @@ export default class AuthorController {
                 })
                 return
             }
-            const payload = {
+            const payload: JWTPayload = {
                 id: user.id,
                 account: user.account,
                 username: user.username,
                 email: user.email,
-                role: user.role?.roleName,
-                permissions: user.role?.permissions?.map(per => per.perName)
+                role: user.role!.roleName,
+                permissions: user.role!.permissions!.map(per => per.perName)
             }
             const token = jwt.sign(
                 payload,
@@ -235,22 +257,61 @@ export default class AuthorController {
 
             try {
                 // get profile from google
-                const userRes = await axios.get<{ string: any }>(
+                const userRes = await axios.get<GoogleUserProfile>(
                     `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`
                 )
+                const profile = userRes.data
+                const userInDB = await this.userUsecase.getOrCreate({
+                    username: profile.name,
+                    account: profile.email,
+                    email: profile.email,
+                })
+                const payload: JWTPayload = {
+                    id: userInDB.id,
+                    account: userInDB.account,
+                    username: userInDB.username,
+                    email: userInDB.email,
+                    role: userInDB.role!.roleName,
+                    permissions: userInDB.role!.permissions!.map(p => p.perName)
+                }
+                const refeshToken = jwt.sign(
+                    payload,
+                    ENV.JWT_SECRET,
+                    {
+                        expiresIn: ENV.REFESH_EXPRISES_IN
+                    }
+                )
+                const accessToken = jwt.sign(
+                    payload,
+                    ENV.JWT_SECRET,
+                    {
+                        expiresIn: ENV.REFESH_EXPRISES_IN
+                    }
+                )
 
-                console.log("profile: ", userRes.data)
+                res.cookie("refesh_token", refeshToken, {
+                    httpOnly: true
+                })
+                
+                res.cookie("access_token", accessToken, {
+                    httpOnly: true
+                })
+
                 res.status(200).json({
-                    profile: userRes.data
+                    profile: userRes.data,
+                    refeshToken: refeshToken,
+                    accessToken: accessToken,
                 })
                 return
             } catch (error) {
+                console.log(error)
                 res.status(500).json({
                     message: "Something went wrong"
                 })
                 return
             }
         } catch (error) {
+            console.log(error)
             res.status(500).json({
                 message: "Something went wrong"
             })

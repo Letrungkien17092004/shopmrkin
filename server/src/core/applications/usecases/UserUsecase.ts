@@ -73,6 +73,26 @@ export default class UserUsecase implements IUserUsecase {
         }
     }
 
+    async getOrCreate(options: { account: string, email: string, username: string }): Promise<User> {
+        try {
+            const searchedUser = await this.repository.getOrCreate(options)
+            return searchedUser
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.DATABASE_NOT_EXIST:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.ENGINE
+                        })
+                }
+            }
+            throw new USECASE_ERROR({
+                code: USECASE_ERROR_CODE.UNDEFINED
+            })
+        }
+    }
+
     async update(options: Partial<User> & Pick<User, "id">): Promise<User> {
         try {
             const user = await this.repository.update(options)

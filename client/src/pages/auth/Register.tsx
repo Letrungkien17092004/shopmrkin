@@ -1,13 +1,18 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import LoginWithGoogle from "../../components/LoginWithGoogle.tsx";
+
+
+
+
 export default function Register() {
     return (<>
-        <main className="pad-top-bot-24px overflow-hiden">
+        <main className="pad-vertical-24px flex flex-center h-full-vh">
             <div className="grid">
-                <div className="row">
+                <div className="row no-gutters">
                     <div className="col c-10 m-10 l-6 c-o-1 l-o-3 ">
-                        <section className="w-full border-radius-8px pad-bot-12px box-shadow-1">
-                            <h1 className="pad-top-bot-12px text-align-center">Đăng ký tài khoản</h1>
+                        <section className="w-full border-radius-8px pad-12px box-shadow-1">
+                            <h1 className="pad-vertical-12px text-align-center">Đăng ký tài khoản</h1>
                             <form className="flex flex-col row-gap-10px justify-center pad-left-right-24px" action="">
 
                                 <div className="pad-left-8px w-full text-error">
@@ -57,9 +62,7 @@ export default function Register() {
                                 <div style={{ flex: 1, height: 1, background: "rgba(0,0,0,0.15)", marginLeft: 12 }} />
                             </div>
                             <div className="w-full flex flex-center mar-top-12px">
-                                <div className="flex flex-center cursor-pointer">
-                                    <img src="/public/image/google-48.png" alt="google-icon" />
-                                </div>
+                                <LoginWithGoogle/>
                             </div>
                         </section>
                     </div>

@@ -7,7 +7,7 @@ export type UserConstructorParam = {
     password_hash: string
     email: string
     roleId: number
-    role?: Role
+    role: Role
 }
 /**
  * Represents a user entity in the system.

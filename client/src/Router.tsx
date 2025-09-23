@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
 import HomePage from "./pages/customer/Home.tsx"
 import Login from "./pages/auth/Login.tsx"
 import Register from "./pages/auth/Register.tsx"
-
+import AuthGoogleCallback from "./pages/auth/AuthGoogleCallback.tsx"
 // manager
 import { Manager, Dashboard, OrderManager } from "./pages/admin/index.tsx"
 import {ProductManager, ProductDetail, CreateProduct, ModifyProduct} from "./pages/admin/product/index.ts"
@@ -15,6 +15,7 @@ export default function Router() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/auth/google/callback" element={<AuthGoogleCallback/>}></Route>
 
                 <Route path="/manager/" element={<Manager />}>
                     <Route index element={<Dashboard />} />

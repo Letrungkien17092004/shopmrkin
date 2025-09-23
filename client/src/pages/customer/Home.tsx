@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import HomeNavbar from "./HomeNavbar.tsx";
+import AuthService from "../../services/AuthService.ts";
+const authService = new AuthService()
 
 function HomeFilterOptions() {
+    useEffect(() => {
+        authService.veriyAccessToken()
+    }, [])
     return (<>
         <section className="home-filter">
             <div className="heading-1"><span>Lựa chọn lọc</span></div>
