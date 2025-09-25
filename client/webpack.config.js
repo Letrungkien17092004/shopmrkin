@@ -36,6 +36,7 @@ const config = {
                 // Định nghĩa các biến môi trường
                 GENERATE_OAUTH_URL: JSON.stringify(process.env.GENERATE_OAUTH_URL),
                 GOOGLE_CALLBACK_BE_URL: JSON.stringify(process.env.GOOGLE_CALLBACK_BE_URL),
+                BACK_END_HOST: JSON.stringify(process.env.BACK_END_HOST),
             },
         }),
     ],

@@ -114,19 +114,16 @@ export default class AuthorController {
                 role: user.role!.roleName,
                 permissions: user.role!.permissions!.map(per => per.perName)
             }
-            const token = jwt.sign(
+            const refeshToken = jwt.sign(
                 payload,
                 ENV.JWT_SECRET,
                 {
                     expiresIn: ENV.REFESH_EXPRISES_IN
                 }
             )
-
-            res.cookie("refesh_token", token, {
-                httpOnly: true
-            })
             res.status(200).json({
-                message: "OK"
+                message: "OK",
+                refeshToken: refeshToken
             })
             return
         } catch (error) {
@@ -177,11 +174,9 @@ export default class AuthorController {
                 expiresIn: ENV.ACCESS_EXPRISES_IN
             })
 
-            res.cookie("access_token", accessToken, {
-                httpOnly: true
-            })
             res.status(200).json({
-                message: "OK"
+                message: "OK",
+                accessToken: accessToken
             })
 
         } catch (error) {
@@ -298,7 +293,12 @@ export default class AuthorController {
                 })
 
                 res.status(200).json({
-                    profile: userRes.data,
+                    profile: {
+                        id: payload.id,
+                        account: payload.account,
+                        username: payload.username,
+                        email: payload.email,
+                    },
                     refeshToken: refeshToken,
                     accessToken: accessToken,
                 })

@@ -18,7 +18,7 @@ app.use(cors())
 app.use(logRequest)
 app.use(cookieParser())
 
-app.use('/api/author', [bodyParser.json(), authorRouter]) // authorization API
+app.use('/api/auth', [bodyParser.json(), authorRouter]) // authorization API
 app.use("/api", [bodyParser.json(), productRouter]) // product API
 app.use("/api", [bodyParser.json(), variantRouter]) // variant API
 
