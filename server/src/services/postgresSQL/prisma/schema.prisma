@@ -51,6 +51,7 @@ model Users {
   roleId Int 
   products Products[]
   variants Variants[]
+  media Media[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("users")
@@ -93,4 +94,28 @@ model Variants {
   stock Int
   createdAt DateTime @default(now())  
   updatedAt DateTime @updatedAt
+}
+
+model Media {
+  id String @id @default(uuid(7))
+  fileName String
+  filePath String
+  hostname String
+  media_type MediaType
+  size Int
+  status MediaStatus @default(ORPHANED)
+  userId String 
+  author Users @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())  
+  updatedAt DateTime @updatedAt
+} 
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+enum MediaStatus {
+  ORPHANED
+  ASSIGNED
 }

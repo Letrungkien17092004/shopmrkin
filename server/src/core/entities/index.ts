@@ -5,7 +5,7 @@ import RolePermission from "core/entities/RolePermission.js";
 import Category from "core/entities/Category.js";
 import Product from "core/entities/Product.js";
 import Variant from "core/entities/Variant.js";
-
+import Media from "./Media.js";
 export {
     User,
     Role,
@@ -13,5 +13,6 @@ export {
     RolePermission,
     Category,
     Product,
-    Variant
+    Variant,
+    Media
 }
