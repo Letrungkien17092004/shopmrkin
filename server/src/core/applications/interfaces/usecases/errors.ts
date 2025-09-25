@@ -5,13 +5,13 @@
  * different types of errors that may occur during the execution of use case functions.
  *
  * @enum USECASE_ERROR_CODE
- * @property {string} ENGINE   - Engine error, such as issues with the Prisma client or initial database setup.
+ * @property {string} INITIAL   - connection error, such as issues with the Prisma client or initial database setup.
  * @property {string} UNKNOW   - Unknown error, including connection or internet-related issues.
  * @property {string} NOTFOUND - Resource not found error.
  * @property {string} EXIST    - Resource already exists error.
  */
 export enum USECASE_ERROR_CODE {
-    ENGINE = "UC_000", // engine error, prisma client, initial database
+    INITIAL = "UC_000", // connection error, prisma client, initial database
     UNDEFINED = "UC_001", // this error only occurs when it does not belong to the remaining errors
     UNKNOW = "UC_002", // unknow error(connection, internet, ...)
     NOTFOUND = "UC_003", // resource not found
@@ -31,7 +31,7 @@ export enum USECASE_ERROR_CODE {
  * ```typescript
  * throw new USECASE_ERROR({ message: "User not found", code: "USER_NOT_FOUND" });
  * code: 
- * - UC_000: engine error, prisma client, initial database
+ * - UC_000: connection error, prisma client, initial database
  * - UC_001: unknow error (connection, internet,...)
  * - UC_002: resource not found
  * - UC_003: resource already exist

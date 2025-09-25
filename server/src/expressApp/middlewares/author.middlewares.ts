@@ -60,7 +60,6 @@ export async function authorRefeshToken(req: Request, res: Response, next: NextF
 export async function authorAccessToken(req: Request, res: Response, next: NextFunction) {
     try {
         const authorToken = req.headers["authorization"]?req.headers["authorization"].split(" ")[1]:undefined
-        console.log("authorToken: ", authorToken)
         if (!authorToken) {
             res.status(401).json({
                 message: "Unauthorized "

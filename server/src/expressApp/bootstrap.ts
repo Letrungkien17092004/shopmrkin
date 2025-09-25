@@ -7,6 +7,7 @@ import cors from "cors"
 import authorRouter from "expressApp/routers/AuthorRouter.js";
 import productRouter from "./routers/ProductRouter.js";
 import variantRouter from "./routers/VariantRouter.js";
+import mediaRouter from "./routers/MediaRouter.js";
 
 function logRequest(req: Request, res: Response, next: NextFunction) {
     console.log(`[${req.method}] ${req.protocol}://${req.hostname}:8000${req.path}`)
@@ -21,6 +22,7 @@ app.use(cookieParser())
 app.use('/api/auth', [bodyParser.json(), authorRouter]) // authorization API
 app.use("/api", [bodyParser.json(), productRouter]) // product API
 app.use("/api", [bodyParser.json(), variantRouter]) // variant API
+app.use("/api/media", mediaRouter) // media API
 
 
 export default app

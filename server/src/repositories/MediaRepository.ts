@@ -11,7 +11,7 @@ export default class MediaRepository implements IMediaRepository {
      * @param options 
      * @returns 
      */
-    async create(options: Omit<Media, "id">): Promise<Media> {
+    async create(options: Omit<Media, "id" | "createdAt" | "updatedAt">): Promise<Media> {
         try {
             const createdMedia = await prisma.media.create({
                 data: {

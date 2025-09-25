@@ -9,7 +9,7 @@ type MediaConstructorParam = {
     size: number
     status: "ORPHANED" | "ASSIGNED"
     userId: string
-    author: User
+    author?: User
     createdAt: Date
     updatedAt: Date
 }
@@ -23,7 +23,8 @@ export default class Media {
     size: number
     status: "ORPHANED" | "ASSIGNED"
     userId: string
-    author: User
+    author?: User
+
     createdAt: Date
     updatedAt: Date
 

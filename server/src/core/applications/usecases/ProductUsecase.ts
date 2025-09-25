@@ -21,7 +21,7 @@ export default class ProductUsecase implements IProductUsecase {
                     case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({
                             message: error.message,
-                            code: USECASE_ERROR_CODE.ENGINE
+                            code: USECASE_ERROR_CODE.INITIAL
                         })
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
@@ -54,7 +54,7 @@ export default class ProductUsecase implements IProductUsecase {
                     case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({
                             message: error.message,
-                            code: USECASE_ERROR_CODE.ENGINE
+                            code: USECASE_ERROR_CODE.INITIAL
                         })
                 }
             }
@@ -75,7 +75,7 @@ export default class ProductUsecase implements IProductUsecase {
                     case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({
                             message: error.message,
-                            code: USECASE_ERROR_CODE.ENGINE
+                            code: USECASE_ERROR_CODE.INITIAL
                         })
                 }
             }
@@ -96,7 +96,7 @@ export default class ProductUsecase implements IProductUsecase {
                     case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({
                             message: error.message,
-                            code: USECASE_ERROR_CODE.ENGINE
+                            code: USECASE_ERROR_CODE.INITIAL
                         })
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
@@ -132,7 +132,7 @@ export default class ProductUsecase implements IProductUsecase {
                     case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({
                             message: error.message,
-                            code: USECASE_ERROR_CODE.ENGINE
+                            code: USECASE_ERROR_CODE.INITIAL
                         })
                     case REPO_ERROR_CODE.NOTFOUND: 
                         throw new USECASE_ERROR({

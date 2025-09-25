@@ -1,7 +1,7 @@
 import { Media } from "core/entities/index.js"
 
 export default interface IMediaUsecase {
-    create(options: Omit<Media, "id">): Promise<Media>
+    create(options: Omit<Media, "id" | "createdAt" | "updatedAt">): Promise<Media>
     getById(id: string): Promise<Media | null>
     updateById(id: string, options: Partial<Media>): Promise<Media>
     deleteById(id: string): Promise<void>

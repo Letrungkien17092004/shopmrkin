@@ -19,6 +19,11 @@ const envSchema = z.object({
     GOOGLE_OAUTH_STATE_STRING: z.string(),
     REDIRECT_URI: z.string(),
     FRONTEND_URL: z.string(),
+
+    // Upload folder
+    UPLOAD_FOLDER: z.string(),
 })
 
-export const ENV = envSchema.parse(process.env)
+export const ENV = envSchema.parse({
+    ...process.env
+})

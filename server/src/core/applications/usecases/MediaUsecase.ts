@@ -10,12 +10,17 @@ export default class MediaUsecase implements IMediaUsecase {
         this.repo = repo
     }
 
-    async create(options: Omit<Media, "id">): Promise<Media> {
+    async create(options: Omit<Media, "id" | "createdAt" | "updatedAt">): Promise<Media> {
         try {
             return await this.repo.create(options)
         } catch (error) {
             if (error instanceof REPO_ERROR) {
                 switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: "Database error",
+                            code: USECASE_ERROR_CODE.INITIAL
+                        })
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "Media already exist",
@@ -44,7 +49,7 @@ export default class MediaUsecase implements IMediaUsecase {
                     case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({
                             message: "Database error",
-                            code: USECASE_ERROR_CODE.ENGINE
+                            code: USECASE_ERROR_CODE.INITIAL
                         })
                     case REPO_ERROR_CODE.UNKNOW:
                         throw new USECASE_ERROR({
@@ -69,7 +74,7 @@ export default class MediaUsecase implements IMediaUsecase {
                     case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({
                             message: "Database error",
-                            code: USECASE_ERROR_CODE.ENGINE
+                            code: USECASE_ERROR_CODE.INITIAL
                         })
                     case REPO_ERROR_CODE.NOTFOUND:
                         throw new USECASE_ERROR({
@@ -94,7 +99,7 @@ export default class MediaUsecase implements IMediaUsecase {
                     case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({
                             message: "Database error",
-                            code: USECASE_ERROR_CODE.ENGINE
+                            code: USECASE_ERROR_CODE.INITIAL
                         })
                     case REPO_ERROR_CODE.NOTFOUND:
                         throw new USECASE_ERROR({

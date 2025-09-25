@@ -121,13 +121,30 @@ export default class AuthorController {
                     expiresIn: ENV.REFESH_EXPRISES_IN
                 }
             )
+            const accessToken = jwt.sign(
+                payload,
+                ENV.JWT_SECRET,
+                {
+                    expiresIn: ENV.ACCESS_EXPRISES_IN
+                }
+            )
             res.status(200).json({
                 message: "OK",
-                refeshToken: refeshToken
+                refeshToken: refeshToken,
+                accessToken: accessToken
             })
             return
         } catch (error) {
             console.log(error)
+            if (error instanceof USECASE_ERROR) {
+                switch (error.code) {
+                    case USECASE_ERROR_CODE.INITIAL:
+                        res.status(500).json({
+                            message: "Database error"
+                        })
+                        return
+                }
+            }
             if (error instanceof TypeError) {
                 res.status(400).json({
                     message: "Missing data, require account and password"

@@ -20,9 +20,9 @@ const authorController = new AuthorController(userUsecase, adminUsecase)
 const authorRouter = Router()
 
 authorRouter.post("/registor", authorController.register)
-authorRouter.get("/login", authorController.login)
-authorRouter.get("/refesh-access-token", [authorRefeshToken, authorController.generateAccessToken])
-authorRouter.get("/verify-access-token", [authorAccessToken, authorController.verifyAccessToken])
+authorRouter.post("/login", authorController.login)
+authorRouter.post("/refesh-access-token", [authorRefeshToken, authorController.generateAccessToken])
+authorRouter.post("/verify-access-token", [authorAccessToken, authorController.verifyAccessToken])
 authorRouter.get("/google/url", authorController.generateOauth2RedirectUrl)
 authorRouter.get("/google/callback", authorController.authGoogleCallBack)
 
