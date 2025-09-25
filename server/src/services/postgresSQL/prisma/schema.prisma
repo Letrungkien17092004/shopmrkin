@@ -75,6 +75,8 @@ model Products {
   categoryId Int 
   category Categories @relation(fields: [categoryId], references: [id]) 
   variants Variants[]
+  media Product_Media[]
+
 
   // time
   createdAt DateTime @default(now())
@@ -108,6 +110,9 @@ model Media {
   author Users @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())  
   updatedAt DateTime @updatedAt
+
+  products Product_Media[]
+
 } 
 
 enum MediaType {
@@ -118,4 +123,13 @@ enum MediaType {
 enum MediaStatus {
   ORPHANED
   ASSIGNED
+}
+
+model Product_Media {
+  productId String
+  mediaId String
+  product Products @relation(fields: [productId], references: [id])
+  media Media @relation(fields: [mediaId], references: [id])
+
+  @@id([productId, mediaId])
 }

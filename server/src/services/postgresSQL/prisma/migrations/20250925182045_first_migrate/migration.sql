@@ -1,3 +1,9 @@
+-- CreateEnum
+CREATE TYPE "MediaType" AS ENUM ('IMAGE', 'VIDEO');
+
+-- CreateEnum
+CREATE TYPE "MediaStatus" AS ENUM ('ORPHANED', 'ASSIGNED');
+
 -- CreateTable
 CREATE TABLE "roles" (
     "id" SERIAL NOT NULL,
@@ -76,6 +82,30 @@ CREATE TABLE "Variants" (
     CONSTRAINT "Variants_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Media" (
+    "id" TEXT NOT NULL,
+    "fileName" TEXT NOT NULL,
+    "filePath" TEXT NOT NULL,
+    "hostname" TEXT NOT NULL,
+    "media_type" "MediaType" NOT NULL,
+    "size" INTEGER NOT NULL,
+    "status" "MediaStatus" NOT NULL DEFAULT 'ORPHANED',
+    "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Media_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Product_Media" (
+    "productId" TEXT NOT NULL,
+    "mediaId" TEXT NOT NULL,
+
+    CONSTRAINT "Product_Media_pkey" PRIMARY KEY ("productId","mediaId")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "roles_roleName_key" ON "roles"("roleName");
 
@@ -117,3 +147,12 @@ ALTER TABLE "Variants" ADD CONSTRAINT "Variants_productId_fkey" FOREIGN KEY ("pr
 
 -- AddForeignKey
 ALTER TABLE "Variants" ADD CONSTRAINT "Variants_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Media" ADD CONSTRAINT "Media_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Product_Media" ADD CONSTRAINT "Product_Media_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Products"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Product_Media" ADD CONSTRAINT "Product_Media_mediaId_fkey" FOREIGN KEY ("mediaId") REFERENCES "Media"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
