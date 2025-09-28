@@ -10,11 +10,12 @@ const controller = new ProductController(usecase)
 
 const productRouter = Router()
 
-
-productRouter.post("/product", [authorAccessToken, controller.addProduct])
-productRouter.get("/product/:id", controller.findProductWithId)
-productRouter.put("/product/:id", [authorAccessToken, controller.updateProduct])
-productRouter.delete("/product/:id", [authorAccessToken, controller.deleteProduct])
+// RESTful
+productRouter.post("/product", [authorAccessToken, controller.create])
+productRouter.get("/product", controller.findMany) // get-all
+productRouter.get("/product/:id", controller.findOneById) // get-by-id
+productRouter.put("/product/:id", [authorAccessToken, controller.updateById])
+productRouter.delete("/product/:id", [authorAccessToken, controller.deleteById])
 
 export default productRouter
 

@@ -10,9 +10,10 @@ const controller = new VariantController(usecase)
 
 const variantRouter = Router()
 
-
+// RESTful
 variantRouter.post('/variant', [authorAccessToken, controller.create])
-variantRouter.get('/variant/:id', controller.findWithId)
+variantRouter.get('/variant', controller.findMany) // get-all
+variantRouter.get('/variant/:id', controller.findOneById) // get by id
 variantRouter.put("/variant/:id", [authorAccessToken, controller.updateById])
 variantRouter.delete("/variant/:id", [authorAccessToken, controller.deleteById])
 

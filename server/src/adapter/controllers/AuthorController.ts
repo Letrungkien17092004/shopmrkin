@@ -35,17 +35,15 @@ export default class AuthorController {
     constructor(userUsecase: IUserUsecase, adminSystemUsecase: IAdminSystemUsecase) {
         this.userUsecase = userUsecase
         this.adminSystemUsecase = adminSystemUsecase
-
-        this.register = this.register.bind(this)
-        this.login = this.login.bind(this)
-        this.generateAccessToken = this.generateAccessToken.bind(this)
-        this.verifyAccessToken = this.verifyAccessToken.bind(this)
-        this.generateOauth2RedirectUrl = this.generateOauth2RedirectUrl.bind(this)
-        this.authGoogleCallBack = this.authGoogleCallBack.bind(this)
     }
 
-
-    async register(req: Request, res: Response): Promise<void> {
+    /**
+     * Sign-in with account, password
+     * @param req 
+     * @param res 
+     * @returns 
+     */
+    register = async (req: Request, res: Response): Promise<void> => {
         try {
             let username = req.body['username']
             let account = req.body['account']
@@ -90,7 +88,13 @@ export default class AuthorController {
         }
     }
 
-    async login(req: Request, res: Response): Promise<void> {
+    /**
+     * Login with account and password, create refesh_token when success
+     * @param req 
+     * @param res 
+     * @returns 
+     */
+    login = async (req: Request, res: Response): Promise<void> => {
         try {
             const account = req.body['account']
             const password = req.body['password']
@@ -158,17 +162,23 @@ export default class AuthorController {
         }
     }
 
-    async generateAccessToken(req: Request, res: Response): Promise<void> {
+    /**
+     * Create access_token, require refesh_token to use
+     * @param req 
+     * @param res 
+     * @returns 
+     */
+    createAccessToken = async (req: Request, res: Response): Promise<void> => {
         try {
             // there isn't author property
-            if (!req.author) {
+            if (!req.user) {
                 res.status(401).json({
                     message: "Unauthorized"
                 })
                 return
             }
 
-            const user = await this.userUsecase.getById(req.author.id)
+            const user = await this.userUsecase.getById(req.user.id)
 
             // user not found
             if (!user) {
@@ -203,9 +213,15 @@ export default class AuthorController {
         }
     }
 
-    async verifyAccessToken(req: Request, res: Response): Promise<void> {
+    /**
+     * Verify access_token
+     * @param req 
+     * @param res 
+     * @returns 
+     */
+    verifyAccessToken = async (req: Request, res: Response): Promise<void> => {
         try {
-            if (!req.author) {
+            if (!req.user) {
                 res.status(401).json({
                     message: "Unauthorized"
                 })
@@ -221,8 +237,12 @@ export default class AuthorController {
         }
     }
 
-    // generate URL Google OAuth2
-    async generateOauth2RedirectUrl(req: Request, res: Response): Promise<void> {
+    /**
+     * Generate URL Google OAuth2, which is used to redirect to the Google login page
+     * @param req 
+     * @param res 
+     */
+    generateOauth2RedirectUrl = async (req: Request, res: Response): Promise<void> => {
         try {
             const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth"
             const options = {
@@ -248,8 +268,14 @@ export default class AuthorController {
         }
     }
 
-    // receive access_token (google token) from request, then abtain profile from Google API
-    async authGoogleCallBack(req: Request, res: Response): Promise<void> {
+    /**
+     * Login with Google, this controller uses Google's state and access_token to get the user's profile
+     * if the user has never signed-in with Google, new account will be created, then sign JWT
+     * @param req 
+     * @param res 
+     * @returns 
+     */
+    loginWithGoogle = async (req: Request, res: Response): Promise<void> => {
         try {
             const access_token = req.query["access_token"] as string
             const state = req.query["state"] as string
@@ -315,6 +341,7 @@ export default class AuthorController {
                         account: payload.account,
                         username: payload.username,
                         email: payload.email,
+                        picture: profile.picture
                     },
                     refeshToken: refeshToken,
                     accessToken: accessToken,

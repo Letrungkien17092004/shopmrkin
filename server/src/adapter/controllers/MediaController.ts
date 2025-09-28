@@ -3,8 +3,7 @@ import IMediaUsecase from "core/applications/interfaces/usecases/IMediaUsecase.j
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
 import { z } from "zod"
 import { ENV } from "config/env.js";
-import { mediaDTOIn, mediaDTOOut, MediaDTOOut } from "adapter/DTO/Media/index.js";
-
+import { MediaDTO, MediaToOutput } from "adapter/DTO/index.js"
 const FilesMulter = z.array(
     z.object({
         fieldname: z.string(),
@@ -26,8 +25,13 @@ export default class MediaController {
 
     createMany = async (req: Request, res: Response) => {
         try {
+            if (!req.user) {
+                res.status(401).json({
+                    message: "Unauthorized"
+                })
+            }
             const files = FilesMulter.parse(req.files)
-            const media: MediaDTOOut[] = []
+            const media: MediaToOutput[] = []
             for (let i = 0; i < files.length; i++) {
                 const createdMedia = await this.usecase.create({
                     fileName: files[i].filename,
@@ -36,10 +40,10 @@ export default class MediaController {
                     media_type: files[i].mimetype.split("/")[0] === "video" ? "VIDEO" : "IMAGE",
                     size: files[i].size,
                     status: "ORPHANED",
-                    userId: req.author!.id
+                    userId: req.user!.id
                 })
 
-                media.push(mediaDTOOut(createdMedia))
+                media.push(MediaDTO.toOutputMany(createdMedia))
             }
             res.status(200).json({
                 media: media

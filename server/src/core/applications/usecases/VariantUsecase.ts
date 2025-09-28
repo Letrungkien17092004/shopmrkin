@@ -12,7 +12,12 @@ export default class VariantUsecase implements IVariantUsecase {
         this.repo = repo
     }
 
-    async create(options: Omit<Variant, "id" | "createdAt" | "updatedAt">): Promise<Variant> {
+    /**
+     * Create a Variant
+     * @param options 
+     * @returns 
+     */
+    async create(options: Omit<Variant, "id"> & { include?: boolean }): Promise<Variant> {
         try {
             const createdVariant = await this.repo.create(options)
             return createdVariant
@@ -45,9 +50,14 @@ export default class VariantUsecase implements IVariantUsecase {
         }
     }
 
-    async getById(id: string): Promise<Variant | null> {
+    /**
+     * Retrieves a list of Variant
+     * @param options 
+     * @returns 
+     */
+    async findMany(options: { fields: Partial<Pick<Variant, "name" | "sku" | "productId" | "userId">>, orderBy?: [{createdAt: "asc"} | {createdAt: "desc"} | {updatedAt: "asc"} | {updatedAt: "desc"}], limit?: number, offset?: number, include?: boolean }): Promise<Variant[]> {
         try {
-            const searchedVariant = await this.repo.getById(id)
+            const searchedVariant = await this.repo.findMany(options)
             return searchedVariant
         } catch (error) {
             if (error instanceof REPO_ERROR) {
@@ -66,9 +76,14 @@ export default class VariantUsecase implements IVariantUsecase {
         }
     }
 
-    async updateById(id: string, authorId: string, options: Omit<Partial<Variant>, "id">): Promise<Variant> {
+    /**
+     * Retrieves a Variant by SKU
+     * @param options 
+     * @returns 
+     */
+    async findOneBySku(options: { sku: string, include?: boolean }): Promise<Variant | null> {
         try {
-            const updatedVariant = await this.repo.updateById(id, authorId, options)
+            const updatedVariant = await this.repo.findOneBySku(options)
             return updatedVariant
         } catch (error) {
             if (error instanceof REPO_ERROR) {
@@ -98,9 +113,83 @@ export default class VariantUsecase implements IVariantUsecase {
         }
     }
 
-    async deleteByID(id: string, authorId: string): Promise<void> {
+    /**
+     * Retrieves a Variant by ID
+     * @param id 
+     * @param authorId 
+     */
+    async findOneById(options: { id: string, include?: boolean }): Promise<Variant | null> {
         try {
-            const status = await this.repo.deleteById(id, authorId)
+            return await this.repo.findOneById(options)
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.INITIAL
+                        })
+                    case REPO_ERROR_CODE.NOTFOUND: 
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.NOTFOUND
+                        })
+                }
+            }
+            throw new USECASE_ERROR({
+                message: "Undefined error object",
+                code: USECASE_ERROR_CODE.UNDEFINED
+            })
+        }
+    }
+
+    /**
+     * Update a variant by ID
+     * @param options 
+     */
+    async updateById(options: { id: string; userId: string; fields: Partial<Omit<Variant, "id">>; include?: boolean; }): Promise<Variant> {
+        try {
+            return await this.repo.updateById(options)
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.INITIAL
+                        })
+                    case REPO_ERROR_CODE.NOTFOUND: 
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.NOTFOUND
+                        })
+                    case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.EXISTED
+                        })
+                    
+                    case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.CONSTRAINT
+                        })
+                }
+            }
+            throw new USECASE_ERROR({
+                message: "Undefined error object",
+                code: USECASE_ERROR_CODE.UNDEFINED
+            })
+        }
+    }
+
+    /**
+     * Delete a Variant by ID
+     * @param options 
+     */
+    async deleteById(options: { id: string; userId: string; }): Promise<void> {
+        try {
+            await this.repo.deleteById(options)
         } catch (error) {
             if (error instanceof REPO_ERROR) {
                 switch (error.code) {

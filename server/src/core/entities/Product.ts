@@ -1,44 +1,52 @@
-import { User, Category, Variant } from "core/entities/index.js"
+import { User, Category, Variant, Media } from "core/entities/index.js"
+
 type ProductConstructorParam = {
     id: string,
-    productCode: number,
+    product_code: number,
     name: string,
     description: string,
-    // relation
-    authorId: string,
-    author?: User,
     categoryId: number,
+    userId: string,
+    // relation
+    user?: User,
     category?: Category,
+    media?: Media[]
     variants?: Variant[]
 
     // time
-    createdAt: Date,
-    updatedAt: Date
+    createdAt?: Date,
+    updatedAt?: Date
 }
 
 export default class Product {
     id: string
-    productCode: number
+    product_code: number
     name: string
     description: string
-    authorId: string
-    author?: User
+    userId: string
     categoryId: number
+
+    user?: User
     category?: Category
+    media?: Media[]
     variants?: Variant[]
-    createdAt: Date
-    updatedAt: Date
+
+    createdAt?: Date
+    updatedAt?: Date
 
     constructor(options: ProductConstructorParam) {
         this.id = options.id
-        this.productCode = options.productCode
+        this.product_code = options.product_code
         this.name = options.name
         this.description = options.description
-        this.authorId = options.authorId
-        this.author = options.author
+        this.userId = options.userId
         this.categoryId = options.categoryId
+        
+        this.user = options.user
         this.category = options.category
+        this.media = options.media
         this.variants = options.variants
+        
         this.createdAt = options.createdAt
         this.updatedAt = options.updatedAt
     }

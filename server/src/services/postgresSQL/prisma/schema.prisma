@@ -19,8 +19,11 @@ model Roles {
   id Int @id @default(autoincrement())
   roleName String @unique @db.VarChar(30)
   description String? @db.VarChar(255)
+
+  // Relationship
   permissions Roles_Permissions[]
   users Users[]
+
   @@map("roles")
 }
 
@@ -28,15 +31,21 @@ model Permissions {
   id Int @id @default(autoincrement())
   perName String @unique @db.VarChar(30)
   description String? @db.VarChar(255)
+
+  // Relationship
   roles Roles_Permissions[]
+
   @@map("permission")
 }
 
 model Roles_Permissions {
-  role Roles @relation(fields: [roleId], references: [id])
   roleId Int 
-  permission Permissions @relation(fields: [permisId], references: [id])
   permisId Int
+
+  // Relationship
+  role Roles @relation(fields: [roleId], references: [id])
+  permission Permissions @relation(fields: [permisId], references: [id])
+
   @@id([roleId, permisId])
   @@map("roles_permission")
 }
@@ -47,11 +56,17 @@ model Users {
   account String  @db.VarChar(50) @unique
   password_hash String  @db.VarChar(255)
   email String @db.VarChar(255) @unique
-  role Roles @relation(fields: [roleId], references: [id])
+
+  // Foreign key
   roleId Int 
+
+  // Relationship
+  role Roles @relation(fields: [roleId], references: [id])
   products Products[]
   variants Variants[]
   media Media[]
+
+  // Time
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("users")
@@ -69,14 +84,16 @@ model Products {
   product_code Int @unique @default(autoincrement())
   name String
   description String
-  authorId String
-  author Users @relation(fields: [authorId], references: [id])
-  // relation
+
+  // Foreign key
+  userId String
   categoryId Int 
+
+  // Relationship
   category Categories @relation(fields: [categoryId], references: [id]) 
   variants Variants[]
   media Product_Media[]
-
+  user Users @relation(fields: [userId], references: [id])
 
   // time
   createdAt DateTime @default(now())
@@ -88,12 +105,18 @@ model Variants {
   id String @id @default(uuid(7))
   name String
   sku String @unique
-  productId String
-  product Products @relation(fields: [productId], references: [id])
-  authorId String
-  author Users @relation(fields: [authorId], references: [id])
-  price Decimal
   stock Int
+  price Decimal
+  userId String
+
+  // Foreign Key
+  productId String
+
+  // Relationship
+  user Users @relation(fields: [userId], references: [id])
+  product Products @relation(fields: [productId], references: [id])
+
+  // Time
   createdAt DateTime @default(now())  
   updatedAt DateTime @updatedAt
 }
@@ -105,14 +128,16 @@ model Media {
   hostname String
   media_type MediaType
   size Int
-  status MediaStatus @default(ORPHANED)
   userId String 
-  author Users @relation(fields: [userId], references: [id])
+
+  // Relationship
+  products Product_Media[]
+  user Users @relation(fields: [userId], references: [id])
+  status MediaStatus @default(ORPHANED)
+
+  // Time
   createdAt DateTime @default(now())  
   updatedAt DateTime @updatedAt
-
-  products Product_Media[]
-
 } 
 
 enum MediaType {
@@ -128,6 +153,8 @@ enum MediaStatus {
 model Product_Media {
   productId String
   mediaId String
+
+  // Relation ship
   product Products @relation(fields: [productId], references: [id])
   media Media @relation(fields: [mediaId], references: [id])
 

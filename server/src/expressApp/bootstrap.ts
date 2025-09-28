@@ -19,10 +19,10 @@ app.use(cors())
 app.use(logRequest)
 app.use(cookieParser())
 
-app.use('/api/auth', [bodyParser.json(), authorRouter]) // authorization API
+app.use('/api', [bodyParser.json(), authorRouter]) // authorization API
 app.use("/api", [bodyParser.json(), productRouter]) // product API
 app.use("/api", [bodyParser.json(), variantRouter]) // variant API
-app.use("/api/media", mediaRouter) // media API
+app.use("/api", mediaRouter) // media API
 
 
 export default app

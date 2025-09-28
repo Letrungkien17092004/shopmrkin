@@ -11,7 +11,7 @@ export default class ProductUsecase implements IProductUsecase {
         this.productRepo = productRepo
     }
 
-    async create(options: Omit<Product, "id" | "productCode" | "createdAt" | "updatedAt">): Promise<Product> {
+    async create(options: Omit<Product, "id" | "product_code" | "createdAt" | "updatedAt"> & { include?: boolean }): Promise<Product> {
         try {
             const createdProduct = await this.productRepo.create(options)
             return createdProduct
@@ -43,10 +43,30 @@ export default class ProductUsecase implements IProductUsecase {
             })
         }
     }
+
+    async findMany(options: { fields: Partial<Pick<Product, "userId" | "categoryId">>, orderBy?: [{createdAt: "asc"} | {createdAt: "desc"} | {updatedAt: "asc"} | {updatedAt: "desc"}], limit?: number, offset?: number, include?: boolean }): Promise<Product[]> {
+        try {
+            return await this.productRepo.findMany(options)
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.INITIAL
+                        })
+                }
+            }
+            throw new USECASE_ERROR({
+                message: (error as Error).message || "",
+                code: USECASE_ERROR_CODE.UNDEFINED
+            })
+        }
+    }
     
-    async getByProductCode(productCode: number): Promise<Product | null> {
+    async findOneByCode(options: { product_code: number, include?: boolean }): Promise<Product | null> {
         try {
-            const searchedProduct = await this.productRepo.getByProductCode(productCode)
+            const searchedProduct = await this.productRepo.findOneByCode(options)
             return searchedProduct
         } catch (error) {
             if (error instanceof REPO_ERROR) {
@@ -65,9 +85,9 @@ export default class ProductUsecase implements IProductUsecase {
         }
     }
 
-    async getById(id: string): Promise<Product | null> {
+    async findOneById(options: { id: string, include?: boolean }): Promise<Product | null> {
         try {
-            const searchedProduct = await this.productRepo.getById(id)
+            const searchedProduct = await this.productRepo.findOneById(options)
             return searchedProduct
         } catch (error) {
             if (error instanceof REPO_ERROR) {
@@ -86,9 +106,9 @@ export default class ProductUsecase implements IProductUsecase {
         }
     }
 
-    async updateById(id: string, authorId: string, options: Omit<Partial<Product>, "id">): Promise<Product> {
+    async updateById(options: { id: string, userId: string, fields: Partial<Omit<Product, "id">>, include?: boolean }): Promise<Product> {
         try {
-            const updatedProduct = await this.productRepo.updateById(id, authorId, options)
+            const updatedProduct = await this.productRepo.updateById(options)
             return updatedProduct
         } catch (error) {
             if (error instanceof REPO_ERROR) {
@@ -123,9 +143,9 @@ export default class ProductUsecase implements IProductUsecase {
         }
     }
 
-    async deleteById(id: string, authorId: string): Promise<void> {
+    async deleteById(options: { id: string, userId: string }): Promise<void> {
         try {
-            const status = await this.productRepo.deleteById(id, authorId)
+            const status = await this.productRepo.deleteById(options)
         } catch (error) {
             if (error instanceof REPO_ERROR) {
                 switch (error.code) {

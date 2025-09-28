@@ -3,7 +3,7 @@ import "express"
 declare global {
     namespace Express {
         interface Request {
-            author?: {
+            user?: {
                 id: string,
                 account: string,
                 username: string,

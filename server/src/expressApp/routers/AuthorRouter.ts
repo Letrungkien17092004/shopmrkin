@@ -19,11 +19,13 @@ const authorController = new AuthorController(userUsecase, adminUsecase)
 
 const authorRouter = Router()
 
-authorRouter.post("/registor", authorController.register)
-authorRouter.post("/login", authorController.login)
-authorRouter.post("/refesh-access-token", [authorRefeshToken, authorController.generateAccessToken])
-authorRouter.post("/verify-access-token", [authorAccessToken, authorController.verifyAccessToken])
-authorRouter.get("/google/url", authorController.generateOauth2RedirectUrl)
-authorRouter.get("/google/callback", authorController.authGoogleCallBack)
+authorRouter.post("/auth/registor", authorController.register)
+authorRouter.post("/auth/login", authorController.login)
+authorRouter.post("/auth/refesh-access-token", [authorRefeshToken, authorController.createAccessToken])
+authorRouter.post("/auth/verify-access-token", [authorAccessToken, authorController.verifyAccessToken])
+
+
+authorRouter.get("/auth/google-redirect-url", authorController.generateOauth2RedirectUrl)
+authorRouter.get("/auth/login-google", authorController.loginWithGoogle)
 
 export default authorRouter

@@ -6,12 +6,12 @@ type VariantConstructorParam = {
     sku: string,
     productId: string,
     product?: Product,
-    authorId: string
-    author?: User
+    userId: string
+    user?: User
     price: number,
     stock: number,
-    createdAt: Date,
-    updatedAt: Date
+    createdAt?: Date,
+    updatedAt?: Date
 }
 
 export default class Variant {
@@ -19,13 +19,15 @@ export default class Variant {
     name: string
     sku: string
     productId: string
-    product?: Product
-    authorId: string
-    author?: User
+    userId: string
     price: number
     stock: number
-    createdAt: Date
-    updatedAt: Date
+    
+    product?: Product
+    user?: User
+    
+    createdAt?: Date
+    updatedAt?: Date
 
     constructor(options: VariantConstructorParam) {
         this.id = options.id
@@ -33,8 +35,8 @@ export default class Variant {
         this.sku = options.sku
         this.productId = options.productId
         this.product = options.product
-        this.authorId = options.authorId
-        this.author = options.author
+        this.userId = options.userId
+        this.user = options.user
         this.price = options.price
         this.stock = options.stock
         this.createdAt = options.createdAt

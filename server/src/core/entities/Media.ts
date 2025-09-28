@@ -9,9 +9,9 @@ type MediaConstructorParam = {
     size: number
     status: "ORPHANED" | "ASSIGNED"
     userId: string
-    author?: User
-    createdAt: Date
-    updatedAt: Date
+    user?: User
+    createdAt?: Date
+    updatedAt?: Date
 }
 
 export default class Media {
@@ -22,11 +22,12 @@ export default class Media {
     media_type: "IMAGE" | "VIDEO"
     size: number
     status: "ORPHANED" | "ASSIGNED"
+    
     userId: string
-    author?: User
+    user?: User
 
-    createdAt: Date
-    updatedAt: Date
+    createdAt?: Date
+    updatedAt?: Date
 
     constructor(options: MediaConstructorParam) {
         this.id = options.id
@@ -37,7 +38,7 @@ export default class Media {
         this.size = options.size
         this.status = options.status
         this.userId = options.userId
-        this.author = options.author
+        this.user = options.user
         this.createdAt = options.createdAt
         this.updatedAt = options.updatedAt
     }

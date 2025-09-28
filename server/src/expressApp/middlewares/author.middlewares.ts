@@ -5,8 +5,13 @@ import { z } from "zod"
 
 export async function authorRefeshToken(req: Request, res: Response, next: NextFunction) {
     try {
-        const authorToken = req.cookies["refesh_token"]
-
+        const authorToken = req.headers["authorization"]?req.headers["authorization"].split(" ")[1]:undefined
+        if (!authorToken) {
+            res.status(401).json({
+                message: "Unauthorized "
+            })
+            return
+        }
         if (!authorToken) {
             res.status(401).json({
                 message: "Unauthorized "
@@ -25,7 +30,7 @@ export async function authorRefeshToken(req: Request, res: Response, next: NextF
         const deocoded = jwt.verify(authorToken, ENV.JWT_SECRET)
         const payload = PayloadSchema.parse(deocoded)
 
-        req.author = payload
+        req.user = payload
         next()
     } catch (error) {
         console.log("Log in author middleware")
@@ -78,7 +83,7 @@ export async function authorAccessToken(req: Request, res: Response, next: NextF
         const deocoded = jwt.verify(authorToken, ENV.JWT_SECRET)
         const payload = PayloadSchema.parse(deocoded)
 
-        req.author = payload
+        req.user = payload
         next()
     } catch (error) {
         console.log("Log in author middleware")

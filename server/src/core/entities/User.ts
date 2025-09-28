@@ -1,4 +1,7 @@
 import Role from "./Role.js"
+import Product from "./Product.js"
+import Variant from "./Variant.js"
+import Media from "./Media.js"
 
 export type UserConstructorParam = {
     id: string
@@ -7,7 +10,10 @@ export type UserConstructorParam = {
     password_hash: string
     email: string
     roleId: number
-    role: Role
+    role?: Role
+
+    createdAt?: Date
+    updatedAt?: Date
 }
 /**
  * Represents a user entity in the system.
@@ -16,44 +22,18 @@ export type UserConstructorParam = {
  * This class encapsulates user information such as credentials, contact details, and role association.
  */
 export default class User {
-    /**
-     * The unique identifier of the user.
-     * @remarks
-     * May be null if the user has not been persisted yet.
-     */
+
     id: string
-
-    /**
-     * The display name of the user.
-     */
     username: string
-
-    /**
-     * The account name used for login.
-     */
     account: string
-
-    /**
-     * The hashed password of the user.
-     */
     password_hash: string
-
-    /**
-     * The email address of the user.
-     * @remarks
-     * May be null if not provided.
-     */
     email: string
-
-    /**
-     * The identifier of the role assigned to the user.
-     */
     roleId: number
-
-    /**
-     * the role object
-     */
+    
     role?: Role
+
+    createdAt?: Date
+    updatedAt?: Date
 
     /**
      * Creates a new instance of the User class.
@@ -67,5 +47,7 @@ export default class User {
         this.email = options.email
         this.roleId = options.roleId
         this.role = options.role
+        this.createdAt = options.createdAt
+        this.updatedAt = options.updatedAt
     }
 }

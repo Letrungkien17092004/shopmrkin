@@ -1,8 +1,15 @@
 import { Request, Response } from "express";
 import IProductUsecase from "core/applications/interfaces/usecases/IProductUsecase.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
-import { ProductMapper } from "adapter/mappers/ProductMapper.js";
 import { z } from "zod"
+import { ProductDTO } from "adapter/DTO/index.js"
+
+// CONSTANT
+const MAX_NAME_LENGTH = 200
+const MAX_DESCRIPTION_LENGTH = 1000
+
+const MIN_NAME_LENGTH = 5
+const MIN_DESCRIPTION_LENGTH = 5
 
 
 export default class ProductController {
@@ -10,17 +17,11 @@ export default class ProductController {
 
     constructor(productUsecase: IProductUsecase) {
         this.productUsecase = productUsecase
-
-        this.addProduct = this.addProduct.bind(this)
-        this.findProductWithId = this.findProductWithId.bind(this)
-        this.findProductWithCode = this.findProductWithCode.bind(this)
-        this.updateProduct = this.updateProduct.bind(this)
-        this.deleteProduct = this.deleteProduct.bind(this)
     }
 
-    async addProduct(req: Request, res: Response): Promise<void> {
+    create = async (req: Request, res: Response): Promise<void> => {
         try {
-            if (!req.author) {
+            if (!req.user) {
                 res.status(401).json({
                     message: "Unauthorized"
                 })
@@ -28,37 +29,42 @@ export default class ProductController {
             }
 
             // not an admin
-            if (req.author.role.toLowerCase() != "administrator") {
+            if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
                     message: "require administrator role"
                 })
                 return
             }
 
-            // create Z schema
-            const ProductSchema = z.object({
-                name: z.string().min(10).max(50),
-                description: z.string().min(1).max(1000),
-                categoryId: z.number()
+            const CreateDataSchema = z.object({
+                fields: z.object({
+                    name: z.string().min(MIN_NAME_LENGTH).max(MAX_NAME_LENGTH),
+                    description: z.string().min(MIN_DESCRIPTION_LENGTH).max(MAX_DESCRIPTION_LENGTH),
+                    categoryId: z.number()
+                }),
+                include: z.enum(["0", "1"]).optional()
             })
 
             // parser the body
-            const data = ProductSchema.parse(req.body)
+            const createDataSchema = CreateDataSchema.parse({
+                fields: req.body,
+                include: req.query.include
+            })
 
             const createdProduct = await this.productUsecase.create({
-                ...data,
-                authorId: req.author.id
+                ...createDataSchema.fields,
+                userId: req.user.id,
+                include: Boolean(Number(createDataSchema.include))
             })
 
             res.status(201).json({
-                message: "OK",
-                productId: createdProduct.id
+                product: createdProduct
             })
             return
         } catch (error) {
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
-                    case USECASE_ERROR_CODE.ENGINE:
+                    case USECASE_ERROR_CODE.INITIAL:
                         res.status(500).json({
                             message: "Server Internal Error!"
                         })
@@ -90,11 +96,72 @@ export default class ProductController {
         }
     }
 
-    async findProductWithId(req: Request, res: Response): Promise<void> {
+    findMany = async (req: Request, res: Response): Promise<void> => {
         try {
-            const idString = req.params['id']
-            
-            const searchedProduct = await this.productUsecase.getById(idString)
+            const FindManyOption = z.object({
+                fields: z.object({
+                    categoryId: z.number().optional(),
+                    userId: z.string().optional(),
+                }),
+                limit: z.number().optional(),
+                offset: z.number().optional(),
+                include: z.enum(["0", "1"]).optional()
+            })
+
+            const findManyOption = FindManyOption.parse({
+                fields: z.object({
+                    categoryId: Number(req.query.categoryId),
+                    userId: req.query.userId,
+                }),
+                limit: Number(req.query.limit),
+                offset: Number(req.query.offset),
+                include: req.query.include
+            })
+
+            const products = await this.productUsecase.findMany({
+                fields: findManyOption.fields,
+                limit: Number(req.query.limit),
+                offset: Number(req.query.offset),
+                include: Boolean(Number(req.query.include))
+            })
+            res.status(200).json({
+                products: ProductDTO.toOutputMany(products)
+            })
+        } catch (error) {
+            console.log(error)
+            if (error instanceof USECASE_ERROR) {
+                if (error.code === USECASE_ERROR_CODE.INITIAL) {
+                    res.status(500).json({
+                        message: "Database Error"
+                    })
+                    return
+                }
+            }
+
+            res.status(500).json({
+                message: "Server internal error"
+            })
+            return
+        }
+    }
+
+    findOneByCode = async (req: Request, res: Response): Promise<void> => {
+        try {
+
+            const FindOption = z.object({
+                product_code: z.number(),
+                include: z.enum(["0", "1"]).optional()
+            })
+
+            const findOption = FindOption.parse({
+                product_code: Number(req.params["product_code"]),
+                include: req.query.include
+            })
+
+            const searchedProduct = await this.productUsecase.findOneByCode({
+                product_code: findOption.product_code,
+                include: Boolean(Number(findOption.include))
+            })
             if (!searchedProduct) {
                 res.status(404).json({
                     message: "Product not found"
@@ -103,13 +170,61 @@ export default class ProductController {
             }
 
             res.status(200).json({
-                product: ProductMapper.toOutputSafe(searchedProduct)
+                product: ProductDTO.toInputSingle(searchedProduct)
             })
             return
         } catch (error) {
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
-                    case USECASE_ERROR_CODE.ENGINE:
+                    case USECASE_ERROR_CODE.INITIAL:
+                        res.status(500).json({
+                            message: "Server Internal Error!"
+                        })
+                        return
+
+                }
+            }
+
+            res.status(500).json({
+                message: "Server Internal Error!"
+            })
+            return
+
+        }
+    }
+
+    findOneById = async (req: Request, res: Response): Promise<void> => {
+        try {
+
+            const FindOption = z.object({
+                id: z.string(),
+                include: z.enum(["0", "1"]).optional()
+            })
+
+            const findOption = FindOption.parse({
+                id: req.params["id"],
+                include: req.query.include
+            })
+
+            const searchedProduct = await this.productUsecase.findOneById({
+                id: findOption.id,
+                include: Boolean(Number(findOption.include))
+            })
+            if (!searchedProduct) {
+                res.status(404).json({
+                    message: "Product not found"
+                })
+                return
+            }
+
+            res.status(200).json({
+                product: ProductDTO.toOutputSingle(searchedProduct)
+            })
+            return
+        } catch (error) {
+            if (error instanceof USECASE_ERROR) {
+                switch (error.code) {
+                    case USECASE_ERROR_CODE.INITIAL:
                         res.status(500).json({
                             message: "Server Internal Error!"
                         })
@@ -121,79 +236,51 @@ export default class ProductController {
                 message: "Server Internal Error!"
             })
             return
-            
+
         }
     }
 
-    async findProductWithCode(req: Request, res: Response): Promise<void> {
+    updateById = async (req: Request, res: Response): Promise<void> => {
         try {
-            const productCode = Number(req.params['product_code'])
-            
-            const searchedProduct = await this.productUsecase.getByProductCode(productCode)
-            if (!searchedProduct) {
-                res.status(404).json({
-                    message: "Product not found"
-                })
-                return
-            }
-
-            res.status(200).json({
-                product: ProductMapper.toOutputSafe(searchedProduct)
-            })
-            return
-        } catch (error) {
-            if (error instanceof USECASE_ERROR) {
-                switch (error.code) {
-                    case USECASE_ERROR_CODE.ENGINE:
-                        res.status(500).json({
-                            message: "Server Internal Error!"
-                        })
-                        return
-                }
-            }
-
-            res.status(500).json({
-                message: "Server Internal Error!"
-            })
-            return
-            
-        }
-    }
-
-    async updateProduct(req: Request, res: Response): Promise<void> {
-        try {
-            if (!req.author) {
+            if (!req.user) {
                 res.status(401).json({
                     message: "Unauthorized"
                 })
                 return
             }
 
-            if (req.author.role.toLowerCase() != "administrator") {
+            if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
                     message: "require administrator role"
                 })
                 return
             }
 
-            const productId = req.params['id']
-            const UpdateSchema = z.object({
-                name: z.string().min(10).max(50).optional(),
-                description: z.string().min(1).max(100).optional(),
-                categoryId: z.number().optional()
+            const UpdateOption = z.object({
+                id: z.string(),
+                fields: z.object({
+                    name: z.string().min(MIN_NAME_LENGTH).max(MAX_NAME_LENGTH).optional(),
+                    description: z.string().min(MIN_DESCRIPTION_LENGTH).max(MAX_DESCRIPTION_LENGTH).optional(),
+                    categoryId: z.number().optional()
+                }),
+                include: z.enum(["0", "1"]).optional()
             })
 
-            const dataToUpdate = UpdateSchema.parse(req.body)
+            const updateOption = UpdateOption.parse({
+                id: req.params["id"],
+                fields: req.body,
+                include: req.query.include
+            })
 
-            const updatedProduct = await this.productUsecase.updateById(
-                productId,
-                req.author.id,
-                dataToUpdate
-            )
+            const updatedProduct = await this.productUsecase.updateById({
+                id: updateOption.id,
+                userId: req.user.id,
+                fields: updateOption.fields,
+                include: Boolean(Number(updateOption.include))
+            })
 
             res.status(200).json({
-                message: "OK",
-                product: ProductMapper.toOutputSafe(updatedProduct)
+                product: ProductDTO.toOutputSingle(updatedProduct)
             })
             return
         } catch (error) {
@@ -227,25 +314,28 @@ export default class ProductController {
         }
     }
 
-    async deleteProduct(req: Request, res: Response): Promise<void> {
+    deleteById = async (req: Request, res: Response): Promise<void> => {
         try {
-            const productId = req.params['id']
-
-            if (!req.author) {
+            if (!req.user) {
                 res.status(401).json({
                     message: "Unauthorized"
                 })
                 return
             }
 
-            if (req.author.role.toLowerCase() != "administrator")  {
+            if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
                     message: "require administrator role"
                 })
                 return
             }
 
-            await this.productUsecase.deleteById(productId, req.author.id)
+            const id = req.params["id"]
+            await this.productUsecase.deleteById({
+                id: id,
+                userId: req.user.id
+            })
+
             res.status(200).json({
                 message: "OK"
             })
@@ -253,9 +343,14 @@ export default class ProductController {
         } catch (error) {
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
+                    case USECASE_ERROR_CODE.INITIAL:
+                        res.status(404).json({
+                            message: "Database error"
+                        })
+                        return
                     case USECASE_ERROR_CODE.NOTFOUND:
                         res.status(404).json({
-                            message: "Product not found, or authorId not match"
+                            message: "Product not found or you don't own this resoucre"
                         })
                         return
                 }

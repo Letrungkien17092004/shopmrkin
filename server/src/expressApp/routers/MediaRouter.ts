@@ -11,7 +11,7 @@ const mediaController = new MediaController(mediaUsecase)
 
 const mediaRouter = Router()
 
-mediaRouter.post("/upload", authorAccessToken, uploadMiddleware.array("media"), mediaController.createMany)
+mediaRouter.post("/media/upload", authorAccessToken, uploadMiddleware.array("media"), mediaController.createMany)
 
 export default mediaRouter
 

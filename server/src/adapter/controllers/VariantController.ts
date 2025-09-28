@@ -1,7 +1,9 @@
-import { VariantMapper } from "adapter/mappers/VariantMapper.js";
 import IVariantUsecase from "core/applications/interfaces/usecases/IVariantUsecase.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
 import { Request, Response } from "express";
+
+import { VariantDTO } from "adapter/DTO/index.js"
+
 import { z } from "zod"
 
 export default class VariantController {
@@ -9,46 +11,49 @@ export default class VariantController {
 
     constructor(usecase: IVariantUsecase) {
         this.usecase = usecase
-
-        this.create = this.create.bind(this)
-        this.findWithId = this.findWithId.bind(this)
-        this.updateById = this.updateById.bind(this)
-        this.deleteById = this.deleteById.bind(this)
     }
 
-    async create(req: Request, res: Response): Promise<void> {
+    create = async (req: Request, res: Response): Promise<void> => {
         try {
 
-            if (!req.author) {
+            if (!req.user) {
                 res.status(401).json({
                     message: "Unauthorized"
                 })
                 return
             }
 
-            if (req.author.role.toLowerCase() != "administrator") {
+            if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
                     message: "require administrator role"
                 })
                 return
             }
 
-            const VariantSchema = z.object({
-                name: z.string().min(5).max(50),
-                sku: z.string().min(5).max(20),
-                productId: z.string(),
-                price: z.number(),
-                stock: z.number(),
+            const CreateDataSchema = z.object({
+                fields: z.object({
+                    name: z.string().min(5).max(50),
+                    sku: z.string().min(5).max(20),
+                    productId: z.string(),
+                    price: z.number(),
+                    stock: z.number(),
+                }),
+                include: z.enum(["0", "1"]).optional()
             })
 
-            const dataToCreate = VariantSchema.parse(req.body)
+            const createData = CreateDataSchema.parse({
+                fields: req.body,
+                include: req.query.include
+            })
+
+            const dataToCreate = VariantDTO.toInputSingle({ ...createData.fields, userId: req.user.id })
 
             const createdVariant = await this.usecase.create({
                 ...dataToCreate,
-                authorId: req.author.id
+                include: Boolean(Number(createData.include))
             })
             res.status(201).json({
-                variant: createdVariant
+                variant: VariantDTO.toOutputSingle(createdVariant)
             })
             return
         } catch (error) {
@@ -82,10 +87,64 @@ export default class VariantController {
         }
     }
 
-    async findWithId(req: Request, res: Response): Promise<void> {
+    findMany = async (req: Request, res: Response): Promise<void> => {
         try {
-            const variantId = req.params['id']
-            const searchedVariant = await this.usecase.getById(variantId)
+            const FindManyOption = z.object({
+                fields: z.object({
+                    name: z.string().optional(),
+                    sku: z.string().optional(),
+                    productId: z.string().optional(),
+                    userId: z.string().optional(),
+                }),
+                limit: z.number().optional(),
+                offset: z.number().optional(),
+                include: z.enum(["0", "1"]).optional()
+            })
+
+            const findManyOption = FindManyOption.parse({
+                fields: {
+                    name: req.query.name,
+                    sku: req.query.sku,
+                    productId: req.query.productId,
+                    userId: req.query.userId
+                },
+                limit: Number(req.query.limit),
+                offset: Number(req.query.offset),
+                include: req.query.include
+            })
+
+            const variants = await this.usecase.findMany({
+                fields: findManyOption.fields,
+                limit: findManyOption.limit,
+                offset: findManyOption.offset,
+                include: Boolean(Number(findManyOption.include))
+            })
+            res.status(200).json({
+                variants: VariantDTO.toOutputMany(variants)
+            })
+        } catch (error) {
+            res.status(500).json({
+                message: "Something went wrong"
+            })
+        }
+    }
+
+    findOneById = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const ReqDataSchema = z.object({
+                variantId: z.string(),
+                include: z.enum(["0", "1"]).optional()
+            })
+
+            const reqData = ReqDataSchema.parse({
+                variantId: req.params['variantId'],
+                include: req.query.include
+            })
+
+            const searchedVariant = await this.usecase.findOneById({
+                id: reqData.variantId,
+                include: Boolean(Number(reqData.include))
+            })
 
             if (!searchedVariant) {
                 res.status(404).json({
@@ -95,7 +154,7 @@ export default class VariantController {
             }
 
             res.status(200).json({
-                variant: VariantMapper.toOutputSafe(searchedVariant)
+                variant: VariantDTO.toOutputSingle(searchedVariant)
             })
             return
         } catch (error) {
@@ -106,37 +165,49 @@ export default class VariantController {
         }
     }
 
-    async updateById(req: Request, res: Response): Promise<void> {
+    updateById = async (req: Request, res: Response): Promise<void> => {
         try {
 
-            if (!req.author) {
+            if (!req.user) {
                 res.status(401).json({
                     message: "Unauthorized"
                 })
                 return
             }
 
-            if (req.author.role.toLowerCase() != "administrator") {
+            if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
                     message: "require administrator role"
                 })
                 return
             }
 
-            const variantId = req.params['id']
-            const VariantSchema = z.object({
-                name: z.string().min(5).max(50).optional(),
-                sku: z.string().min(5).max(20).optional(),
-                price: z.number().optional(),
-                stock: z.number().optional(),
+            const UpdateDataSchema = z.object({
+                variantId: z.string(),
+                fields: z.object({
+                    name: z.string().min(5).max(50).optional(),
+                    sku: z.string().min(5).max(20).optional(),
+                    price: z.number().optional(),
+                    stock: z.number().optional(),
+                }),
+                include: z.enum(["0", "1"]).optional()
             })
 
-            const dataToUpdate = VariantSchema.parse(req.body)
+            const updateData = UpdateDataSchema.parse({
+                variantId: req.params['id'],
+                fields: req.body,
+                include: req.query.include
+            })
 
-            const updatedVariant = await this.usecase.updateById(variantId, req.author.id, dataToUpdate)
+            const updatedVariant = await this.usecase.updateById({
+                id: updateData.variantId,
+                fields: updateData.fields,
+                userId: req.user.id,
+                include: Boolean(Number(updateData.include))
+            })
 
             res.status(200).json({
-                variant: VariantMapper.toOutputSafe(updatedVariant)
+                variant: VariantDTO.toOutputSingle(updatedVariant)
             })
             return
         } catch (error) {
@@ -159,16 +230,16 @@ export default class VariantController {
         }
     }
 
-    async deleteById(req: Request, res: Response): Promise<void> {
+    deleteById = async (req: Request, res: Response): Promise<void> => {
         try {
-            if (!req.author) {
+            if (!req.user) {
                 res.status(401).json({
                     message: "Unauthorized"
                 })
                 return
             }
 
-            if (req.author.role.toLowerCase() != "administrator") {
+            if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
                     message: "require administrator role"
                 })
@@ -176,9 +247,10 @@ export default class VariantController {
             }
 
             const variantId = req.params['id']
-
-            // try delete
-            await this.usecase.deleteByID(variantId, req.author.id)
+            await this.usecase.deleteById({
+                id: variantId,
+                userId: req.user.id
+            })
             res.status(200).json({
                 message: "Delete successfuly"
             })
