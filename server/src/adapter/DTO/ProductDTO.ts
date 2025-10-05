@@ -21,6 +21,7 @@ type ToOutput = {
     category?: string,
     media?: { filePath: string, hostname: string,type: string }[],
     variants?: {
+        id: string,
         name: string,
         sku: string,
         price: number,
@@ -59,6 +60,7 @@ export default class ProductDTO {
         } | undefined = undefined
 
         var variants: {
+            id: string,
             name: string,
             sku: string,
             price: number,
@@ -77,6 +79,7 @@ export default class ProductDTO {
 
         if (product.variants) {
             variants = product.variants.map(v => ({
+                id: v.id,
                 name: v.name,
                 sku: v.sku,
                 price: v.price,

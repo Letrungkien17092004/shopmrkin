@@ -99,7 +99,9 @@ export default class VariantRepository implements IVariantRepository {
                     user: true,
                     product: true
                 },
-                orderBy: options.orderBy
+                orderBy: options.orderBy,
+                skip: options.offset,
+                take: options.limit
             })
 
             return searchedVariant.map(variant => new Variant({
@@ -163,14 +165,14 @@ export default class VariantRepository implements IVariantRepository {
             if (include === false) {
                 const searchVariant = await prisma.variants.findUnique({
                     where: {
-                        sku: options.id
+                        id: options.id
                     }
                 })
                 return searchVariant ? new Variant({ ...searchVariant, price: Number(searchVariant.price) }) : null
             }
             const searchVariant = await prisma.variants.findUnique({
                 where: {
-                    sku: options.id
+                    id: options.id
                 },
                 include: {
                     user: true,

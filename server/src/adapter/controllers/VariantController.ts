@@ -108,8 +108,8 @@ export default class VariantController {
                     productId: req.query.productId,
                     userId: req.query.userId
                 },
-                limit: Number(req.query.limit),
-                offset: Number(req.query.offset),
+                limit: Number(req.query.limit) || undefined,
+                offset: Number(req.query.offset) || undefined,
                 include: req.query.include
             })
 
@@ -123,6 +123,7 @@ export default class VariantController {
                 variants: VariantDTO.toOutputMany(variants)
             })
         } catch (error) {
+            console.log(error)
             res.status(500).json({
                 message: "Something went wrong"
             })
@@ -137,10 +138,11 @@ export default class VariantController {
             })
 
             const reqData = ReqDataSchema.parse({
-                variantId: req.params['variantId'],
+                variantId: req.params['id'],
                 include: req.query.include
             })
 
+            console.log("id: ", reqData.variantId)
             const searchedVariant = await this.usecase.findOneById({
                 id: reqData.variantId,
                 include: Boolean(Number(reqData.include))
@@ -158,6 +160,7 @@ export default class VariantController {
             })
             return
         } catch (error) {
+            console.log(error)
             res.status(500).json({
                 message: "Server Internal Error!"
             })

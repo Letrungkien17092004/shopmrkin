@@ -67,7 +67,7 @@ export default class ProductRepository implements IProductRepository {
                         categoryId: options.fields.categoryId,
                     },
                     orderBy: orderBy,
-                    skip: options.offset,
+                    skip: options.offset || 0,
                     take: options.limit || 100
                 })
                 return products.map(p => new Product({ ...p }))
@@ -89,8 +89,8 @@ export default class ProductRepository implements IProductRepository {
                     category: true
                 },
                 orderBy: orderBy,
-                skip: options.offset,
-                take: options.limit || 100
+                skip: options.offset || 0,
+                take: options.limit || 10
             })
             return products.map(p => {
                 const media = p.media.map(m => new Media({

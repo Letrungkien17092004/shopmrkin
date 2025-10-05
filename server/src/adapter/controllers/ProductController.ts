@@ -58,7 +58,7 @@ export default class ProductController {
             })
 
             res.status(201).json({
-                product: createdProduct
+                product: ProductDTO.toOutputSingle(createdProduct)
             })
             return
         } catch (error) {
@@ -113,8 +113,8 @@ export default class ProductController {
                     categoryId: Number(req.query.categoryId),
                     userId: req.query.userId,
                 }),
-                limit: Number(req.query.limit),
-                offset: Number(req.query.offset),
+                limit: Number(req.query.limit) || undefined,
+                offset: Number(req.query.offset) || undefined,
                 include: req.query.include
             })
 
