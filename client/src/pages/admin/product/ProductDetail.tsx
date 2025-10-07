@@ -49,7 +49,7 @@ export default function ProductDetail() {
                                         {/* image */}
                                         <div className="col l-7">
                                             <div className="w-full">
-                                                <img className="image-contain" src={product.imgUrl} alt={`img ${product.productName}`} />
+                                                <img className="image-contain" src={product.media[0]?.filePath} alt={`img ${product.name}`} />
                                             </div>
                                         </div>
                                         {/* name, price, stock */}
@@ -57,7 +57,7 @@ export default function ProductDetail() {
                                             {/* name */}
                                             <div className="w-full pad-bot-12px">
                                                 <p className="paragraph font-medium">
-                                                    {product.productName}
+                                                    {product.name}
                                                 </p>
                                             </div>
                                             {/* price */}

@@ -40,6 +40,7 @@ export default function ProductCreateForm() {
             } catch (error) {
                 window.alert("có lỗi xảy ra")
                 console.error("Can't create product: ", error)
+                setIsSaving(false)
             }
         }
         createData()

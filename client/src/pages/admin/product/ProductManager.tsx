@@ -2,31 +2,72 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductService from "../../../services/ProductService.ts";
 import type { Product } from "../../../services/ProductService.ts";
-import { NormalButton, DangerButton } from "../../../components/buttons/Button.tsx";
+import { NormalButton } from "../../../components/buttons/Button.tsx";
+import Loading from "../../../components/Loading.tsx";
+import Notification from "../../../components/notifications/Notification.tsx";
+import { ProductTable } from "../../../components/table/index.ts"
+import useNotificationController from "../../../hooks/useNotificationController.ts";
 
 const productService = new ProductService()
 export default function ProductManager() {
     const [products, setProducts] = useState<Product[]>([])
-
+    const [toDelete, setToDelete] = useState<string | null>(null)
+    const [isDeleting, setIsDeleting] = useState<boolean>(false)
+    const { notifications, pushNotification, removeNotification } = useNotificationController()
     // initial data
     useEffect(() => {
-        const controller = new AbortController()
         const fetch = async () => {
             setProducts(await productService.getAll())
         }
 
         fetch()
-        return () => controller.abort()
     }, [])
 
-    const OnDeleteItem = useCallback((id: string) => {
-        return async (e: React.MouseEvent) => {
+    // delete product 
+    useEffect(() => {
+        if (!toDelete) { return }
+        const deleteData = async () => {
+            try {
+                await productService.deleteById(toDelete)
+                setProducts(await productService.getAll())
+                pushNotification({
+                    message: "Xóa thành công",
+                    type: "bottom-right"
+                })
+            } catch (error) {
+                console.log("Có lỗi xảy ra vui lòng thử lại sau")
+                pushNotification({
+                    message: "Xóa không thành công",
+                    type: "bottom-right"
+                })
+
+            } finally {
+                setToDelete(null)
+                setIsDeleting(false)
+            }
+        }
+
+        deleteData()
+        setIsDeleting(true)
+    }, [toDelete])
+
+
+    // create Event handler, handle delete product by product's id
+    const createDeleteEventHandler = useCallback((id: string) => {
+        return (e: React.MouseEvent) => {
             e.stopPropagation()
-            await productService.deleteById(id)
-            setProducts(prev => prev.filter(prod => prod.id !== id))
+            setToDelete(id)
         }
     }, [])
     return (<>
+        {notifications.map(notice => (
+            <Notification
+                key={notice.id}
+                message={notice.message}
+                type={notice.type}
+                onClose={removeNotification(notice.id)}
+            />
+        ))}
         <div className="pad-24px h-full-vh">
             <div className="h-5pt">
                 <span className="text-3xl font-normal">
@@ -39,50 +80,26 @@ export default function ProductManager() {
                 </NormalButton>
             </div>
             <div className="dash-dark"></div>
-            <div className="h-90pt product-table-wrapper overflow-scroll-y">
-                <table className="product-table text-sm font-normal">
-                    <thead>
-                        <tr>
-                            <th>#ID</th>
-                            <th>Ảnh</th>
-                            <th>Tên SP</th>
-                            <th>Khoảng giá</th>
-                            <th>Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products.map(prod => (
-                            <tr key={prod.id}>
-                                <td title={prod.id} className="product-table-id">{prod.id}</td>
-                                <td className="product-image">
-                                    <img src={prod.imgUrl} alt="Tên SP" />
-                                </td>
-                                <td>{prod.productName}</td>
-                                <td className="price">{prod.minPrice} - {prod.maxPrice}</td>
-                                <td className="stock">{prod.stock}</td>
-                                <td className="actions">
-                                    <NormalButton>
-                                        <Link
-                                        style={
-                                            {
-                                                fontSize: 'inherit', 
-                                                textDecoration: "none", 
-                                                color: "inherit"
-                                            }}
-                                        to={prod.id}
-                                        >
-                                            Chi tiết
-                                        </Link>
-                                        </NormalButton>
-                                    <DangerButton onClick={OnDeleteItem(prod.id)}>Xóa</DangerButton>
-                                </td>
-                            </tr>
-                        ))}
-
-                    </tbody>
-                </table>
-            </div>
+            {
+                isDeleting
+                    ? (
+                        <Loading />
+                    )
+                    : (
+                        <div className="h-90pt product-table-wrapper overflow-scroll-y">
+                            <ProductTable
+                            listProduct={products.map(p => ({
+                                ...p,
+                                imageURL: p.media[0]?.filePath || "",
+                                minPrice: p.minPrice,
+                                maxPrice: p.maxPrice,
+                                stock: p.stock
+                            }))}
+                            createDeleteEventHandler={createDeleteEventHandler}
+                            />
+                        </div>
+                    )
+            }
         </div>
     </>)
 }

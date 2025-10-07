@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useReducer, useState } from "react";
-import { NormalButton } from "../../../components/buttons/Button.tsx";
+import { DangerButton, NormalButton } from "../../../components/buttons/Button.tsx";
 import ProductService, { Product } from "../../../services/ProductService.ts";
 import TextAreaInput from "../../../components/TextAreaInput.tsx";
 import VariantModifyForm from "./VariantModifyForm.tsx";
@@ -12,7 +12,10 @@ export default function ProductModifyForm({ id }: { id: string }) {
     const [prod, setProd] = useState<Product | null>(null)
     const [prodName, setProdName] = useState<string>("")
     const [prodDescription, setProdDescription] = useState<string>("")
-    const [isSaving, setIsSaving] = useState<boolean>(false)
+    const [productSavingState, setProductSavingState] = useState<"nosaving" | "saving" | "done" | "error">("nosaving")
+    const [variantsSavingState, setVariantsSavingState] = useState<"nosaving" | "saving" | "done" | "error">("nosaving")
+    const [totalSavingState, setTotalSavingState] = useState<"nosaving" | "saving" | "done" | "error">("nosaving")
+    const [isChanged, setIsChanged] = useState<boolean>(false)
 
     // fetch product
     useEffect(() => {
@@ -22,7 +25,7 @@ export default function ProductModifyForm({ id }: { id: string }) {
                 const prod_ = await productService.findById(id)
                 if (prod_) {
                     setProd(prod_)
-                    setProdName(prod_.productName)
+                    setProdName(prod_.name)
                     setProdDescription(prod_.description)
                 }
             } catch (error) {
@@ -36,39 +39,63 @@ export default function ProductModifyForm({ id }: { id: string }) {
         fetchProd()
     }, [loaded])
 
-    // click save
+    // handle save product
     useEffect(() => {
-        if (!isSaving) return
+        if (productSavingState !== "saving") return
+        if (!isChanged) {
+            setProductSavingState("done")
+            return
+        }
         if (!prod) return
+
         const modifyData = async () => {
             try {
                 const updated = await productService.updateById(prod.id, {
-                    productName: prodName,
+                    name: prodName,
                     description: prodDescription
                 })
-                window.alert("Xong!")
+                setProductSavingState("done")
             } catch (error) {
-                window.alert("có lỗi xảy ra")
+                setProductSavingState("error")
                 console.error("Can't create product: ", error)
-            } finally {
-                setIsSaving(false)
             }
         }
         modifyData()
-    }, [prodName, prodDescription, isSaving])
+    }, [prodName, prodDescription, productSavingState])
 
+    // update total saving state when all update is done
+    useEffect(() => {
+        if (totalSavingState !== "saving") { return }
+        if (productSavingState === "done" && variantsSavingState === "done") {
+            setTotalSavingState("done")
+            return
+        }
+        if (productSavingState === "error" || variantsSavingState === "error") {
+            setTotalSavingState("error")
+            return
+        }
+    }, [productSavingState, variantsSavingState, totalSavingState])
+
+    // Create event handler, set product name
     const onChangeName = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setIsChanged(true)
         setProdName(e.target.value)
     }, [prodName])
 
-    const onChangeDescription = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    // Create event handler, set product description
+    const onisChangedescription = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setIsChanged(true)
         setProdDescription(e.target.value)
     }, [prodDescription])
 
+    // Craete event handler, handle when user clicks "save"
     const onClickSave = useCallback((e: React.MouseEvent) => {
         e.stopPropagation()
-        setIsSaving(true)
+        setProductSavingState("saving")
+        setVariantsSavingState("saving")
+        setTotalSavingState("saving")
     }, [])
+
 
     if (loaded && !prod) {
         return <h1>Không tìm thấy sản phẩm này</h1>
@@ -115,7 +142,7 @@ export default function ProductModifyForm({ id }: { id: string }) {
                                     textareaId="product-description"
                                     placeholder="viết mô tả sản phẩm ở đây"
                                     value={prodDescription}
-                                    onChange={onChangeDescription}
+                                    onChange={onisChangedescription}
                                 />
                             </div>
                         </div>
@@ -124,14 +151,20 @@ export default function ProductModifyForm({ id }: { id: string }) {
 
                 <div className="product-form-field w-full">
                     <h3>Thêm phân loại</h3>
-                    <VariantModifyForm id={prod.id} isSaving={isSaving}/>
+                    <VariantModifyForm id={prod.id} savingState={variantsSavingState} setSavingState={setVariantsSavingState} />
                 </div>
 
                 <div className="dash-dark"></div>
                 <div className="w-full">
-                    {isSaving
+                    {totalSavingState === "saving"
                         ? <NormalButton>Đang xử lý</NormalButton>
-                        : <NormalButton onClick={onClickSave}>Lưu</NormalButton>
+                        :
+                        totalSavingState === "nosaving"
+                            ? <NormalButton onClick={onClickSave}>Lưu</NormalButton>
+                            :
+                            totalSavingState === "done"
+                                ? <NormalButton>Xong</NormalButton>
+                                : <DangerButton>Có lỗi xảy ra</DangerButton>
                     }
                 </div>
             </section>

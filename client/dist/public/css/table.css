@@ -1,0 +1,79 @@
+
+/* ==== Table ==== */
+.table-wrapper {
+    width: 100%;
+    padding: 16px;
+    padding-left: 0;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table .table-data-image {
+    width: 80px;
+}
+
+.table .table-data-image img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.thead {
+    background: #f5f6f8;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: #555;
+}
+
+.table th,
+.table td {
+    padding: 12px 16px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.table tbody tr {
+    border-top: 1px solid #eee;
+    transition: background 0.2s ease-in;
+}
+
+.table tbody tr:hover {
+    background: #fafafa;
+}
+
+.table .table-data-code {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 350px;
+}
+
+.table .table-data-price {
+    color: #0f9d58;
+    font-weight: bold;
+}
+
+.table .table-data-stock {
+    text-align: center;
+    font-weight: bold;
+    color: #333;
+}
+
+.table .table-data-actions {
+    text-align: center;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+

@@ -1,6 +1,8 @@
 import React, { useCallback, useState } from "react"
 import { Outlet, Link } from "react-router-dom"
+import AuthService from "../../services/AuthService.ts"
 
+const authService = new AuthService()
 
 export default function Manager() {
     type TabNames = "" | "Dashboard" | "Products" | "Orders" | "Delivery" | "Customer"
@@ -30,10 +32,12 @@ export default function Manager() {
                             {/* User info */}
                             <div className="w-full">
                                 <div className="flex flex-col flex-center">
-                                    <img className="avatar-40px" src="/public/svg/user-regular-full.svg" alt="" />
+                                    <img className="avatar-40px" src={`${authService.getProfile().picture}`} />
                                 </div>
                                 <div className="text-ac text-sm mar-top-8px font-bold">
-                                    Admin
+                                    {
+                                        authService.getProfile().username
+                                    }
                                 </div>
                             </div>
                             <div className="dash-dark"></div>

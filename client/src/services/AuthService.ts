@@ -6,6 +6,7 @@ type UserProfile = {
     email: string,
     account: string,
     username: string,
+    picture: string
 }
 
 export default class AuthService {
@@ -35,6 +36,15 @@ export default class AuthService {
     storeRefeshToken(refeshToken: string): void {
         localStorage.setItem("refesh_token", refeshToken)
         localStorage.setItem("refesh_token_createdAt", new Date(Date.now()).toDateString())
+    }
+
+    /**
+     * Retrieves refesh_token from localStorage
+     * @returns {string}
+     */
+    getRefeshToken(): string {
+        const token = localStorage.getItem("refesh_token") || ""
+        return token
     }
 
     /**
@@ -128,7 +138,7 @@ export default class AuthService {
     async veriyAccessToken(): Promise<boolean> {
         try {
             const token = localStorage.getItem("accessToken");
-            const response = await axios.get("http://localhost:8000/api/author/verify-access-token", {
+            const response = await axios.get("http://localhost:8000/api/auth/verify-access-token", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -152,10 +162,18 @@ export default class AuthService {
     async refeshAccess(): Promise<boolean> {
         try {
             type APIResponse = {
-                message: string,
                 accessToken: string
             }
-            const response = await axios.get<APIResponse>(`${ENV.BACK_END_HOST}/api/auth/refesh-access-token`)
+            const response = await axios.post<APIResponse>(
+                `${ENV.BACK_END_HOST}/api/auth/refesh-access-token`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${this.getRefeshToken()}`
+                    }
+                }
+            )
+            this.storeAccessToken(response.data.accessToken)
             console.log(response)
             return true
         } catch (error) {
