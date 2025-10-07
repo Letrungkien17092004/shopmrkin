@@ -219,7 +219,7 @@ export default class VariantRepository implements IVariantRepository {
             const searchVariant = await prisma.variants.update({
                 data: {
                     name: options.fields.name,
-                    sku: options.fields.name,
+                    sku: options.fields.sku,
                     price: options.fields.price,
                     stock: options.fields.stock
                 },
