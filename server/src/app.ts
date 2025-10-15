@@ -1,5 +1,5 @@
 import app from "./expressApp/bootstrap.js";
-
-app.listen(8000, () => {
+import { ENV } from "./config/env.js";
+app.listen(ENV.PORT, () => {
     console.log("listening at: http://localhost:8000")
 })
