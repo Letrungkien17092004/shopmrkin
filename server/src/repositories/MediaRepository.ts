@@ -24,21 +24,6 @@ export default class MediaRepository implements IMediaRepository {
                 }
             })
 
-            const blankRole = new Role({
-                id: -100,
-                roleName: "NOROLE",
-                description: null
-            })
-            const blankUser = new User({
-                id: "",
-                username: "",
-                account: "",
-                password_hash: "",
-                email: "",
-                roleId: -100,
-                role: blankRole
-            })
-
             return new Media({
                 id: createdMedia.id,
                 fileName: createdMedia.fileName,
@@ -48,7 +33,6 @@ export default class MediaRepository implements IMediaRepository {
                 size: createdMedia.size,
                 status: createdMedia.status,
                 userId: createdMedia.userId,
-                author: blankUser,
                 createdAt: createdMedia.createdAt,
                 updatedAt: createdMedia.updatedAt
             })
@@ -69,25 +53,10 @@ export default class MediaRepository implements IMediaRepository {
                     id: id
                 }
             })
-            
+
             if (!searchedMedia) {
                 return null
             }
-
-            const blankRole = new Role({
-                id: -100,
-                roleName: "NOROLE",
-                description: null
-            })
-            const blankUser = new User({
-                id: "",
-                username: "",
-                account: "",
-                password_hash: "",
-                email: "",
-                roleId: -100,
-                role: blankRole
-            })
 
             return new Media({
                 id: searchedMedia.id,
@@ -98,9 +67,38 @@ export default class MediaRepository implements IMediaRepository {
                 size: searchedMedia.size,
                 status: searchedMedia.status,
                 userId: searchedMedia.userId,
-                author: blankUser,
                 createdAt: searchedMedia.createdAt,
                 updatedAt: searchedMedia.updatedAt
+            })
+        } catch (error) {
+            throw baseExceptionHandler(error)
+        }
+    }
+
+    async assignMediaToProduct(mediaId: string, productId: string): Promise<Media> {
+        try {
+            const productMedia = await prisma.product_Media.create({
+                data: {
+                    mediaId: mediaId,
+                    productId: productId
+                },
+                relationLoadStrategy: "join",
+                include: {
+                    media: true
+                }
+            })
+            return new Media({
+                id: productMedia.media.id,
+                fileName: productMedia.media.fileName,
+                filePath: productMedia.media.filePath,
+                hostname: productMedia.media.hostname,
+                media_type: productMedia.media.media_type,
+                size: productMedia.media.size,
+                userId: productMedia.media.userId,
+                status: productMedia.media.status,
+                createdAt: productMedia.media.createdAt,
+                updatedAt: productMedia.media.updatedAt
+
             })
         } catch (error) {
             throw baseExceptionHandler(error)
@@ -119,24 +117,8 @@ export default class MediaRepository implements IMediaRepository {
                     id: id
                 },
                 data: {
-                    media_type: options.media_type,
                     status: options.status,
                 }
-            })
-
-            const blankRole = new Role({
-                id: -100,
-                roleName: "NOROLE",
-                description: null
-            })
-            const blankUser = new User({
-                id: "",
-                username: "",
-                account: "",
-                password_hash: "",
-                email: "",
-                roleId: -100,
-                role: blankRole
             })
 
             return new Media({
@@ -148,7 +130,6 @@ export default class MediaRepository implements IMediaRepository {
                 size: updatedMedia.size,
                 status: updatedMedia.status,
                 userId: updatedMedia.userId,
-                author: blankUser,
                 createdAt: updatedMedia.createdAt,
                 updatedAt: updatedMedia.updatedAt
             })

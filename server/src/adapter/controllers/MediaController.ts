@@ -3,7 +3,7 @@ import IMediaUsecase from "core/applications/interfaces/usecases/IMediaUsecase.j
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
 import { z } from "zod"
 import { ENV } from "config/env.js";
-import { MediaDTO, MediaToOutput } from "adapter/DTO/index.js"
+import { MediaDTO } from "adapter/DTO/index.js"
 const FilesMulter = z.array(
     z.object({
         fieldname: z.string(),
@@ -31,7 +31,7 @@ export default class MediaController {
                 })
             }
             const files = FilesMulter.parse(req.files)
-            const media: MediaToOutput[] = []
+            const media: MediaDTO.OutputType[] = []
             for (let i = 0; i < files.length; i++) {
                 const createdMedia = await this.usecase.create({
                     fileName: files[i].filename,
@@ -43,7 +43,7 @@ export default class MediaController {
                     userId: req.user!.id
                 })
 
-                media.push(MediaDTO.toOutputMany(createdMedia))
+                media.push(MediaDTO.toOutputOne(createdMedia))
             }
             res.status(200).json({
                 media: media
@@ -52,6 +52,44 @@ export default class MediaController {
         } catch (error) {
             console.log(error)
             res.status(500).send("ERROR")
+        }
+    }
+
+    /**
+     * Assign a list media to a product
+     * @param req 
+     * @param res 
+     */
+    assignMediaToProduct = async (req: Request, res: Response) => {
+        try {
+            if (!req.user) {
+                res.status(401).json({
+                    message: "Unauthorized"
+                })
+            }
+            const BodySchema = z.object({
+                listMediaId: z.array(z.string()).min(1),
+                productId: z.string()
+            })
+            const { listMediaId, productId } = BodySchema.parse(req.body)
+            const mediaOutput: MediaDTO.OutputType[] = []
+            for (let i = 0; i < listMediaId.length; i++) {
+                const medId = listMediaId[i]!
+                mediaOutput.push(await this.usecase.assignMediaToProduct(medId, productId))
+            }
+            res.status(200).json({
+                media: mediaOutput
+            })
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                res.status(40).json({
+                    message: "invalid body data"
+                })
+                return
+            }
+            res.status(500).json({
+                error: error
+            })
         }
     }
 }

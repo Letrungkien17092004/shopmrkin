@@ -3,11 +3,15 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser"
 import { Request, Response, NextFunction } from "express";
 import cors from "cors"
+import path from "path";
 // import router
 import authorRouter from "expressApp/routers/AuthorRouter.js";
 import productRouter from "./routers/ProductRouter.js";
 import variantRouter from "./routers/VariantRouter.js";
 import mediaRouter from "./routers/MediaRouter.js";
+
+const PUBLIC_DIR = path.join(process.cwd(), "public")
+console.log(PUBLIC_DIR)
 
 function logRequest(req: Request, res: Response, next: NextFunction) {
     console.log(`[${req.method}] ${req.protocol}://${req.hostname}:8000${req.path}`)
@@ -18,6 +22,7 @@ const app = express()
 app.use(cors())
 app.use(logRequest)
 app.use(cookieParser())
+app.use("/public", express.static(PUBLIC_DIR))
 
 app.use('/api', [bodyParser.json(), authorRouter]) // authorization API
 app.use("/api", [bodyParser.json(), productRouter]) // product API
