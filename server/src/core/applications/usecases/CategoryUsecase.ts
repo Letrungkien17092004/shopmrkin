@@ -2,7 +2,7 @@ import ICategoryUsecase from "../interfaces/usecases/ICategoryUsecase.js";
 import ICategoryRepository from "../interfaces/repositories/ICategoryRepository.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../interfaces/usecases/errors.js";
 import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.js";
-import { Category } from "core/entities/index.js"
+import { Category } from "../../../core/entities/index.js"
 
 
 export default class CategoryUsecase implements ICategoryUsecase {

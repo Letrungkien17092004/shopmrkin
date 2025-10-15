@@ -1,4 +1,4 @@
-import { Category } from "core/entities/index.js";
+import { Category } from "../../../../core/entities/index.js";
 
 
 export default interface ICategoryRepository {

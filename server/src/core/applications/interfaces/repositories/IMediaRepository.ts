@@ -1,4 +1,4 @@
-import { Media } from "core/entities/index.js"
+import { Media } from "../../../../core/entities/index.js"
 
 
 export default interface IMediaRepository {

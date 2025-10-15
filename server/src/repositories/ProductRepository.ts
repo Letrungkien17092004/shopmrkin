@@ -1,7 +1,7 @@
-import { Category, Product, User, Variant, Media } from "core/entities/index.js";
-import IProductRepository from "core/applications/interfaces/repositories/IProductRepository.js";
-import { baseExceptionHandler } from "core/applications/interfaces/repositories/errors.js";
-import { PrismaClient } from "services/postgresSQL/generated/prisma/client/index.js";
+import { Category, Product, User, Variant, Media } from "../core/entities/index.js";
+import IProductRepository from "../core/applications/interfaces/repositories/IProductRepository.js";
+import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient()
 
@@ -31,14 +31,20 @@ export default class ProductRepository implements IProductRepository {
                         category: true
                     }
                 })
+                var category: Category | null = null
+                if (createdProduct.category) {
+                    category = new Category({
+                        id: createdProduct.category.id,
+                        name: createdProduct.category?.name,
+                        slug: createdProduct.category?.slug
+                    })
+                }
                 return new Product({
                     ...createdProduct,
                     user: new User({
                         ...createdProduct.user
                     }),
-                    category: new Category({
-                        ...createdProduct.category
-                    })
+                    category: category
                 })
             }
 
@@ -50,7 +56,7 @@ export default class ProductRepository implements IProductRepository {
                     userId: options.userId
                 }
             })
-            return new Product({ ...createdProduct })
+            return new Product({ ...createdProduct, category: null })
         } catch (error) {
             throw baseExceptionHandler(error)
         }
@@ -70,7 +76,7 @@ export default class ProductRepository implements IProductRepository {
                     skip: options.offset || 0,
                     take: options.limit || 100
                 })
-                return products.map(p => new Product({ ...p }))
+                return products.map(p => new Product({ ...p, category: null }))
             }
 
             const products = await prisma.products.findMany({
@@ -131,6 +137,7 @@ export default class ProductRepository implements IProductRepository {
                 })
             })
         } catch (error) {
+            console.log("Log herrrr", error)
             throw baseExceptionHandler(error)
         }
     }
@@ -151,7 +158,7 @@ export default class ProductRepository implements IProductRepository {
                     }
                 })
                 if (!searchedProduct) return null
-                return new Product({ ...searchedProduct })
+                return new Product({ ...searchedProduct, category: null })
             }
 
             const searchedProduct = await prisma.products.findUnique({
@@ -228,7 +235,7 @@ export default class ProductRepository implements IProductRepository {
                     }
                 })
                 if (!searchedProduct) return null
-                return new Product({ ...searchedProduct })
+                return new Product({ ...searchedProduct, category: null })
             }
 
             const searchedProduct = await prisma.products.findUnique({
@@ -279,11 +286,21 @@ export default class ProductRepository implements IProductRepository {
                 roleId: searchedProduct.user.roleId,
             })
 
+            var category: Category | null = null
+            if (searchedProduct.category) {
+                category = new Category({
+                    id: searchedProduct.category.id,
+                    name: searchedProduct.category?.name,
+                    slug: searchedProduct.category?.slug
+                })
+            }
+
             return new Product({
                 ...searchedProduct,
                 media: media,
                 user: user,
-                variants: variants
+                variants: variants,
+                category: category
             })
         } catch (error) {
             throw baseExceptionHandler(error)
@@ -313,7 +330,7 @@ export default class ProductRepository implements IProductRepository {
                         categoryId: options.fields.categoryId
                     }
                 })
-                return new Product({ ...updatedProduct })
+                return new Product({ ...updatedProduct, category: null })
             }
 
             const updatedProduct = await prisma.products.update({
@@ -370,11 +387,21 @@ export default class ProductRepository implements IProductRepository {
                 roleId: updatedProduct.user.roleId,
             })
 
+            var category: Category | null = null
+            if (updatedProduct.category) {
+                category = new Category({
+                    id: updatedProduct.category.id,
+                    name: updatedProduct.category?.name,
+                    slug: updatedProduct.category?.slug
+                })
+            }
+
             return new Product({
                 ...updatedProduct,
                 media: media,
                 user: user,
-                variants: variants
+                variants: variants,
+                category: category
             })
         } catch (error) {
             throw baseExceptionHandler(error)

@@ -1,4 +1,4 @@
-import {Role, Permission, RolePermission} from 'core/entities/index.js'
+import {Role, Permission, RolePermission} from '../../../../core/entities/index.js'
 
 export default interface IAdminSystemUsecase {
     createRole(attributes: Pick<Role, "roleName" | "description">): Promise<Role>

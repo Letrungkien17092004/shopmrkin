@@ -1,4 +1,4 @@
-import {Permission} from "core/entities/index.js";
+import {Permission} from "../../../../core/entities/index.js";
 
 export default interface IPermissionsRepository {
     create(options: Omit<Permission, "id">): Promise<Permission>

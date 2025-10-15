@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import IMediaUsecase from "core/applications/interfaces/usecases/IMediaUsecase.js";
-import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
+import IMediaUsecase from "../../core/applications/interfaces/usecases/IMediaUsecase.js";
+import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js";
 import { z } from "zod"
-import { ENV } from "config/env.js";
-import { MediaDTO } from "adapter/DTO/index.js"
+import { ENV } from "../../config/env.js";
+import { MediaDTO } from "../../adapter/DTO/index.js"
 const FilesMulter = z.array(
     z.object({
         fieldname: z.string(),
@@ -36,7 +36,7 @@ export default class MediaController {
                 const createdMedia = await this.usecase.create({
                     fileName: files[i].filename,
                     filePath: `${ENV.UPLOAD_FOLDER}/${files[i].filename}`,
-                    hostname: "localhost:8000",
+                    hostname: "http://localhost:8000",
                     media_type: files[i].mimetype.split("/")[0] === "video" ? "VIDEO" : "IMAGE",
                     size: files[i].size,
                     status: "ORPHANED",

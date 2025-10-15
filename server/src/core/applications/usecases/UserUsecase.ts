@@ -2,7 +2,7 @@ import IUserUsecase from "../interfaces/usecases/IUserUsecase.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../interfaces/usecases/errors.js";
 import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.js";
 import IUsersRepository from "../interfaces/repositories/IUsersRepository.js";
-import { User } from "core/entities/index.js";
+import { User } from "../../../core/entities/index.js";
 import bcrypt from 'bcrypt';
 
 export default class UserUsecase implements IUserUsecase {

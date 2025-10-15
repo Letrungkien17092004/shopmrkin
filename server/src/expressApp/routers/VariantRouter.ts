@@ -1,8 +1,8 @@
 import { Router } from "express";
-import VariantController from "adapter/controllers/VariantController.js";
-import { authorAccessToken } from "expressApp/middlewares/author.middlewares.js";
-import VariantRepository from "repositories/VariantRepository.js";
-import VariantUsecase from "core/applications/usecases/VariantUsecase.js";
+import VariantController from "../../adapter/controllers/VariantController.js";
+import { authorAccessToken } from "../../expressApp/middlewares/author.middlewares.js";
+import VariantRepository from "../../repositories/VariantRepository.js";
+import VariantUsecase from "../../core/applications/usecases/VariantUsecase.js";
 
 const repo = new VariantRepository()
 const usecase = new VariantUsecase(repo)

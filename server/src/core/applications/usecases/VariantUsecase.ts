@@ -1,8 +1,8 @@
-import { Variant } from "core/entities/index.js"
-import IVariantRepository from "core/applications/interfaces/repositories/IVariantRepository.js"
-import IVariantUsecase from "core/applications/interfaces/usecases/IVariantUsecase.js"
-import { REPO_ERROR, REPO_ERROR_CODE } from "core/applications/interfaces/repositories/errors.js"
-import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js"
+import { Variant } from "../../../core/entities/index.js"
+import IVariantRepository from "../../../core/applications/interfaces/repositories/IVariantRepository.js"
+import IVariantUsecase from "../../../core/applications/interfaces/usecases/IVariantUsecase.js"
+import { REPO_ERROR, REPO_ERROR_CODE } from "../../../core/applications/interfaces/repositories/errors.js"
+import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../../core/applications/interfaces/usecases/errors.js"
 
 
 export default class VariantUsecase implements IVariantUsecase {

@@ -5,13 +5,12 @@ import { Request, Response, NextFunction } from "express";
 import cors from "cors"
 import path from "path";
 // import router
-import authorRouter from "expressApp/routers/AuthorRouter.js";
+import authorRouter from "./routers/AuthorRouter.js";
 import productRouter from "./routers/ProductRouter.js";
 import variantRouter from "./routers/VariantRouter.js";
 import mediaRouter from "./routers/MediaRouter.js";
 
 const PUBLIC_DIR = path.join(process.cwd(), "public")
-console.log(PUBLIC_DIR)
 
 function logRequest(req: Request, res: Response, next: NextFunction) {
     console.log(`[${req.method}] ${req.protocol}://${req.hostname}:8000${req.path}`)

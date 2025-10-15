@@ -1,7 +1,7 @@
 import crypto from "crypto"
 import multer from "multer";
 import path from "path"
-import { ENV } from "config/env.js";
+import { ENV } from "../../config/env.js";
 
 // path config
 const __dirname = import.meta.dirname

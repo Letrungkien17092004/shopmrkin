@@ -1,7 +1,7 @@
-import IMediaRepository from "core/applications/interfaces/repositories/IMediaRepository.js";
-import { PrismaClient } from "services/postgresSQL/generated/prisma/client/index.js";
-import { Media, User, Role } from "core/entities/index.js"
-import { baseExceptionHandler } from "core/applications/interfaces/repositories/errors.js";
+import IMediaRepository from "../core/applications/interfaces/repositories/IMediaRepository.js";
+import { PrismaClient } from "@prisma/client";
+import { Media, User, Role } from "../core/entities/index.js"
+import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
 
 const prisma = new PrismaClient()
 export default class MediaRepository implements IMediaRepository {

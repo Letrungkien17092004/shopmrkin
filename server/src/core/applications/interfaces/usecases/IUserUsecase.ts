@@ -1,4 +1,4 @@
-import User, {UserConstructorParam} from "core/entities/User.js"
+import User, {UserConstructorParam} from "../../../../core/entities/User.js"
 
 export default interface IUserUsecase {
     create(options: Omit<User, "id" | "roleId">): Promise<User>

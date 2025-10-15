@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import IProductUsecase from "core/applications/interfaces/usecases/IProductUsecase.js";
-import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
+import IProductUsecase from "../../core/applications/interfaces/usecases/IProductUsecase.js";
+import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js";
 import { z } from "zod"
-import { ProductDTO } from "adapter/DTO/index.js"
+import { ProductDTO } from "../../adapter/DTO/index.js"
 
 // CONSTANT
 const MAX_NAME_LENGTH = 200
@@ -341,6 +341,7 @@ export default class ProductController {
             })
             return
         } catch (error) {
+            console.log(error)
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
                     case USECASE_ERROR_CODE.INITIAL:

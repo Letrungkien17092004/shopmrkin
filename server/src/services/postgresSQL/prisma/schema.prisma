@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma/client"
   previewFeatures = ["relationJoins"]
 }
 
@@ -87,10 +86,10 @@ model Products {
 
   // Foreign key
   userId String
-  categoryId Int 
+  categoryId Int? 
 
   // Relationship
-  category Categories @relation(fields: [categoryId], references: [id]) 
+  category Categories? @relation(fields: [categoryId], references: [id], onDelete: SetNull) 
   variants Variants[]
   media Product_Media[]
   user Users @relation(fields: [userId], references: [id])
@@ -113,8 +112,8 @@ model Variants {
   productId String
 
   // Relationship
-  user Users @relation(fields: [userId], references: [id])
-  product Products @relation(fields: [productId], references: [id])
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Products @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   // Time
   createdAt DateTime @default(now())  
@@ -132,7 +131,7 @@ model Media {
 
   // Relationship
   products Product_Media[]
-  user Users @relation(fields: [userId], references: [id])
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
   status MediaStatus @default(ORPHANED)
 
   // Time
@@ -155,8 +154,8 @@ model Product_Media {
   mediaId String
 
   // Relation ship
-  product Products @relation(fields: [productId], references: [id])
-  media Media @relation(fields: [mediaId], references: [id])
+  product Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
 
   @@id([productId, mediaId])
 }

@@ -1,10 +1,10 @@
-import { Product } from "core/entities/index.js";
+import { Product } from "../../core/entities/index.js";
 
 type InputParams = {
     product_code: number,
     name: string,
     description: string,
-    categoryId: number,
+    categoryId: number | null,
     userId: string,
 }
 

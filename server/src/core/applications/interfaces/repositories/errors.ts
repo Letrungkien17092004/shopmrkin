@@ -20,7 +20,7 @@ import {
     PrismaClientKnownRequestError,
     PrismaClientInitializationError,
     PrismaClientRustPanicError
-} from "services/postgresSQL/generated/prisma/client/runtime/library.js";
+} from "@prisma/client/runtime/library.js";
 
 /**
  * enum for the REPO ERROR CODE
@@ -42,7 +42,7 @@ export enum REPO_ERROR_CODE {
 export class REPO_ERROR extends Error {
     code: REPO_ERROR_CODE
 
-    constructor({message, code}: {message?: string, code: REPO_ERROR_CODE}) {
+    constructor({ message, code }: { message?: string, code: REPO_ERROR_CODE }) {
         super(message)
         this.code = code
     }
@@ -58,6 +58,7 @@ export class REPO_ERROR extends Error {
  * - string REPO_ERROR.code: error code
  */
 export function baseExceptionHandler(error: unknown) {
+    console.log("Error in Repo:", error)
     if (error instanceof PrismaClientKnownRequestError) {
         switch (error.code) {
             case "P1003":

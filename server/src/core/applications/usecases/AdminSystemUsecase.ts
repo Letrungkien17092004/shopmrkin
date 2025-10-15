@@ -1,5 +1,5 @@
 import IAdminSystemUsecase from "../interfaces/usecases/IAdminSystemUsecase.js";
-import { Role, Permission, RolePermission } from "core/entities/index.js"
+import { Role, Permission, RolePermission } from "../../../core/entities/index.js"
 import IRolesRepository from "../interfaces/repositories/IRolesRepository.js";
 import IPermissionsRepository from "../interfaces/repositories/IPermissionsRepository.js";
 import IRolePerRepository from "../interfaces/repositories/IRolePerRepository.js";

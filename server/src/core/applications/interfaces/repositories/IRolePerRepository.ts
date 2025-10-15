@@ -1,4 +1,4 @@
-import RolePermission from "core/entities/RolePermission.js";
+import RolePermission from "../../../../core/entities/RolePermission.js";
 
 
 

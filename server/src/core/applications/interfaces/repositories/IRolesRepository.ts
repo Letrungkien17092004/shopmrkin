@@ -1,4 +1,4 @@
-import {Role} from "core/entities/index.js"
+import {Role} from "../../../../core/entities/index.js"
 
 export default interface IRolesRepository {
     create(newRole: Partial<Role>): Promise<Role>

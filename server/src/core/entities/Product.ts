@@ -1,15 +1,15 @@
-import { User, Category, Variant, Media } from "core/entities/index.js"
+import { User, Category, Variant, Media } from "../../core/entities/index.js"
 
 type ProductConstructorParam = {
     id: string,
     product_code: number,
     name: string,
     description: string,
-    categoryId: number,
+    categoryId: number | null,
     userId: string,
     // relation
     user?: User,
-    category?: Category,
+    category?: Category | null,
     media?: Media[]
     variants?: Variant[]
 
@@ -24,10 +24,10 @@ export default class Product {
     name: string
     description: string
     userId: string
-    categoryId: number
+    categoryId: number | null
 
     user?: User
-    category?: Category
+    category?: Category | null
     media?: Media[]
     variants?: Variant[]
 

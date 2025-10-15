@@ -1,4 +1,4 @@
-import { Product } from "core/entities/index.js";
+import { Product } from "../../../../core/entities/index.js";
 
 export default interface IProductUsecase {
     create(options: Omit<Product, "id" | "product_code" | "createdAt" | "updatedAt"> & { include?: boolean }): Promise<Product>

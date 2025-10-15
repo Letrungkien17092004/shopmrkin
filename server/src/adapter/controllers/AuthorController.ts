@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import axios from "axios"
-import IUserUsecase from "core/applications/interfaces/usecases/IUserUsecase.js";
-import IAdminSystemUsecase from "core/applications/interfaces/usecases/IAdminSystemUsecase.js";
-import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
+import IUserUsecase from "../../core/applications/interfaces/usecases/IUserUsecase.js";
+import IAdminSystemUsecase from "../../core/applications/interfaces/usecases/IAdminSystemUsecase.js";
+import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js";
 import jwt from "jsonwebtoken";
-import { ENV } from "config/env.js";
+import { ENV } from "../../config/env.js";
 
 type GoogleUserProfile = {
     email: string,
@@ -310,7 +310,7 @@ export default class AuthorController {
                     username: userInDB.username,
                     email: userInDB.email,
                     role: userInDB.role!.roleName,
-                    permissions: userInDB.role!.permissions!.map(p => p.perName)
+                    permissions: (userInDB.role?.permissions?.map(p => p.perName)) || []
                 }
                 const refeshToken = jwt.sign(
                     payload,

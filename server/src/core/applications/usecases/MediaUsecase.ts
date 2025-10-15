@@ -2,7 +2,7 @@ import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.j
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../interfaces/usecases/errors.js";
 import IMediaRepository from "../interfaces/repositories/IMediaRepository.js";
 import IMediaUsecase from "../interfaces/usecases/IMediaUsecase.js";
-import { Media } from "core/entities/index.js"
+import { Media } from "../../../core/entities/index.js"
 
 export default class MediaUsecase implements IMediaUsecase {
     private repo: IMediaRepository

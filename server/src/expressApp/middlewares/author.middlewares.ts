@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken"
-import { ENV } from "config/env.js";
+import { ENV } from "../../config/env.js";
 import { z } from "zod"
 
 export async function authorRefeshToken(req: Request, res: Response, next: NextFunction) {

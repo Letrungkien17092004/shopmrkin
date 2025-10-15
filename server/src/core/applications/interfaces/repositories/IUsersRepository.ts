@@ -1,4 +1,4 @@
-import { User } from "core/entities/index.js"
+import { User } from "../../../../core/entities/index.js"
 
 export default interface IUsersRepository {
     create(attributes: Omit<User, "id" | "roleId">): Promise<User>

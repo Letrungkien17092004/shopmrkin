@@ -1,8 +1,8 @@
-import IVariantUsecase from "core/applications/interfaces/usecases/IVariantUsecase.js";
-import { USECASE_ERROR, USECASE_ERROR_CODE } from "core/applications/interfaces/usecases/errors.js";
+import IVariantUsecase from "../../core/applications/interfaces/usecases/IVariantUsecase.js";
+import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js";
 import { Request, Response } from "express";
 
-import { VariantDTO } from "adapter/DTO/index.js"
+import { VariantDTO } from "../../adapter/DTO/index.js"
 
 import { z } from "zod"
 

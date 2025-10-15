@@ -1,8 +1,8 @@
 import { Router } from "express";
-import ProductController from "adapter/controllers/ProductController.js";
-import ProductRepository from "repositories/ProductRepository.js";
-import ProductUsecase from "core/applications/usecases/ProductUsecase.js";
-import { authorAccessToken } from "expressApp/middlewares/author.middlewares.js";
+import ProductController from "../../adapter/controllers/ProductController.js";
+import ProductRepository from "../../repositories/ProductRepository.js";
+import ProductUsecase from "../../core/applications/usecases/ProductUsecase.js";
+import { authorAccessToken } from "../../expressApp/middlewares/author.middlewares.js";
 
 const repo = new ProductRepository()
 const usecase = new ProductUsecase(repo)

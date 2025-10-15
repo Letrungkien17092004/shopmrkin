@@ -1,7 +1,7 @@
-import { Category } from "core/entities/index.js";
-import { PrismaClient } from "services/postgresSQL/generated/prisma/client/index.js";
-import ICategoryRepository from "core/applications/interfaces/repositories/ICategoryRepository.js";
-import { baseExceptionHandler } from "core/applications/interfaces/repositories/errors.js";
+import { Category } from "../core/entities/index.js";
+import { PrismaClient } from "@prisma/client";
+import ICategoryRepository from "../core/applications/interfaces/repositories/ICategoryRepository.js";
+import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
 
 const prisma = new PrismaClient()
 export default class CategoryRepository implements ICategoryRepository {

@@ -1,4 +1,4 @@
-import { Variant } from "core/entities/index.js";
+import { Variant } from "../../../../core/entities/index.js";
 
 export default interface IVariantRepository {
     create(options: Omit<Variant, "id"> & { include?: boolean }): Promise<Variant>

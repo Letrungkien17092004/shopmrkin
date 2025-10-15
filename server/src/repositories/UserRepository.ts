@@ -1,7 +1,7 @@
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js"
-import { PrismaClient } from "services/postgresSQL/generated/prisma/client/client.js";
-import { User, Role, Permission } from "core/entities/index.js"
-import IUsersRepository from "core/applications/interfaces/repositories/IUsersRepository.js";
+import { PrismaClient } from "@prisma/client";
+import { User, Role, Permission } from "../core/entities/index.js"
+import IUsersRepository from "../core/applications/interfaces/repositories/IUsersRepository.js";
 import crypto from 'crypto';
 
 const prisma = new PrismaClient()

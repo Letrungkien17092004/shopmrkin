@@ -1,4 +1,4 @@
-import { Variant } from "core/entities/index.js"
+import { Variant } from "../../core/entities/index.js"
 
 type InputParams = {
     name: string,

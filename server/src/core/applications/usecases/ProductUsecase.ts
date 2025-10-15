@@ -1,4 +1,4 @@
-import { Product } from "core/entities/index.js"
+import { Product } from "../../../core/entities/index.js"
 import IProductUsecase from "../interfaces/usecases/IProductUsecase.js"
 import IProductRepository from "../interfaces/repositories/IProductRepository.js"
 import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.js"

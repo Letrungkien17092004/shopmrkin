@@ -1,4 +1,4 @@
-import { Product } from "core/entities/index.js";
+import { Product } from "../../../../core/entities/index.js";
 
 
 export default interface IProductRepository {
