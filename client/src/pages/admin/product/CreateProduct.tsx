@@ -1,12 +1,113 @@
-import React from "react";
-import ProductCreateForm from "./ProductCreateForm.tsx";
+import React, { useCallback, useEffect, useState } from "react";
+import CreateProductForm from "./CreateProductForm.tsx";
+import CreateVariantForm from "./CreateVariantForm.tsx";
+import CreateImageForm from "./CreateImageForm.tsx";
+import Loading from "../../../components/Loading.tsx";
+import { NormalButton } from "../../../components/buttons/Button.tsx";
+import { CreateProductProvider, useCreateProduct } from "../../../contexts/CreateProductContext.tsx";
+import { MediaService, ProductService, VariantService } from "../../../services/index.ts"
+import { Variant } from "../../../services/VariantService.ts";
+const mediaService = new MediaService()
+const productService = new ProductService()
+const variantService = new VariantService()
 
-export default function CreateProduct() {
+function CreateProductWrapper() {
+    const { product, variants, media } = useCreateProduct()
+    const [isSaving, setIsSaving] = useState<boolean>(false)
+
+    // post data to server
+    useEffect(() => {
+        // if not saving then skip
+        if (!isSaving) { return }
+        const postData = async () => {
+            try {
+                console.log("saving")
+                // upload media
+                const uploadedMedia = await mediaService.uploadMedia(media.map(med => med.file))
+
+                // create product
+                const createdProduct = await productService.create({
+                    name: product.name,
+                    description: product.description,
+                    category: "NOCATEGORY"
+                })
+
+                // create variants
+                for (let i = 0; i < variants.length; i++) {
+                    const v = variants[i]!
+                    await variantService.create({
+                        name: v.name,
+                        sku: v.sku,
+                        price: v.price,
+                        stock: v.stock,
+                        productId: createdProduct.id
+                    })
+                }
+
+                // assign media to product
+                const listMediaId = uploadedMedia.map(item => item.id)
+                await mediaService.assignMediaToProduct(listMediaId, createdProduct.id)
+                setIsSaving(false)
+            } catch (error) {
+                console.log(error)
+                setIsSaving(false)
+            }
+        }
+        postData()
+    }, [isSaving])
+
+    // Create event handler when user click to save button
+    const onClickSave = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation()
+        console.log({
+            product, variants, media
+        })
+
+        // if saving then skip
+        if (isSaving) { return }
+        if (media.length == 0) {
+            window.alert("Cần ít nhất 1 ảnh")
+            return
+        }
+        setIsSaving(true)
+    }, [product, variants, media])
+
+    if (isSaving) {
+        return (<>
+            <div className="pad-12px h-full-vh  overflow-scroll-y">
+                <h1>Thêm sản phẩm</h1>
+                <Loading />
+            </div>
+        </>)
+    }
     return (<>
         <div className="pad-12px h-full-vh  overflow-scroll-y">
             <h1>Thêm sản phẩm</h1>
+
             <div className="dash-dark"></div>
-            <ProductCreateForm/>
+            <h3>Thêm ảnh</h3>
+            <CreateImageForm />
+
+            <div className="dash-dark"></div>
+            <h3>Thông tin sản phẩm</h3>
+            <CreateProductForm />
+
+            <div className="dash-dark"></div>
+            <h3>Thêm biến thể</h3>
+            <CreateVariantForm />
+
+            <div className="dash-dark"></div>
+            <div className="w-full flex flex-center justify-start">
+                <NormalButton className="text-xl" onClick={onClickSave}>Lưu</NormalButton>
+            </div>
         </div>
     </>)
+}
+
+export default function CreateProduct() {
+    return (
+        <CreateProductProvider>
+            <CreateProductWrapper />
+        </CreateProductProvider>
+    )
 }

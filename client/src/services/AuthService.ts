@@ -13,6 +13,26 @@ export default class AuthService {
 
 
     /**
+     * set Login status is true or false
+     * @param value 
+     */
+    setIsLogin(value: boolean): void {
+        localStorage.setItem("isLogin", value.toString())
+    }
+
+    /**
+     * Get Login status
+     * @returns 
+     */
+    getIsLogin(): boolean {
+        const isLogin = localStorage.getItem("isLogin")
+        if (isLogin && isLogin === "true") {
+            return true
+        }
+        return false
+    }
+
+    /**
      * Store the user's profile in localStorage
      * @param profile 
      */
@@ -20,13 +40,16 @@ export default class AuthService {
         localStorage.setItem("profile", JSON.stringify(profile))
     }
 
+    /**
+     * Retrieve User's profile
+     * @returns 
+     */
     getProfile(): UserProfile {
         const profile: UserProfile | null = JSON.parse(localStorage.getItem("profile") || "null")
         if (profile == null) {
             throw new Error("profile is invalid")
         }
         return profile
-
     }
 
     /**
@@ -124,9 +147,11 @@ export default class AuthService {
             this.storeRefeshToken(response.data.refeshToken)
             this.storeAccessToken(response.data.accessToken)
             this.storeProfile(response.data.profile)
+            this.setIsLogin(true)
             console.log(response.data)
             return true
         } catch (error) {
+            this.setIsLogin(false)
             return false
         }
     }

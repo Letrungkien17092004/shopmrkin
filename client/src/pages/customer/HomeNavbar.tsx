@@ -1,6 +1,9 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
+import { useAuthContext } from "../../contexts/AuthContext.tsx"
 
 export default function HomeNavbar() {
+    const {isLogin, profile} = useAuthContext()
     return (<>
         <nav className="navbar">
             <div className="grid">
@@ -12,7 +15,7 @@ export default function HomeNavbar() {
                         </div>
                     </div>
                     {/* menu */}
-                    <div className="col c-0 m-7 l-8">
+                    <div className="col c-0 m-7 l-7">
                         <div className="navbar__menu">
                             <div className="navbar__menu-item">
                                 <span>Home</span>
@@ -29,14 +32,31 @@ export default function HomeNavbar() {
                         </div>
                     </div>
                     {/* actions */}
-                    <div className="col c-4 m-2 l-2">
+                    <div className="col c-4 m-2 l-3">
                         <div className="navbar__actions">
-                            <div className="navbar__actions-cart-icon">
-                                <img style={{ width: "20px" }} src="/public/svg/cart-shopping-solid-full.svg" alt="cart-image" />
-                            </div>
-                            <div className="navbar__actions-user-icon">
-                                <img style={{ width: "20px" }} src="/public/svg/user-regular-full.svg" alt="cart-image" />
-                            </div>
+                            {
+                                isLogin
+                                    ?
+                                    <>
+                                        <div className="navbar__actions-cart-icon">
+                                            <img style={{ width: "20px" }} src="/public/svg/cart-shopping-solid-full.svg" alt="cart-image" />
+                                        </div>
+                                        <div className="navbar__actions-user-icon">
+                                            <img style={{ width: "30px" }} className="image-avatar" src={`${profile?.picture}`} alt="cart-image" />
+                                        </div>
+                                    </>
+                                    : 
+                                    <>
+                                        <div className="navbar__actions__items">
+                                            <Link className="disable-link text-base font-semibold text-hover-highlight" to="/login">Đăng nhập</Link>
+                                        </div>
+                                        
+                                        <div className="navbar__actions__items">
+                                            <Link className="disable-link text-base font-semibold text-hover-highlight" to="/register">Đăng ký</Link>
+                                        </div>
+                                    </>
+                            }
+
                         </div>
                     </div>
                 </div>

@@ -8,8 +8,14 @@ export function DangerButton({ children, onClick }: { children: string | React.R
     </>)
 }
 
-export function NormalButton({ children, onClick }: { children: string | React.ReactElement, onClick?: React.MouseEventHandler}) {
+
+interface NormalButtonProps {
+    children: React.ReactNode,
+    className?: string,
+    onClick?: React.MouseEventHandler
+}
+export function NormalButton({ children, className,onClick }: NormalButtonProps) {
     return (<>
-        <button onClick={onClick}  className="btn btn-blue">{children}</button>
+        <button onClick={onClick}  className={`btn btn-blue ${className}`}>{children}</button>
     </>)
 }

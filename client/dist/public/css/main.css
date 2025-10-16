@@ -66,6 +66,9 @@ html {
     height: var(--navbar-height);
 }
 
+.navbar__actions__items {
+    padding: 4px 8px;
+}
 .navbar__actions-cart-icon,
 .navbar__actions-user-icon {
     padding: 8px;

@@ -31,6 +31,7 @@ export default function ProductTable({ listProduct, createDeleteEventHandler }: 
                 <TableRow>
                     <TableHeading text="CODE" />
                     <TableHeading text="Name" />
+                    <TableHeading text="Image" />
                     <TableHeading text="Price" />
                     <TableHeading text="Stock" />
                     <TableHeading text="Actions" />
@@ -38,11 +39,11 @@ export default function ProductTable({ listProduct, createDeleteEventHandler }: 
             </TableHead>
             <TableBody>
                 {listProduct.map(p => (
-                    <TableRow>
+                    <TableRow key={p.id}>
                         <TableData data={p.product_code} className="table-data-code" />
-                        <TableDataImage imageURL={p.imageURL} />
                         <TableData data={p.name} />
-                        <TableDataPrice price={{minPrice: p.maxPrice, maxPrice: p.maxPrice}} />
+                        <TableDataImage imageURL={p.imageURL} />
+                        <TableDataPrice price={{minPrice: p.minPrice, maxPrice: p.maxPrice}} />
                         <TableDataStock stock={p.stock} />
                         <TableDataActions>
                             <NormalButton>

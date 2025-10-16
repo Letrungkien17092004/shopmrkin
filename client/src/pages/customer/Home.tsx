@@ -2,8 +2,7 @@ import React, { useEffect } from "react";
 import HomeNavbar from "./HomeNavbar.tsx";
 import HomeListProduct from "./HomeListProduct.tsx";
 import HomeFilter from "./HomeFilter.tsx";
-
-
+import { AuthProvider } from "../../contexts/AuthContext.tsx";
 
 function HomeContentLayout() {
     return (<>
@@ -21,9 +20,11 @@ function HomeContentLayout() {
         </main>
     </>)
 }
-export default function HomePage() {
-    return (<>
-        <HomeNavbar />
-        <HomeContentLayout />
-    </>)
+export default function Home() {
+    return (
+        <AuthProvider>
+            <HomeNavbar />
+            <HomeContentLayout />
+        </AuthProvider>
+    )
 }

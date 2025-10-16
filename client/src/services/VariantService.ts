@@ -87,7 +87,7 @@ export default class VariantService {
      * Create a Variant
      * @param options 
      */
-    async create(options: Omit<Variant, "id">): Promise<Variant> {
+    async create(options: Omit<Variant, "id" | "userId">): Promise<Variant> {
         try {
             if (authService.accessIsExpired()) {
                 await authService.refeshAccess()

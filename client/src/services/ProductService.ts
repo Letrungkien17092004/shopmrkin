@@ -108,7 +108,9 @@ export class Product {
 
 }
 
-const demoImage = "https://down-vn.img.susercontent.com/file/vn-11134207-7ra0g-m6gngdko0gip8d.webp"
+const defaultImageHostname = "https://down-vn.img.susercontent.com"
+const defaultImageFilePath = "/file/vn-11134207-7ra0g-m6gngdko0gip8d.webp"
+const defaultImageFileName = "vn-11134207-7ra0g-m6gngdko0gip8d.webp"
 
 function wait(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -120,7 +122,7 @@ export default class ProductService {
      * @param options 
      * @returns 
      */
-    async create(options: Omit<Product, "id" | "productCode" | "variants" | "createdAt" | "updatedAt" | "stock" | "minPrice" | "maxPrice">): Promise<Product> {
+    async create(options: Omit<Product, "id" | "productCode" | "variants" | "createdAt" | "updatedAt" | "stock" | "minPrice" | "maxPrice" | "product_code" | "media">): Promise<Product> {
         try {
             if (authService.accessIsExpired()) {
                 await authService.refeshAccess()
@@ -138,17 +140,17 @@ export default class ProductService {
                     }
                 }
             )
-            console.log(response)
+            const product = response.data.product
             return new Product({
-                id: response.data.product.id,
-                name: response.data.product.name,
-                product_code: response.data.product.product_code,
-                description: response.data.product.description,
+                id: product.id,
+                name: product.name,
+                product_code: product.product_code,
+                description: product.description,
                 category: "Need Code",
-                media: [{ fileName: "", filePath: demoImage, hostname: "" }],
+                media: [...product.media, { fileName: defaultImageFileName, filePath: defaultImageFilePath, hostname: defaultImageHostname }],
                 variants: [],
-                createdAt: new Date(response.data.product.createdAt),
-                updatedAt: new Date(response.data.product.updatedAt)
+                createdAt: new Date(product.createdAt),
+                updatedAt: new Date(product.updatedAt)
             })
         } catch (error) {
             console.log(error)
@@ -219,7 +221,7 @@ export default class ProductService {
                 product_code: p.product_code,
                 description: p.description,
                 category: "TODO",
-                media: [{ fileName: "", filePath: demoImage, hostname: "" }],
+                media: [...p.media, { fileName: defaultImageFileName, filePath: defaultImageFilePath, hostname: defaultImageHostname }],
                 variants: p.variants.map(v => new Variant({
                     id: "",
                     name: v.name,
@@ -280,7 +282,7 @@ export default class ProductService {
                 product_code: productData.product_code,
                 description: productData.description,
                 category: productData.category,
-                media: [{ fileName: "", filePath: demoImage, hostname: "" }],
+                media: [...productData.media, { fileName: defaultImageFileName, filePath: defaultImageFilePath, hostname: defaultImageHostname }],
                 variants: productData.variants.map(v => new Variant({
                     id: "",
                     name: v.name,

@@ -1,4 +1,4 @@
-import path, { join } from "path"
+import path from "path"
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import webpack from "webpack";
 import dotenv from "dotenv"

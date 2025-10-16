@@ -1,11 +1,13 @@
 import React from "react";
 
-type Props = {
-    children: React.ReactElement[] | React.ReactElement,
+interface Props {
+    children: React.ReactNode,
+    className?: string
 }
-export default function TableDataActions({children}: Props) {
+export default function TableDataActions({children, className}: Props) {
+    className = className || ""
     return (<>
-        <td className="table-data-actions">
+        <td className={`table-data-actions ${className}`}>
             {children}
         </td>
     </>)

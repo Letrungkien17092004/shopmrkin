@@ -90,7 +90,7 @@ export default function ProductManager() {
                             <ProductTable
                             listProduct={products.map(p => ({
                                 ...p,
-                                imageURL: p.media[0]?.filePath || "",
+                                imageURL: `${p.media[0]?.hostname}${p.media[0]?.filePath}`,
                                 minPrice: p.minPrice,
                                 maxPrice: p.maxPrice,
                                 stock: p.stock

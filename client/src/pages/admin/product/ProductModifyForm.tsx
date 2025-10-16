@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { DangerButton, NormalButton } from "../../../components/buttons/Button.tsx";
 import ProductService, { Product } from "../../../services/ProductService.ts";
-import TextAreaInput from "../../../components/TextAreaInput.tsx";
+import TextAreaInput from "../../../components/inputs/TextAreaInput.tsx";
 import VariantModifyForm from "./VariantModifyForm.tsx";
 
 
