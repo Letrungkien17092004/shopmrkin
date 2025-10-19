@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { useAuthContext } from "../../contexts/AuthContext.tsx"
-
 export default function Navbar() {
     const {isLogin, profile} = useAuthContext()
     return (<>
@@ -11,7 +10,7 @@ export default function Navbar() {
                     {/* logo */}
                     <div className="col c-8 m-3 l-2">
                         <div className="navbar__logo">
-                            <span>Shopmrkin</span>
+                            <Link className="disable-link" to="/">Shopmrkin</Link>
                         </div>
                     </div>
                     {/* menu */}

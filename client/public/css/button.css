@@ -1,0 +1,16 @@
+
+
+.add-card-btn {
+    padding: 4px 6px;
+    background-color: rgb(255, 72, 0);
+    color: #fff;
+    max-width: fit-content;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.add-card-btn:hover {
+    filter: brightness(120%);
+    transform: scale(1.03);
+}
