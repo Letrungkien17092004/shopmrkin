@@ -4,9 +4,9 @@ client/node_modules/
 # Keep environment variables out of version control
 .env
 tasks.md
-server/src/services/postgresSQL/generated/prisma/client/
-server/dist/
 
-client/dist/bundle.js
-client/dist/index.html
+server/dist/
+server/public/
+
+client/dist/
 
