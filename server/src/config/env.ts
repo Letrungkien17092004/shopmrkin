@@ -11,7 +11,7 @@ const envSchema = z.object({
     PORT: z.string().regex(/^\d+$/),
     JWT_SECRET: z.string().min(1),
     ACCESS_EXPRISES_IN: z.enum(['1h']),
-    REFESH_EXPRISES_IN: z.enum(['3 days']),
+    REFESH_EXPRISES_IN: z.enum(['3 days', "7 days"]),
 
     // google OAuth2 config
     GOOGLE_CLIENT_ID: z.string(),
