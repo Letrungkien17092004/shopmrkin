@@ -142,8 +142,8 @@ html {
     margin-bottom: 4px;
 }
 
-/* HOME-LIST-PRODUCT__HEADER */
-.home-list-product__header {
+/* HOME-product-list__HEADER */
+.home-product-list__header {
     font-size: 1rem;
     color: var(--text-color);
     padding-top: 12px;
@@ -153,23 +153,23 @@ html {
     justify-content: space-between;
 }
 
-.home-list-product__header__result-count {
+.home-product-list__header__result-count {
     font-size: 1rem;
     font-weight: 300;
 }
 
-.home-list-product__header__sort {
+.home-product-list__header__sort {
     display: flex;
     /* font-size: 1.1rem; */
 }
 
-.home-list-product__header__sort-label {
+.home-product-list__header__sort-label {
     margin-right: 24px;
     display: flex;
     align-items: center;
 }
 
-.home-list-product__header__sort-select-wrapper {
+.home-product-list__header__sort-select-wrapper {
     box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.15);
     padding-right: 8px;
     border-radius: 20px;
@@ -178,21 +178,21 @@ html {
     overflow: hidden;
 }
 
-.home-list-product__header__sort-select-wrapper select {
+.home-product-list__header__sort-select-wrapper select {
     cursor: pointer;
     padding: 6px 18px 6px 12px;
     border: none;
     outline: none;
 }
 
-.home-list-product__applied-filters {
+.home-product-list__applied-filters {
     margin-top: 12px;
     display: flex;
     align-items: center;
     height: 50px;
 }
 
-.home-list-product__applied-filters-label {
+.home-product-list__applied-filters-label {
     font-size: 1.2rem;
     margin-right: 12px;
     white-space: nowrap;
@@ -200,7 +200,7 @@ html {
 
 
 
-.home-list-product__applied-filters-list {
+.home-product-list__applied-filters-list {
     display: flex;
     align-items: center;
     /* flex-wrap: wrap; */
@@ -210,7 +210,7 @@ html {
     overflow-x: scroll; */
 }
 
-.home-list-product__applied-filter-item {
+.home-product-list__applied-filter-item {
     background-color: var(--primary-color);
     color: var(--text-color-when-primary);
     padding: 4px 8px;
@@ -221,20 +221,20 @@ html {
     max-width: 50%;
 }
 
-.home-list-product__applied-filter-item span {
+.home-product-list__applied-filter-item span {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     display: block;
 }
 
-.home-list-product__applied-filter-item-delete {
+.home-product-list__applied-filter-item-delete {
     padding-left: 8px;
     padding-right: 8px;
     cursor: pointer;
 }
 
-.home-list-product__applied-filters-clear {
+.home-product-list__applied-filters-clear {
     cursor: pointer;
     color: var(--text-color);
     font-weight: 300;
@@ -243,15 +243,16 @@ html {
     font-style: italic;
 }
 
-.home-list-product__applied-filters-clear span {
+.home-product-list__applied-filters-clear span {
     white-space: nowrap;
     text-decoration: dashed;
 }
 
 /* product-items*/
 .product__item {
+    position: relative;
     cursor: pointer;
-    padding: 10px;
+    box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.15);
     transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
@@ -260,25 +261,37 @@ html {
     transform: translateY(-4px) scale(1.03);
 }
 
-.product__item__image {
-    position: relative;
+
+.product__discount {
+    position: absolute;
+    top: 10px;
+    left: 0px;
+    /* content: "50%"; */
+    background-color: #ff4d4f; /* đỏ tươi phổ biến cho nhãn giảm giá */
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 4px 10px;
+    /* border-radius: 4px; */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    z-index: 2;
 }
 
+.product__item__image {
+    padding: 10px;
+}
 .product__item__image img {
     object-fit: contain;
+    aspect-ratio: 1/1;
     width: 100%;
 }
 
-.product__item__image-off-value {
-    background-color: var(--primary-color);
-    padding: 4px 12px;
-    border-radius: 8px;
-    color: var(--text-color-when-primary);
-    position: absolute;
-    left: 5%;
-    top: 10%;
-}
 
+.product__item__info {
+    padding: 0px 10px 10px 10px;
+}
 .product__item__info--score {
     display: flex;
     align-items: center;
@@ -309,13 +322,13 @@ html {
     justify-content: flex-start;
 }
 
-.product__item__info--real-cost {
+.product__item__info--priceAfterDiscount {
     margin-right: 6px;
     font-weight: 600;
     color: var(--text-real-cost);
 }
 
-.product__item__info--origin-cost {
+.product__item__info--origin-price {
     font-size: 0.9rem;
     color: var(--text-origin-cost);
     text-decoration: line-through;

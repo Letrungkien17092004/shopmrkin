@@ -16,7 +16,7 @@ interface AuthContextType {
     isLogin: boolean,
 }
 
-const AuthContext = createContext<AuthContextType>({ isLogin: false })
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [isLogin, setIsLogin] = useState<boolean>(false)
@@ -30,8 +30,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setIsLogin(true)
         } catch (error) {
             // if already login but have no profile
-            if (isLogin_) {
-                console.error("Log in AuthContext: already login but have no profile")
+            if (error instanceof Error) {
+                if (isLogin_ && error.message === "profile is invalid") {
+                    console.error("Log in AuthContext: already login but have no profile")
+                    setIsLogin(false)
+                }
             }
         }
     }, [])
@@ -45,5 +48,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuthContext() {
     const context = useContext(AuthContext)
+    if (!context) {
+        throw new Error("useAuthContext must be used in AuthProvider")
+    }
     return context
 }

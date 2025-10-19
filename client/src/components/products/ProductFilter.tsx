@@ -1,6 +1,6 @@
 import React from "react"
 
-export default function HomeFilter() {
+export default function ProductFilter() {
     return (<>
         <section className="home-filter">
             <div className="heading-1"><span>Lựa chọn lọc</span></div>

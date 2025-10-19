@@ -1,6 +1,7 @@
 import React from "react"
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom"
-import HomePage from "./pages/customer/Home.tsx"
+import Home from "./pages/customer/Home.tsx"
+import CustomerProductDetail from "./pages/customer/CustomerProductDetail.tsx"
 import Login from "./pages/auth/Login.tsx"
 import Register from "./pages/auth/Register.tsx"
 import AuthGoogleCallback from "./pages/auth/AuthGoogleCallback.tsx"
@@ -12,11 +13,16 @@ export default function Router() {
     return (<>
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<HomePage />} />
+                {/* Customer route */}
+                <Route path="/" element={<Home />} />
+                <Route path="/product-detail/:productId" element={<CustomerProductDetail />} />
+
+                {/* Auth route */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/auth/google/callback" element={<AuthGoogleCallback/>}></Route>
 
+                {/* Admin route */}
                 <Route path="/manager/" element={<Manager />}>
                     <Route index element={<Dashboard />} />
                     <Route path="dashboard" element={<Dashboard />} />

@@ -1,5 +1,6 @@
 import path from "path"
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import CopyPlugin from "copy-webpack-plugin";
 import webpack from "webpack";
 import dotenv from "dotenv"
 
@@ -24,12 +25,12 @@ const config = {
                 test: /\.(tsx|ts)$/,
                 use: "babel-loader",
                 exclude: /node_modules/
-            }
+            },
         ]
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./dist/index.html"
+            template: "./public/index.html"
         }),
         new webpack.DefinePlugin({
             'process.env': {
@@ -39,19 +40,30 @@ const config = {
                 BACK_END_HOST: JSON.stringify(process.env.BACK_END_HOST),
             },
         }),
+        new CopyPlugin({
+            patterns: [
+                {
+                    from: "public",
+                    to: "./public",
+                    globOptions: {
+                        ignore: "**/index.html"
+                    }
+                }
+            ]
+        })
     ],
     devServer: {
         static: [
             {
-                directory: path.join(__dirname, "dist/public/css"),
+                directory: path.join(__dirname, "./public/css"),
                 publicPath: "/public/css"
             },
             {
-                directory: path.join(__dirname, "dist/public/svg"),
+                directory: path.join(__dirname, "./public/svg"),
                 publicPath: "/public/svg"
             },
             {
-                directory: path.join(__dirname, "dist/public/image"),
+                directory: path.join(__dirname, "./public/image"),
                 publicPath: "/public/image"
             },
         ],

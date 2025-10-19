@@ -58,7 +58,7 @@ export default class AuthService {
      */
     storeRefeshToken(refeshToken: string): void {
         localStorage.setItem("refesh_token", refeshToken)
-        localStorage.setItem("refesh_token_createdAt", new Date(Date.now()).toDateString())
+        localStorage.setItem("refesh_token_createdAt", new Date(Date.now()).toString())
     }
 
     /**
@@ -76,7 +76,7 @@ export default class AuthService {
      */
     storeAccessToken(accessToken: string): void {
         localStorage.setItem("access_token", accessToken)
-        localStorage.setItem("access_token_createdAt", new Date(Date.now()).toDateString())
+        localStorage.setItem("access_token_createdAt", new Date(Date.now()).toString())
     }
 
     /**
@@ -96,13 +96,27 @@ export default class AuthService {
         const currentTime = new Date(Date.now())
         const createdAtString = localStorage.getItem("access_token_createdAt") || ""
         const tokenCreatedAtTime = new Date(createdAtString)
-
         // if createdAtString is invalid, tokenCreatedAtTime will be null
         if (!tokenCreatedAtTime) { throw new Error("access_token is null") }
+        const minutesPassed = (currentTime.getTime() - tokenCreatedAtTime.getTime()) / 1000 / 60
+        console.log("tokenCreatedAtTime: ", tokenCreatedAtTime)
+        console.log("minutesPassed: ", minutesPassed)
+        return minutesPassed > 60 
+    }
 
-        const isExpired = currentTime.getTime() - tokenCreatedAtTime.getTime() / 1000 / 60
+    /**
+     * Check the expiry date of refesh_token
+     * @returns {boolean}
+     */
+    refeshIsExpired(): boolean {
+        const currentTime = new Date(Date.now())
+        const createdAtString = localStorage.getItem("refesh_token_createdAt") || ""
+        const tokenCreatedAtTime = new Date(createdAtString)
+        // if createdAtString is invalid, tokenCreatedAtTime will be null
+        if (!tokenCreatedAtTime) { throw new Error("refesh_token is null") }
+        const minutesPassed = (currentTime.getTime() - tokenCreatedAtTime.getTime()) / 1000 / 60
 
-        return isExpired > 15 ? false : true
+        return minutesPassed > (7 * 24 * 60 * 60) // 7 days
     }
 
     /**
@@ -148,7 +162,6 @@ export default class AuthService {
             this.storeAccessToken(response.data.accessToken)
             this.storeProfile(response.data.profile)
             this.setIsLogin(true)
-            console.log(response.data)
             return true
         } catch (error) {
             this.setIsLogin(false)

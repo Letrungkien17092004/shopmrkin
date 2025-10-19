@@ -1,6 +1,7 @@
 import axios from "axios"
 import { ENV } from "../config/ENV.ts"
 import AuthService from "./AuthService.ts"
+import { Variant } from "../entities/index.ts"
 
 const authService = new AuthService()
 
@@ -30,56 +31,6 @@ type VariantResponse = {
     createdAt?: string
     updatedAt?: string
 }
-
-type VariantConstructorParam = {
-    id: string
-    name: string
-    sku: string
-    productId: string
-    userId: string
-    price: number
-    stock: number
-
-    user?: {
-        username: string
-        role?: string
-    }
-
-    createdAt?: Date
-    updatedAt?: Date
-}
-
-export class Variant {
-    id: string
-    name: string
-    sku: string
-    productId: string
-    userId: string
-    price: number
-    stock: number
-
-    user?: {
-        username: string
-        role?: string
-    }
-
-    createdAt?: Date
-    updatedAt?: Date
-
-    constructor(options: VariantConstructorParam) {
-        this.id = options.id
-        this.name = options.name
-        this.sku = options.sku
-        this.price = options.price
-        this.stock = options.stock
-        this.userId = options.userId
-        this.user = options.user
-        this.productId = options.productId
-        this.createdAt = options.createdAt
-        this.updatedAt = options.updatedAt
-    }
-}
-
 
 export default class VariantService {
 
@@ -135,7 +86,7 @@ export default class VariantService {
      */
     async getManyByProductId(productId: string): Promise<Variant[]> {
         try {
-            const response = await axios.get<{variants: VariantResponse[]}>(`${ENV.BACK_END_HOST}/api/variant?productId=${productId}`)
+            const response = await axios.get<{ variants: VariantResponse[] }>(`${ENV.BACK_END_HOST}/api/variant?productId=${productId}`)
             const variants = response.data.variants
             return variants.map(v => new Variant({
                 id: v.id,
@@ -162,7 +113,7 @@ export default class VariantService {
             if (authService.accessIsExpired()) {
                 await authService.refeshAccess()
             }
-            const response = await axios.put<{variant: VariantResponse}>(`${ENV.BACK_END_HOST}/api/variant/${id}`,
+            const response = await axios.put<{ variant: VariantResponse }>(`${ENV.BACK_END_HOST}/api/variant/${id}`,
                 {
                     name: options.name,
                     price: options.price,
@@ -193,7 +144,7 @@ export default class VariantService {
 
     async deleteById(id: string): Promise<void> {
         try {
-            const response = await axios.delete(`${ENV.BACK_END_HOST}/api/variant/${id}`, 
+            const response = await axios.delete(`${ENV.BACK_END_HOST}/api/variant/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${authService.getAccessToken()}`

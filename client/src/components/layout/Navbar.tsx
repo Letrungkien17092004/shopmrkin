@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { useAuthContext } from "../../contexts/AuthContext.tsx"
 
-export default function HomeNavbar() {
+export default function Navbar() {
     const {isLogin, profile} = useAuthContext()
     return (<>
         <nav className="navbar">

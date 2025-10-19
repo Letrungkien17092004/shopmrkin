@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios"
-import VariantService, { Variant } from "./VariantService.ts"
+import VariantService from "./VariantService.ts"
+import { Variant, Product } from "../entities/index.ts"
 import AuthService from "./AuthService.ts"
 import { ENV } from "../config/ENV.ts"
 const variantService = new VariantService()
@@ -35,83 +36,13 @@ type GetAllProductResponse = {
     products: ProductResponse[]
 }
 
-export type ProductConstructorParam = {
-    id: string
-    name: string
-    product_code: number
-    description: string
-    category: string
-    media: { fileName: string, filePath: string, hostname: string }[]
-    variants: Variant[]
-    user?: {
-        username: string,
-        role?: string
-    }
-    createdAt: Date
-    updatedAt: Date
+
+
+const DEFAULT_MEDIA = {
+    fileName: "vn-11134207-7ra0g-m6gngdko0gip8d.webp",
+    filePath: "/file/vn-11134207-7ra0g-m6gngdko0gip8d.webp",
+    hostname: "https://down-vn.img.susercontent.com"
 }
-
-export class Product {
-    id: string
-    name: string
-    product_code: number
-    description: string
-    category: string
-    media: { fileName: string, filePath: string, hostname: string }[]
-    variants: Variant[]
-    user?: {
-        username: string,
-        role?: string
-    }
-    createdAt: Date
-    updatedAt: Date
-
-    constructor(options: ProductConstructorParam) {
-        this.id = options.id
-        this.name = options.name
-        this.product_code = options.product_code
-        this.description = options.description
-        this.category = options.category
-        this.media = options.media
-        this.variants = options.variants
-        this.user = options.user
-        this.createdAt = options.createdAt
-        this.updatedAt = options.updatedAt
-    }
-
-    public get stock(): number {
-        let totalStock = 0
-        this.variants.forEach(variant => totalStock += variant.stock)
-        return totalStock
-    }
-
-    public get minPrice(): number {
-        let min_ = this.variants[0]?.price || 0
-        this.variants.forEach((variant) => {
-            if (variant.price < min_) {
-                min_ = variant.price
-            }
-        })
-        return min_
-    }
-
-    public get maxPrice(): number {
-        let max_ = this.variants[0]?.price || 999999999999
-
-        this.variants.forEach((variant) => {
-            if (variant.price > max_) {
-                max_ = variant.price
-            }
-        })
-        return max_
-    }
-
-}
-
-const defaultImageHostname = "https://down-vn.img.susercontent.com"
-const defaultImageFilePath = "/file/vn-11134207-7ra0g-m6gngdko0gip8d.webp"
-const defaultImageFileName = "vn-11134207-7ra0g-m6gngdko0gip8d.webp"
-
 function wait(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -147,7 +78,7 @@ export default class ProductService {
                 product_code: product.product_code,
                 description: product.description,
                 category: "Need Code",
-                media: [...product.media, { fileName: defaultImageFileName, filePath: defaultImageFilePath, hostname: defaultImageHostname }],
+                media: [DEFAULT_MEDIA],
                 variants: [],
                 createdAt: new Date(product.createdAt),
                 updatedAt: new Date(product.updatedAt)
@@ -214,26 +145,28 @@ export default class ProductService {
         try {
             const response = await axios.get<GetAllProductResponse>(`${ENV.BACK_END_HOST}/api/product?include=1`)
             const products = response.data.products
-            console.log(products)
-            return products.map(p => new Product({
-                id: p.id,
-                name: p.name,
-                product_code: p.product_code,
-                description: p.description,
-                category: "TODO",
-                media: [...p.media, { fileName: defaultImageFileName, filePath: defaultImageFilePath, hostname: defaultImageHostname }],
-                variants: p.variants.map(v => new Variant({
-                    id: "",
-                    name: v.name,
-                    sku: v.sku,
-                    price: v.price,
-                    stock: v.stock,
-                    productId: p.id,
-                    userId: ""
-                })),
-                createdAt: new Date(p.createdAt),
-                updatedAt: new Date(p.updatedAt)
-            }))
+            return products.map(p => {
+                const media = p.media.length !== 0 ? p.media : [DEFAULT_MEDIA]
+                return new Product({
+                    id: p.id,
+                    name: p.name,
+                    product_code: p.product_code,
+                    description: p.description,
+                    category: "TODO",
+                    media: media,
+                    variants: p.variants.map(v => new Variant({
+                        id: "",
+                        name: v.name,
+                        sku: v.sku,
+                        price: v.price,
+                        stock: v.stock,
+                        productId: p.id,
+                        userId: ""
+                    })),
+                    createdAt: new Date(p.createdAt),
+                    updatedAt: new Date(p.updatedAt)
+                })
+            })
         } catch (error) {
             throw new Error("ProductService Error: getData")
         }
@@ -282,7 +215,7 @@ export default class ProductService {
                 product_code: productData.product_code,
                 description: productData.description,
                 category: productData.category,
-                media: [...productData.media, { fileName: defaultImageFileName, filePath: defaultImageFilePath, hostname: defaultImageHostname }],
+                media: productData.media.length!==0?productData.media:[DEFAULT_MEDIA],
                 variants: productData.variants.map(v => new Variant({
                     id: "",
                     name: v.name,
