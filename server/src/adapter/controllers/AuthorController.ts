@@ -6,7 +6,7 @@ import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/inter
 import jwt from "jsonwebtoken";
 import { ENV } from "../../config/env.js";
 
-type GoogleUserProfile = {
+interface GoogleUserProfile {
     email: string,
     family_name: string,
     given_name: string,
@@ -16,7 +16,7 @@ type GoogleUserProfile = {
     verified_email: boolean,
 }
 
-type JWTPayload = {
+interface JWTPayload {
     id: string,
     account: string,
     username: string,
@@ -244,9 +244,16 @@ export default class AuthorController {
      */
     generateOauth2RedirectUrl = async (req: Request, res: Response): Promise<void> => {
         try {
+            const redirect_uri = req.query["redirect_uri"]
+            if (!redirect_uri) {
+                res.status(400).json({
+                    message: "missing redirect_uri"
+                })
+                return
+            }
             const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth"
             const options = {
-                redirect_uri: ENV.REDIRECT_URI,
+                redirect_uri: redirect_uri.toString(),
                 client_id: ENV.GOOGLE_CLIENT_ID,
                 state: ENV.GOOGLE_OAUTH_STATE_STRING,
                 response_type: "token",
@@ -279,7 +286,6 @@ export default class AuthorController {
         try {
             const access_token = req.query["access_token"] as string
             const state = req.query["state"] as string
-            console.log(req.query)
             if (!state || state !== ENV.GOOGLE_OAUTH_STATE_STRING) {
                 res.status(400).json({
                     message: "Invalid state string"
@@ -326,14 +332,6 @@ export default class AuthorController {
                         expiresIn: ENV.REFESH_EXPRISES_IN
                     }
                 )
-
-                res.cookie("refesh_token", refeshToken, {
-                    httpOnly: true
-                })
-                
-                res.cookie("access_token", accessToken, {
-                    httpOnly: true
-                })
 
                 res.status(200).json({
                     profile: {

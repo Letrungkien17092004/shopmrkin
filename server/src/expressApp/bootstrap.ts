@@ -9,6 +9,7 @@ import authorRouter from "./routers/AuthorRouter.js";
 import productRouter from "./routers/ProductRouter.js";
 import variantRouter from "./routers/VariantRouter.js";
 import mediaRouter from "./routers/MediaRouter.js";
+import demoRouter from "./routers/DemoRouter.js";
 
 const PUBLIC_DIR = path.join(process.cwd(), "public")
 
@@ -17,7 +18,7 @@ function logRequest(req: Request, res: Response, next: NextFunction) {
     next()
 }
 const app = express()
-
+app.set("trust proxy", true)
 app.use(cors())
 app.use(logRequest)
 app.use(cookieParser())
@@ -27,6 +28,8 @@ app.use('/api', [bodyParser.json(), authorRouter]) // authorization API
 app.use("/api", [bodyParser.json(), productRouter]) // product API
 app.use("/api", [bodyParser.json(), variantRouter]) // variant API
 app.use("/api", mediaRouter) // media API
+app.use("/api", demoRouter) // demo API
+
 
 
 export default app

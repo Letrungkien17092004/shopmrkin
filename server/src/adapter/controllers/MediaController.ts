@@ -32,11 +32,12 @@ export default class MediaController {
             }
             const files = FilesMulter.parse(req.files)
             const media: MediaDTO.OutputType[] = []
+            const host = `${req.protocol}://${req.get("host")}`
             for (let i = 0; i < files.length; i++) {
                 const createdMedia = await this.usecase.create({
                     fileName: files[i].filename,
                     filePath: `${ENV.UPLOAD_FOLDER}/${files[i].filename}`,
-                    hostname: "http://localhost:8000",
+                    hostname: host,
                     media_type: files[i].mimetype.split("/")[0] === "video" ? "VIDEO" : "IMAGE",
                     size: files[i].size,
                     status: "ORPHANED",

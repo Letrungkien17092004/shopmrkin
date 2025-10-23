@@ -17,8 +17,6 @@ const envSchema = z.object({
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
     GOOGLE_OAUTH_STATE_STRING: z.string(),
-    REDIRECT_URI: z.string(),
-    FRONTEND_URL: z.string(),
 
     // Upload folder
     UPLOAD_FOLDER: z.string(),

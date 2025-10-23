@@ -127,7 +127,8 @@ export default class AuthService {
      * @returns {Promise<string>} A Promise that resolve to the Google OAuth2 URL
      */
     async getGoogleOauth2Url(): Promise<string> {
-        const response = await axios<{ url: string }>(ENV.GENERATE_OAUTH_URL)
+        const url = new URL(ENV.GENERATE_OAUTH_URL)
+        const response = await axios<{ url: string }>(url.toString())
         return response.data.url
     }
 
