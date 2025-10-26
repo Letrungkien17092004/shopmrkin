@@ -1,23 +1,35 @@
 {
   "compilerOptions": {
-    /* Language and Environment */
-    "target": "esnext",
-    /* Modules */
-    "module": "nodenext",
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022"],
+    "moduleResolution": "node",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "esModuleInterop": true,
-    "rootDir": "src",
-    "outDir": "dist",
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "nodenext",
-    /* Type Checking */
     "strict": true,
     "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "allowJs": true,
     "isolatedModules": true,
-    "typeRoots": [
-      "./src/types/",
-      "./node_modules/@types/"
-    ]
+    
+    // QUAN TRỌNG: Thêm types cho Jest
+    "types": ["node", "jest", "@types/jest"]
   },
-  "include": ["src", ],
-  "exclude": ["node_modules", "dist", "src/__tests__/"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
+  }
 }

@@ -64,7 +64,9 @@ model Users {
   products Products[]
   variants Variants[]
   media Media[]
-
+  orders Orders[]
+  payments Payments[]
+  cart Carts? 
   // Time
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -114,6 +116,8 @@ model Variants {
   // Relationship
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
   product Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItems[]
+  cartItems CartItems[]
 
   // Time
   createdAt DateTime @default(now())  
@@ -158,4 +162,85 @@ model Product_Media {
   media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
 
   @@id([productId, mediaId])
+}
+
+// Order Enum
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNED
+}
+
+model Carts {
+  id String @id @default(uuid(7))
+  userId String @unique
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartItems CartItems[]
+  @@map("carts")
+}
+
+model CartItems {
+  id String @id @default(uuid())
+  cartId String
+  variantId String
+
+  quantity Int
+
+  cart Carts @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variant Variants @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  @@unique([cartId, variantId])
+  @@map("cart_items")
+}
+
+model Orders {
+  id String @id @default(uuid(7))
+  userId String
+  totalAmout Decimal
+  status OrderStatus @default(PENDING)
+
+  // relation ship
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItems OrderItems[]
+  payments Payments[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItems {
+  id String @id @default(uuid(7))
+  orderId String
+  variantId String
+  quantity Int
+  unitPrice Decimal
+
+  order Orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant Variants @relation(fields: [variantId], references: [id], onDelete: Cascade) // tôi không thể tạo mối quan hệ one to one giữa Order_items và Variant 
+  @@unique([orderId, variantId])
+  
+  @@map("order_items")
+}
+
+model Payments {
+  id String @id @default(uuid(7))
+  transactionId String @unique
+  amount Decimal
+  orderId String
+  userId String
+  createdAt DateTime @default(now())
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order Orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }

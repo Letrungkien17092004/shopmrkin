@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "jest", "@types/jest"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "strict": false
+  },
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/__test__/**/*.ts",
+    "src/__test__/**/*.ts"
+  ]
+}

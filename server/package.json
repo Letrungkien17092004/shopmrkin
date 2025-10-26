@@ -8,7 +8,12 @@
     "start": "node ./dist/app.js",
     "postinstall": "prisma generate --schema=./src/services/postgresSQL/prisma/schema.prisma",
     "build": "npx tsc",
-    "test": "jest",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test:cart": "cross-env NODE_OPTIONS=--experimental-vm-modules jest Cart",
+    "test:verbose": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose",
+    "test:clear": "jest --clearCache",
     "prisma-generate": "npx prisma generate --schema=./src/services/postgresSQL/prisma/schema.prisma",
     "prisma-migrate": "npx prisma migrate dev --schema=./src/services/postgresSQL/prisma/schema.prisma",
     "prisma-studio": "npx prisma studio --schema=./src/services/postgresSQL/prisma/schema.prisma",
@@ -41,16 +46,18 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "jest": "^30.0.5",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "prisma": "^6.11.1",
-    "ts-jest": "^29.4.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "zod": "^4.0.17"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0"
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.12",
+    "cross-env": "^7.0.3",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5"
   }
 }

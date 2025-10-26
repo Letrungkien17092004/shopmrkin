@@ -6,6 +6,8 @@ import Category from "../../core/entities/Category.js";
 import Product from "../../core/entities/Product.js";
 import Variant from "../../core/entities/Variant.js";
 import Media from "./Media.js";
+import Cart from "./Cart.js";
+import CartItem from "./CartItem.js";
 export {
     User,
     Role,
@@ -14,5 +16,7 @@ export {
     Category,
     Product,
     Variant,
-    Media
+    Media,
+    Cart,
+    CartItem
 }

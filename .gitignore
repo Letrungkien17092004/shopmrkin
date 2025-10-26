@@ -7,6 +7,7 @@ tasks.md
 
 server/dist/
 server/public/
+server/src/__tests__
 
 client/dist/
 

@@ -10,6 +10,7 @@ import productRouter from "./routers/ProductRouter.js";
 import variantRouter from "./routers/VariantRouter.js";
 import mediaRouter from "./routers/MediaRouter.js";
 import demoRouter from "./routers/DemoRouter.js";
+import cartRouter from "./routers/CartRouter.js";
 
 const PUBLIC_DIR = path.join(process.cwd(), "public")
 
@@ -29,6 +30,7 @@ app.use("/api", [bodyParser.json(), productRouter]) // product API
 app.use("/api", [bodyParser.json(), variantRouter]) // variant API
 app.use("/api", mediaRouter) // media API
 app.use("/api", demoRouter) // demo API
+app.use("/api", [bodyParser.json(), cartRouter]) // cart API
 
 
 
