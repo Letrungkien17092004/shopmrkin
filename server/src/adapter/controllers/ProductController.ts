@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 import IProductUsecase from "../../core/applications/interfaces/usecases/IProductUsecase.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js";
-import { z } from "zod"
+import { includes, object, z } from "zod"
 import { ProductDTO } from "../../adapter/DTO/index.js"
 
 // CONSTANT
 const MAX_NAME_LENGTH = 200
-const MAX_DESCRIPTION_LENGTH = 1000
 
-const MIN_NAME_LENGTH = 5
-const MIN_DESCRIPTION_LENGTH = 5
+const MIN_NAME_LENGTH = 1
+const MIN_DESCRIPTION_LENGTH = 1
 
 
 export default class ProductController {
@@ -19,6 +18,12 @@ export default class ProductController {
         this.productUsecase = productUsecase
     }
 
+    /**
+     * Create new product
+     * @param req 
+     * @param res 
+     * @returns
+     */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!req.user) {
@@ -28,7 +33,7 @@ export default class ProductController {
                 return
             }
 
-            // not an admin
+            // if not admin
             if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
                     message: "require administrator role"
@@ -36,25 +41,47 @@ export default class ProductController {
                 return
             }
 
-            const CreateDataSchema = z.object({
-                fields: z.object({
+            const QuerySchema = z.object({
+                include: z.object({
+                    user: z.string().optional(),
+                    media: z.string().optional(),
+                    variants: z.string().optional(),
+                    category: z.string().optional()
+                }).optional()
+            }).optional()
+
+            const CreateOptionSchema = z.object({
+                data: z.object({
                     name: z.string().min(MIN_NAME_LENGTH).max(MAX_NAME_LENGTH),
-                    description: z.string().min(MIN_DESCRIPTION_LENGTH).max(MAX_DESCRIPTION_LENGTH),
+                    description: z.string().min(MIN_DESCRIPTION_LENGTH),
                     categoryId: z.number()
                 }),
-                include: z.enum(["0", "1"]).optional()
+                include: z.object({
+                    user: z.boolean().optional(),
+                    media: z.boolean().optional(),
+                    variants: z.boolean().optional()
+                }).optional()
             })
 
             // parser the body
-            const createDataSchema = CreateDataSchema.parse({
-                fields: req.body,
-                include: req.query.include
+            const queryParsed = QuerySchema.parse(req.query)
+            const createOptionParsed = CreateOptionSchema.parse({
+                data: req.body,
+                include: queryParsed && queryParsed.include
+                    ? {
+                        user: queryParsed.include.user === "true",
+                        media: queryParsed.include.media === "true",
+                        variants: queryParsed.include.variants === "true",
+                    }
+                    : undefined
             })
 
             const createdProduct = await this.productUsecase.create({
-                ...createDataSchema.fields,
-                userId: req.user.id,
-                include: Boolean(Number(createDataSchema.include))
+                ...createOptionParsed,
+                data: {
+                    ...createOptionParsed.data,
+                    userId: req.user.id
+                }
             })
 
             res.status(201).json({
@@ -96,34 +123,74 @@ export default class ProductController {
         }
     }
 
+
+    /**
+     * Retrives a list of product
+     * @param req 
+     * @param res 
+     * @returns 
+     */
     findMany = async (req: Request, res: Response): Promise<void> => {
         try {
+            const QuerySchema = z.object({
+                product_code: z.string().optional(),
+                name: z.string().optional(),
+                description: z.string().optional(),
+                categoryId: z.string().optional(),
+                userId: z.string().optional(),
+                limit: z.string().optional(),
+                offset: z.string().optional(),
+                // include option
+                include: z.object({
+                    variants: z.string().optional(),
+                    media: z.string().optional(),
+                    category: z.string().optional(),
+                    user: z.string().optional(),
+                }).optional()
+            }).optional()
+
             const FindManyOption = z.object({
-                fields: z.object({
+                where: z.object({
+                    product_code: z.number().optional(),
+                    name: z.string().optional(),
+                    description: z.string().optional(),
                     categoryId: z.number().optional(),
                     userId: z.string().optional(),
                 }),
+                include: z.object({
+                    variants: z.boolean().optional(),
+                    media: z.boolean().optional(),
+                    category: z.boolean().optional(),
+                    user: z.boolean().optional(),
+                }).optional(),
                 limit: z.number().optional(),
                 offset: z.number().optional(),
-                include: z.enum(["0", "1"]).optional()
             })
 
-            const findManyOption = FindManyOption.parse({
-                fields: z.object({
-                    categoryId: Number(req.query.categoryId),
-                    userId: req.query.userId,
-                }),
-                limit: Number(req.query.limit) || undefined,
-                offset: Number(req.query.offset) || undefined,
-                include: req.query.include
+            const queryParsed = QuerySchema.parse(req.query)
+            const optionParsed = FindManyOption.parse({
+                where: queryParsed
+                    ? {
+                        product_code: queryParsed.product_code ? parseInt(queryParsed.product_code) : undefined,
+                        name: queryParsed.name,
+                        description: queryParsed.description,
+                        categoryId: queryParsed.categoryId ? parseInt(queryParsed.categoryId) : undefined,
+                        userId: queryParsed.userId
+                    }
+                    : undefined,
+                limit: queryParsed && queryParsed.limit ? parseInt(queryParsed.limit) : undefined,
+                offset: queryParsed && queryParsed.offset ? parseInt(queryParsed.offset) : undefined,
+                include: queryParsed && queryParsed.include
+                    ? {
+                        variants: queryParsed.include.variants === "true",
+                        media: queryParsed.include.media === "true",
+                        category: queryParsed.include.category === "true",
+                        user: queryParsed.include.user === "true",
+                    }
+                    : undefined
             })
 
-            const products = await this.productUsecase.findMany({
-                fields: findManyOption.fields,
-                limit: Number(req.query.limit),
-                offset: Number(req.query.offset),
-                include: Boolean(Number(req.query.include))
-            })
+            const products = await this.productUsecase.findMany(optionParsed)
             res.status(200).json({
                 products: ProductDTO.toOutputMany(products)
             })
@@ -145,71 +212,54 @@ export default class ProductController {
         }
     }
 
-    findOneByCode = async (req: Request, res: Response): Promise<void> => {
-        try {
-
-            const FindOption = z.object({
-                product_code: z.number(),
-                include: z.enum(["0", "1"]).optional()
-            })
-
-            const findOption = FindOption.parse({
-                product_code: Number(req.params["product_code"]),
-                include: req.query.include
-            })
-
-            const searchedProduct = await this.productUsecase.findOneByCode({
-                product_code: findOption.product_code,
-                include: Boolean(Number(findOption.include))
-            })
-            if (!searchedProduct) {
-                res.status(404).json({
-                    message: "Product not found"
-                })
-                return
-            }
-
-            res.status(200).json({
-                product: ProductDTO.toInputSingle(searchedProduct)
-            })
-            return
-        } catch (error) {
-            if (error instanceof USECASE_ERROR) {
-                switch (error.code) {
-                    case USECASE_ERROR_CODE.INITIAL:
-                        res.status(500).json({
-                            message: "Server Internal Error!"
-                        })
-                        return
-
-                }
-            }
-
-            res.status(500).json({
-                message: "Server Internal Error!"
-            })
-            return
-
-        }
-    }
-
+    /**
+     * Retrives one product by id
+     * @param req 
+     * @param res 
+     * @returns 
+     */
     findOneById = async (req: Request, res: Response): Promise<void> => {
         try {
 
-            const FindOption = z.object({
-                id: z.string(),
-                include: z.enum(["0", "1"]).optional()
+            const QuerySchema = z.object({
+                include: z.object({
+                    variants: z.string().optional(),
+                    media: z.string().optional(),
+                    category: z.string().optional(),
+                    user: z.string().optional(),
+                }).optional()
+            }).optional()
+
+            const FindOptionSchema = z.object({
+                where: z.object({
+                    id: z.string()
+                }),
+                include: z.object({
+                    variants: z.boolean().optional(),
+                    media: z.boolean().optional(),
+                    category: z.boolean().optional(),
+                    user: z.boolean().optional(),
+                }).optional()
             })
 
-            const findOption = FindOption.parse({
-                id: req.params["id"],
-                include: req.query.include
+            const queryParsed = QuerySchema.parse(req.query)
+            console.log(queryParsed)
+            const findOptionParsed = FindOptionSchema.parse({
+                where: {
+                    id: req.params["id"]
+                },
+                include: queryParsed && queryParsed.include
+                    ? {
+                        variants: queryParsed.include.variants === "true",
+                        media: queryParsed.include.media === "true",
+                        category: queryParsed.include.category === "true",
+                        user: queryParsed.include.user === "true",
+                    }
+                    : undefined
             })
+            console.log(findOptionParsed)
 
-            const searchedProduct = await this.productUsecase.findOneById({
-                id: findOption.id,
-                include: Boolean(Number(findOption.include))
-            })
+            const searchedProduct = await this.productUsecase.findOneById(findOptionParsed)
             if (!searchedProduct) {
                 res.status(404).json({
                     message: "Product not found"
@@ -231,15 +281,19 @@ export default class ProductController {
                         return
                 }
             }
-
             res.status(500).json({
                 message: "Server Internal Error!"
             })
             return
-
         }
     }
 
+    /**
+     * Update one product by id
+     * @param req 
+     * @param res 
+     * @returns 
+     */
     updateById = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!req.user) {
@@ -256,31 +310,30 @@ export default class ProductController {
                 return
             }
 
-            const UpdateOption = z.object({
-                id: z.string(),
-                fields: z.object({
-                    name: z.string().min(MIN_NAME_LENGTH).max(MAX_NAME_LENGTH).optional(),
-                    description: z.string().min(MIN_DESCRIPTION_LENGTH).max(MAX_DESCRIPTION_LENGTH).optional(),
-                    categoryId: z.number().optional()
+            const UpdateOptionSchema = z.object({
+                where: z.object({
+                    id: z.string(),
+                    userId: z.string()
                 }),
-                include: z.enum(["0", "1"]).optional()
+                data: z.object({
+                    name: z.string().optional(),
+                    description: z.string().optional(),
+                    categoryId: z.number().optional(),
+                })
             })
 
-            const updateOption = UpdateOption.parse({
-                id: req.params["id"],
-                fields: req.body,
-                include: req.query.include
+            const updateOptionParsed = UpdateOptionSchema.parse({
+                where: {
+                    id: req.params['id'],
+                    userId: req.user.id
+                },
+                data: req.body
             })
 
-            const updatedProduct = await this.productUsecase.updateById({
-                id: updateOption.id,
-                userId: req.user.id,
-                fields: updateOption.fields,
-                include: Boolean(Number(updateOption.include))
-            })
+            await this.productUsecase.updateById(updateOptionParsed)
 
             res.status(200).json({
-                product: ProductDTO.toOutputSingle(updatedProduct)
+                message: "update successfully"
             })
             return
         } catch (error) {
@@ -314,6 +367,12 @@ export default class ProductController {
         }
     }
 
+    /**
+     * Delete one product by id
+     * @param req 
+     * @param res 
+     * @returns 
+     */
     deleteById = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!req.user) {
@@ -322,22 +381,20 @@ export default class ProductController {
                 })
                 return
             }
-
             if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
                     message: "require administrator role"
                 })
                 return
             }
-
-            const id = req.params["id"]
             await this.productUsecase.deleteById({
-                id: id,
-                userId: req.user.id
+                where: {
+                    id: req.params['id'],
+                    userId: req.user.id
+                }
             })
-
             res.status(200).json({
-                message: "OK"
+                message: "delete successfully"
             })
             return
         } catch (error) {

@@ -269,7 +269,7 @@ export default class ProductRepository implements IProductRepository {
                             },
                             variants: true
                         }
-                    }) // else
+                    })
                     if (!searchedProduct) return null
                     return new Product({
                         ...searchedProduct,
@@ -292,7 +292,7 @@ export default class ProductRepository implements IProductRepository {
                             },
                             variants: undefined
                         }
-                    }) // else
+                    }) 
                     if (!searchedProduct) return null
                     return new Product({
                         ...searchedProduct,
@@ -318,7 +318,13 @@ export default class ProductRepository implements IProductRepository {
                     })
                 }
                 const searchedProduct = await prisma.products.findUnique({
-                    where: options.where
+                    where: options.where,
+                    relationLoadStrategy: "join",
+                    include: {
+                        ...options.include,
+                        media: undefined,
+                        variants: undefined
+                    }
                 })
                 if (!searchedProduct) return null
                 return new Product(searchedProduct)

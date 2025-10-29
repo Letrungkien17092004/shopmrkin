@@ -1,56 +1,82 @@
-import IVariantUsecase from "../../core/applications/interfaces/usecases/IVariantUsecase.js";
-import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js";
-import { Request, Response } from "express";
-
-import { VariantDTO } from "../../adapter/DTO/index.js"
-
+import { Request, Response } from "express"
 import { z } from "zod"
+import IVariantUsecase from "../../core/applications/interfaces/usecases/IVariantUsecase.js"
+import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js"
+import { VariantDTO } from "../DTO/index.js"
+
+// CONSTANT
+const MAX_NAME_LENGTH = 200
+const MIN_NAME_LENGTH = 1
 
 export default class VariantController {
-    private usecase: IVariantUsecase
+    private variantUsecase: IVariantUsecase
 
-    constructor(usecase: IVariantUsecase) {
-        this.usecase = usecase
+    constructor(variantUsecase: IVariantUsecase) {
+        this.variantUsecase = variantUsecase
     }
 
+    /**
+     * Create new variant
+     * @param req 
+     * @param res 
+     * @returns
+     */
     create = async (req: Request, res: Response): Promise<void> => {
         try {
-
             if (!req.user) {
                 res.status(401).json({
-                    message: "Unauthorized"
+                    message: "Unauthorized!"
                 })
                 return
             }
 
+            // if not admin
             if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
-                    message: "require administrator role"
+                    message: "Forbidden!"
                 })
                 return
             }
 
-            const CreateDataSchema = z.object({
-                fields: z.object({
-                    name: z.string().min(5).max(50),
-                    sku: z.string().min(5).max(20),
-                    productId: z.string(),
-                    price: z.number(),
-                    stock: z.number(),
+            const QuerySchema = z.object({
+                include: z.object({
+                    user: z.string().optional(),
+                    product: z.string().optional()
+                }).optional()
+            }).optional()
+
+            const CreateOptionSchema = z.object({
+                data: z.object({
+                    name: z.string().min(MIN_NAME_LENGTH).max(MAX_NAME_LENGTH),
+                    sku: z.string(),
+                    price: z.number().positive(),
+                    stock: z.number().int().min(0),
+                    productId: z.string()
                 }),
-                include: z.enum(["0", "1"]).optional()
+                include: z.object({
+                    user: z.boolean().optional(),
+                    product: z.boolean().optional()
+                }).optional()
             })
 
-            const createData = CreateDataSchema.parse({
-                fields: req.body,
-                include: req.query.include
+            // parse the query and body
+            const queryParsed = QuerySchema.parse(req.query)
+            const createOptionParsed = CreateOptionSchema.parse({
+                data: req.body,
+                include: queryParsed && queryParsed.include
+                    ? {
+                        user: queryParsed.include.user === "true",
+                        product: queryParsed.include.product === "true"
+                    }
+                    : undefined
             })
 
-            const dataToCreate = VariantDTO.toInputSingle({ ...createData.fields, userId: req.user.id })
-
-            const createdVariant = await this.usecase.create({
-                ...dataToCreate,
-                include: Boolean(Number(createData.include))
+            const createdVariant = await this.variantUsecase.create({
+                ...createOptionParsed,
+                data: {
+                    ...createOptionParsed.data,
+                    userId: req.user.id
+                }
             })
             res.status(201).json({
                 variant: VariantDTO.toOutputSingle(createdVariant)
@@ -87,38 +113,62 @@ export default class VariantController {
         }
     }
 
+    /**
+     * Retrives a list of variant
+     * @param req 
+     * @param res 
+     */
     findMany = async (req: Request, res: Response): Promise<void> => {
         try {
+            const QuerySchema = z.object({
+                name: z.string().optional(),
+                sku: z.string().optional(),
+                productId: z.string().optional(),
+                userId: z.string().optional(),
+                limit: z.string().optional(),
+                offset: z.string().optional(),
+                include: z.object({
+                    product: z.string().optional(),
+                    user: z.string().optional(),
+                }).optional()
+            }).optional()
+
             const FindManyOption = z.object({
-                fields: z.object({
+                where: z.object({
                     name: z.string().optional(),
                     sku: z.string().optional(),
                     productId: z.string().optional(),
                     userId: z.string().optional(),
                 }),
+                include: z.object({
+                    product: z.boolean().optional(),
+                    user: z.boolean().optional(),
+                }).optional(),
                 limit: z.number().optional(),
                 offset: z.number().optional(),
-                include: z.enum(["0", "1"]).optional()
             })
 
-            const findManyOption = FindManyOption.parse({
-                fields: {
-                    name: req.query.name,
-                    sku: req.query.sku,
-                    productId: req.query.productId,
-                    userId: req.query.userId
-                },
-                limit: Number(req.query.limit) || undefined,
-                offset: Number(req.query.offset) || undefined,
-                include: req.query.include
+            const queryParsed = QuerySchema.parse(req.query)
+            const optionParsed = FindManyOption.parse({
+                where: queryParsed
+                    ? {
+                        name: queryParsed.name,
+                        sku: queryParsed.sku,
+                        productId: queryParsed.productId,
+                        userId: queryParsed.userId
+                    }
+                    : undefined,
+                limit: queryParsed && queryParsed.limit ? parseInt(queryParsed.limit) : undefined,
+                offset: queryParsed && queryParsed.offset ? parseInt(queryParsed.offset) : undefined,
+                include: queryParsed && queryParsed.include
+                    ? {
+                        product: queryParsed.include.product === "true",
+                        user: queryParsed.include.user === "true",
+                    }
+                    : undefined
             })
 
-            const variants = await this.usecase.findMany({
-                fields: findManyOption.fields,
-                limit: findManyOption.limit,
-                offset: findManyOption.offset,
-                include: Boolean(Number(findManyOption.include))
-            })
+            const variants = await this.variantUsecase.findMany(optionParsed)
             res.status(200).json({
                 variants: VariantDTO.toOutputMany(variants)
             })
@@ -130,25 +180,46 @@ export default class VariantController {
         }
     }
 
+    /**
+     * Retrives one variant by id
+     * @param req 
+     * @param res 
+     */
     findOneById = async (req: Request, res: Response): Promise<void> => {
         try {
-            const ReqDataSchema = z.object({
-                variantId: z.string(),
-                include: z.enum(["0", "1"]).optional()
+            const QuerySchema = z.object({
+                include: z.object({
+                    product: z.string().optional(),
+                    user: z.string().optional(),
+                }).optional()
+            }).optional()
+
+            const FindOneOption = z.object({
+                where: z.object({
+                    id: z.string()
+                }),
+                include: z.object({
+                    product: z.boolean().optional(),
+                    user: z.boolean().optional(),
+                }).optional()
             })
 
-            const reqData = ReqDataSchema.parse({
-                variantId: req.params['id'],
-                include: req.query.include
+            const queryParsed = QuerySchema.parse(req.query)
+            const optionParsed = FindOneOption.parse({
+                where: {
+                    id: req.params.id
+                },
+                include: queryParsed && queryParsed.include
+                    ? {
+                        product: queryParsed.include.product === "true",
+                        user: queryParsed.include.user === "true",
+                    }
+                    : undefined
             })
 
-            console.log("id: ", reqData.variantId)
-            const searchedVariant = await this.usecase.findOneById({
-                id: reqData.variantId,
-                include: Boolean(Number(reqData.include))
-            })
+            const variant = await this.variantUsecase.findOneById(optionParsed)
 
-            if (!searchedVariant) {
+            if (!variant) {
                 res.status(404).json({
                     message: "Variant not found"
                 })
@@ -156,7 +227,7 @@ export default class VariantController {
             }
 
             res.status(200).json({
-                variant: VariantDTO.toOutputSingle(searchedVariant)
+                variant: VariantDTO.toOutputSingle(variant)
             })
             return
         } catch (error) {
@@ -168,51 +239,54 @@ export default class VariantController {
         }
     }
 
+    /**
+     * Update one variant by id
+     * @param req 
+     * @param res 
+     * @returns 
+     */
     updateById = async (req: Request, res: Response): Promise<void> => {
         try {
-
             if (!req.user) {
                 res.status(401).json({
-                    message: "Unauthorized"
+                    message: "Unauthorized!"
                 })
                 return
             }
 
+            // if not admin
             if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
-                    message: "require administrator role"
+                    message: "Forbidden!"
                 })
                 return
             }
 
-            const UpdateDataSchema = z.object({
-                variantId: z.string(),
-                fields: z.object({
-                    name: z.string().min(5).max(50).optional(),
-                    sku: z.string().min(5).max(20).optional(),
-                    price: z.number().optional(),
-                    stock: z.number().optional(),
+            const UpdateOptionSchema = z.object({
+                where: z.object({
+                    id: z.string(),
+                    userId: z.string()
                 }),
-                include: z.enum(["0", "1"]).optional()
+                data: z.object({
+                    name: z.string().min(MIN_NAME_LENGTH).max(MAX_NAME_LENGTH).optional(),
+                    sku: z.string().optional(),
+                    price: z.number().positive().optional(),
+                    stock: z.number().int().min(0).optional(),
+                })
             })
 
-            const updateData = UpdateDataSchema.parse({
-                variantId: req.params['id'],
-                fields: req.body,
-                include: req.query.include
+            const optionParsed = UpdateOptionSchema.parse({
+                where: {
+                    id: req.params.id,
+                    userId: req.user.id
+                },
+                data: req.body
             })
 
-            const updatedVariant = await this.usecase.updateById({
-                id: updateData.variantId,
-                fields: updateData.fields,
-                userId: req.user.id,
-                include: Boolean(Number(updateData.include))
-            })
-
+            await this.variantUsecase.updateById(optionParsed)
             res.status(200).json({
-                variant: VariantDTO.toOutputSingle(updatedVariant)
+                message: "Update variant successfully"
             })
-            return
         } catch (error) {
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
@@ -233,43 +307,51 @@ export default class VariantController {
         }
     }
 
+    /**
+     * Delete by id
+     * @param req 
+     * @param res 
+     * @returns 
+     */
     deleteById = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!req.user) {
                 res.status(401).json({
-                    message: "Unauthorized"
+                    message: "Unauthorized!"
                 })
                 return
             }
 
+            // if not admin
             if (req.user.role.toLowerCase() != "administrator") {
                 res.status(403).json({
-                    message: "require administrator role"
+                    message: "Forbidden!"
                 })
                 return
             }
 
-            const variantId = req.params['id']
-            await this.usecase.deleteById({
-                id: variantId,
-                userId: req.user.id
+            await this.variantUsecase.deleteById({
+                where: {
+                    id: req.params.id,
+                    userId: req.user.id
+                }
             })
+
             res.status(200).json({
-                message: "Delete successfuly"
+                message: "Delete variant successfully"
             })
         } catch (error) {
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
                     case USECASE_ERROR_CODE.NOTFOUND:
                         res.status(404).json({
-                            message: "Variant not found or not owned"
+                            message: error.message
                         })
                         return
                 }
             }
-
             res.status(500).json({
-                message: "Server Internal Error!"
+                message: "Server internal error"
             })
             return
         }

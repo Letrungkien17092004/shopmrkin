@@ -25,7 +25,7 @@ export default interface IProductUsecase {
      * @returns A Promise that resolves to an array of Product objects.
      */
     findMany(options: {
-        where?: Partial<Pick<Product, "userId" | "categoryId">>,
+        where?: { product_code?: number, name?: string, description?: string, categoryId?: number, userId?: string },
         orderBy?: OrderByOption | OrderByOption[],
         limit?: number,
         offset?: number,

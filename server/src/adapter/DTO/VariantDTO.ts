@@ -17,12 +17,21 @@ type ToOutput = {
     userId: string,
     price: number,
     stock: number,
-    
+
     user?: {
         username: string,
         role: string
     },
-    
+    product?: {
+        id: string,
+        produce_code: number,
+        name: string,
+        description: string,
+        categoryId?: number | null,
+        createdAt?: Date,
+        updatedAt?: Date
+    },
+
     createdAt?: Date,
     updatedAt?: Date
 }
@@ -51,10 +60,32 @@ export default class VariantDTO {
             role: string
         } | undefined = undefined
 
+        var product: {
+            id: string,
+            produce_code: number,
+            name: string,
+            description: string,
+            categoryId?: number | null,
+            createdAt?: Date,
+            updatedAt?: Date
+        } | undefined = undefined
+
         if (variant.user) {
             user = {
                 username: variant.user.username,
                 role: variant.user.role?.roleName || "null"
+            }
+        }
+
+        if (variant.product) {
+            product = {
+                id: variant.product.id,
+                produce_code: variant.product.product_code,
+                name: variant.product.name,
+                description: variant.product.description,
+                categoryId: variant.product.categoryId,
+                createdAt: variant.product.createdAt,
+                updatedAt: variant.product.updatedAt,
             }
         }
         return {
@@ -66,6 +97,7 @@ export default class VariantDTO {
             stock: variant.stock,
             userId: variant.userId,
             user: user,
+            product: product,
 
             // time
             createdAt: variant.createdAt,
