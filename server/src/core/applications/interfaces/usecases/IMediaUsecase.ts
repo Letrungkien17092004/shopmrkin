@@ -1,9 +1,55 @@
 import { Media } from "../../../../core/entities/index.js"
-
+import { IncludeOption, OrderByOption } from "../repositories/IMediaRepository.js"
 export default interface IMediaUsecase {
-    create(options: Omit<Media, "id" | "createdAt" | "updatedAt">): Promise<Media>
-    assignMediaToProduct(mediaId: string, productId: string): Promise<Media>
-    getById(id: string): Promise<Media | null>
-    updateById(id: string, options: Partial<Media>): Promise<Media>
-    deleteById(id: string): Promise<void>
+
+    /**
+     * Create a media
+     * @param options 
+     */
+    create(options: {
+        data: {
+            fileName: string,
+            filePath: string,
+            hostname: string,
+            media_type: "IMAGE" | "VIDEO",
+            size: number,
+            userId: string
+        },
+        include?: IncludeOption
+    }): Promise<Media>
+
+    /**
+     * Find many media by attribute name
+     * @param options 
+     */
+    findMany(options: {
+        where: Partial<Omit<Media, 'user'>>,
+        include?: IncludeOption,
+        orderBy?: OrderByOption | OrderByOption[]
+    }): Promise<Media[]>
+
+    /**
+     * Find one media by media's id
+     * @param options 
+     */
+    findOneById(options: {
+        where: { id: string },
+        include?: IncludeOption
+    }): Promise<Media | null>
+
+    /**
+     * Update media by media's id
+     */
+    updateById(options: {
+        where: { id: string },
+        data: Partial<Media>
+    }): Promise<void>
+
+    /**
+     * Delete a media by media's id  and user's id
+     * @param options 
+     */
+    deleteById(options: {
+        where: {id: string, userId: string}
+    }): Promise<void>
 }

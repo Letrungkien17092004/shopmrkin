@@ -1,6 +1,6 @@
 import { Router } from "express";
 import AuthorController from "../../adapter/controllers/AuthorController.js";
-import { authorRefeshToken, authorAccessToken } from "../../expressApp/middlewares/author.middlewares.js";
+import { requireRefeshToken, requireAccessToken } from "../../expressApp/middlewares/author.middlewares.js";
 import UserRepository from "../../repositories/UserRepository.js";
 import RolesRepository from "../../repositories/RolesRepository.js";
 import PermissionsRepository from "../../repositories/PermissionsRepository.js";
@@ -21,8 +21,8 @@ const authorRouter = Router()
 
 authorRouter.post("/auth/registor", authorController.register)
 authorRouter.post("/auth/login", authorController.login)
-authorRouter.post("/auth/refesh-access-token", [authorRefeshToken, authorController.createAccessToken])
-authorRouter.post("/auth/verify-access-token", [authorAccessToken, authorController.verifyAccessToken])
+authorRouter.post("/auth/refesh-access-token", [requireRefeshToken, authorController.createAccessToken])
+authorRouter.post("/auth/verify-access-token", [requireAccessToken, authorController.verifyAccessToken])
 
 
 authorRouter.get("/auth/google-redirect-url", authorController.generateOauth2RedirectUrl)

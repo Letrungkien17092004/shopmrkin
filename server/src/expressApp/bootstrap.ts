@@ -20,10 +20,13 @@ function logRequest(req: Request, res: Response, next: NextFunction) {
 }
 const app = express()
 app.set("trust proxy", true)
+app.set('query parser', 'extended');
+
 app.use(cors())
 app.use(logRequest)
 app.use(cookieParser())
 app.use("/public", express.static(PUBLIC_DIR))
+
 
 app.use('/api', [bodyParser.json(), authorRouter]) // authorization API
 app.use("/api", [bodyParser.json(), productRouter]) // product API

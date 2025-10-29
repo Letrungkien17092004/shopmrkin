@@ -23,7 +23,7 @@ export default class CartController {
     }
 
     // POST /cart
-    store = async (req: Request, res: Response): Promise<void> => {
+    create = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!req.user) return void res.status(401).json({ message: "Unauthorized" })
 
@@ -38,16 +38,31 @@ export default class CartController {
     }
 
     // GET /cart (current user's cart) or admin can pass ?userId=
-    showCurrent = async (req: Request, res: Response): Promise<void> => {
+    getOneByUserId = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!req.user) return void res.status(401).json({ message: "Unauthorized" })
 
-            const FindSchema = z.object({ userId: z.string().optional(), include: z.enum(["0", "1"]).optional() })
-            const parsed = FindSchema.parse({ userId: req.query.userId, include: req.query.include })
+
+            const rawInclude = req.query.include as Object as { user: string, cartItem: string }
+            let include: { user: boolean, cartItem: boolean } | undefined
+            if (rawInclude && typeof rawInclude === "object") {
+                include = {
+                    user: rawInclude.user === "true",
+                    cartItem: rawInclude.cartItem === "true"
+                }
+            }
+            const FindSchema = z.object({
+                userId: z.string().optional(),
+                include: z.object({
+                    user: z.boolean(),
+                    cartItem: z.boolean()
+                }).optional()
+            })
+            const parsed = FindSchema.parse({ userId: req.query.userId, include: include })
 
             const targetUserId = (req.user.role.toLowerCase() === "administrator" && parsed.userId) ? parsed.userId : req.user.id
 
-            const cart = await this.usecase.findOneByUserId({ userId: targetUserId, include: Boolean(Number(parsed.include)) })
+            const cart = await this.usecase.findOneByUserId({ userId: targetUserId, include: parsed.include })
             if (!cart) return void res.status(404).json({ message: "Cart not found" })
 
             res.status(200).json({ cart: CartDTO.toOutputSingle(cart) })
@@ -59,7 +74,7 @@ export default class CartController {
     }
 
     // POST /cart/:cartId/items
-    storeItem = async (req: Request, res: Response): Promise<void> => {
+    addItem = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!req.user) return void res.status(401).json({ message: "Unauthorized" })
 

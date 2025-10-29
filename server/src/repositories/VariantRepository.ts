@@ -1,262 +1,194 @@
+import { Product, User, Variant } from "../core/entities/index.js";
+import IVariantRepository, { IncludeOption, OrderByOption } from "../core/applications/interfaces/repositories/IVariantRepository.js";
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
 import { PrismaClient } from "@prisma/client";
-import { Product, User, Variant } from "../core/entities/index.js";
-import IVariantRepository from "../core/applications/interfaces/repositories/IVariantRepository.js";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 export default class VariantRepository implements IVariantRepository {
 
     /**
-     * Create a variant
+     * Create a Variant
      * @param options 
-     * @returns 
      */
-    async create(options: Omit<Variant, "id"> & { include?: boolean }): Promise<Variant> {
+    async create(options: {
+        data: Omit<Variant, "id">,
+        include?: IncludeOption
+    }): Promise<Variant> {
         try {
-            const include = options.include || false
-            if (include === false) {
+            // Tách các trường quan hệ (nếu có) ra khỏi dữ liệu create
+            const { user, product, createdAt, updatedAt, ...createData } = options.data;
+
+            if (options.include) {
                 const createdVariant = await prisma.variants.create({
-                    data: {
-                        name: options.name,
-                        sku: options.sku,
-                        productId: options.productId,
-                        userId: options.userId,
-                        price: options.price,
-                        stock: options.stock
-                    }
-                })
-                const convertedPrice = Number(createdVariant.price)
-                return new Variant({ ...createdVariant, price: convertedPrice })
+                    data: createData,
+                    relationLoadStrategy: "join",
+                    include: options.include
+                });
+                return new Variant({
+                    ...createdVariant,
+                    price: Number(createdVariant.price), // Chuyển Decimal sang number
+                    user: createdVariant.user ? new User(createdVariant.user) : undefined,
+                    product: createdVariant.product ? new Product(createdVariant.product) : undefined
+                });
             }
 
             const createdVariant = await prisma.variants.create({
-                data: {
-                    name: options.name,
-                    sku: options.sku,
-                    productId: options.productId,
-                    userId: options.userId,
-                    price: options.price,
-                    stock: options.stock
-                },
-                include: {
-                    user: true,
-                    product: true
-                }
-            })
+                data: createData
+            });
             return new Variant({
                 ...createdVariant,
-                price: Number(createdVariant.price),
-                user: new User({ ...createdVariant.user }),
-                product: new Product({ ...createdVariant.product })
-            })
+                price: Number(createdVariant.price) // Chuyển Decimal sang number
+            });
         } catch (error) {
-            throw baseExceptionHandler(error)
+            throw baseExceptionHandler(error);
         }
     }
 
     /**
-     * Retrieves a list of Variants, filter with options.field include: name, sku, productId, userId
+     * Find many variant by attribute name
      * @param options 
-     * @returns 
      */
-    async findMany(options: { fields: Partial<Pick<Variant, "name" | "sku" | "productId" | "userId">>, orderBy?: [{ createdAt: "asc" } | { createdAt: "desc" } | { updatedAt: "asc" } | { updatedAt: "desc" }], limit?: number, offset?: number, include?: boolean }): Promise<Variant[]> {
+    async findMany(options: {
+        where: Partial<Pick<Variant, "name" | "sku" | "productId" | "userId">>,
+        orderBy?: OrderByOption | OrderByOption[],
+        include?: IncludeOption,
+        limit?: number,
+        offset?: number
+    }): Promise<Variant[]> {
         try {
-            const include = options.include || false
-            if (include === false) {
-                const searchedVariant = await prisma.variants.findMany({
-                    where: {
-                        name: {
-                            contains: options.fields.name
-                        },
-                        sku: options.fields.sku,
-                        productId: options.fields.productId,
-                        userId: options.fields.userId,
-                    },
-                    orderBy: options.orderBy,
-                    skip: options.offset,
-                    take: options.limit
-                })
+            const limit = options.limit || 20;
+            const offset = options.offset || 0;
 
-                return searchedVariant.map(v => new Variant({
+            if (options.include) {
+                const variants = await prisma.variants.findMany({
+                    where: options.where,
+                    relationLoadStrategy: "join",
+                    include: options.include,
+                    orderBy: options.orderBy,
+                    skip: offset,
+                    take: limit
+                });
+                return variants.map(v => new Variant({
                     ...v,
                     price: Number(v.price),
-                }))
+                    user: v.user ? new User(v.user) : undefined,
+                    product: v.product ? new Product(v.product) : undefined
+                }));
             }
 
-
-            const searchedVariant = await prisma.variants.findMany({
-                where: {
-                    name: {
-                        contains: options.fields.name
-                    },
-                    sku: options.fields.sku,
-                    productId: options.fields.productId,
-                    userId: options.fields.userId,
-                },
-                relationLoadStrategy: "join",
-                include: {
-                    user: true,
-                    product: true
-                },
+            const variants = await prisma.variants.findMany({
+                where: options.where,
                 orderBy: options.orderBy,
-                skip: options.offset,
-                take: options.limit
-            })
-
-            return searchedVariant.map(variant => new Variant({
-                ...variant,
-                price: Number(variant.price),
-                user: new User({ ...variant.user }),
-                product: new Product({ ...variant.product })
-            }))
+                skip: offset,
+                take: limit
+            });
+            return variants.map(v => new Variant({
+                ...v,
+                price: Number(v.price)
+            }));
         } catch (error) {
-            throw baseExceptionHandler(error)
+            throw baseExceptionHandler(error);
         }
     }
 
     /**
-     * Retrive a Variant by SKU
+     * Find one variant by sku value
      * @param options 
-     * @returns 
      */
-    async findOneBySku(options: { sku: string, include?: boolean }): Promise<Variant | null> {
+    async findOneBySku(options: {
+        where: { sku: string },
+        include?: IncludeOption
+    }): Promise<Variant | null> {
         try {
-            const include = options.include || false
-            if (include === false) {
+            if (options.include) {
                 const searchVariant = await prisma.variants.findUnique({
-                    where: {
-                        sku: options.sku
-                    }
-                })
-                return searchVariant ? new Variant({ ...searchVariant, price: Number(searchVariant.price) }) : null
-            }
-            const searchVariant = await prisma.variants.findUnique({
-                where: {
-                    sku: options.sku
-                },
-                include: {
-                    user: true,
-                    product: true
-                }
-            })
-            if (searchVariant) {
+                    where: options.where,
+                    relationLoadStrategy: "join",
+                    include: options.include
+                });
+                if (!searchVariant) return null;
                 return new Variant({
                     ...searchVariant,
                     price: Number(searchVariant.price),
-                    user: new User({ ...searchVariant.user }),
-                    product: new Product({ ...searchVariant.product })
-                })
+                    user: searchVariant.user ? new User(searchVariant.user) : undefined,
+                    product: searchVariant.product ? new Product(searchVariant.product) : undefined
+                });
             }
-            return null
+
+            const searchVariant = await prisma.variants.findUnique({
+                where: options.where
+            });
+            return searchVariant ? new Variant({ ...searchVariant, price: Number(searchVariant.price) }) : null;
         } catch (error) {
-            throw baseExceptionHandler(error)
+            throw baseExceptionHandler(error);
         }
     }
 
     /**
-     * Retrieves a Variant by ID
+     * Find one variant by id value
      * @param options 
-     * @returns 
      */
-    async findOneById(options: { id: string; include?: boolean; }): Promise<Variant | null> {
+    async findOneById(options: {
+        where: { id: string },
+        include?: IncludeOption
+    }): Promise<Variant | null> {
         try {
-            const include = options.include || false
-            if (include === false) {
+            if (options.include) {
                 const searchVariant = await prisma.variants.findUnique({
-                    where: {
-                        id: options.id
-                    }
-                })
-                return searchVariant ? new Variant({ ...searchVariant, price: Number(searchVariant.price) }) : null
-            }
-            const searchVariant = await prisma.variants.findUnique({
-                where: {
-                    id: options.id
-                },
-                include: {
-                    user: true,
-                    product: true
-                }
-            })
-            if (searchVariant) {
+                    where: options.where,
+                    relationLoadStrategy: "join",
+                    include: options.include
+                });
+                if (!searchVariant) return null;
                 return new Variant({
                     ...searchVariant,
                     price: Number(searchVariant.price),
-                    user: new User({ ...searchVariant.user }),
-                    product: new Product({ ...searchVariant.product })
-                })
+                    user: searchVariant.user ? new User(searchVariant.user) : undefined,
+                    product: searchVariant.product ? new Product(searchVariant.product) : undefined
+                });
             }
-            return null
+
+            const searchVariant = await prisma.variants.findUnique({
+                where: options.where
+            });
+            return searchVariant ? new Variant({ ...searchVariant, price: Number(searchVariant.price) }) : null;
         } catch (error) {
-            throw baseExceptionHandler(error)
+            throw baseExceptionHandler(error);
         }
     }
 
     /**
-     * Update a Variant by ID and userId (owner)
+     * Update one variant 
      * @param options 
-     * @returns 
      */
-    async updateById(options: { id: string, userId: string, fields: Partial<Omit<Variant, "id">>, include?: boolean }): Promise<Variant> {
+    async updateById(options: {
+        where: { id: string, userId: string },
+        data: { name?: string, sku?: string, price?: number, stock?: number },
+    }): Promise<void> {
         try {
-            const include = options.include || false
-            if (include === false) {
-                const searchVariant = await prisma.variants.update({
-                    data: {
-                        name: options.fields.name,
-                        sku: options.fields.name,
-                        price: options.fields.price,
-                        stock: options.fields.stock
-                    },
-                    where: {
-                        id: options.id,
-                        userId: options.userId
-                    }
-                })
-                return new Variant({ ...searchVariant, price: Number(searchVariant.price) })
-            }
-            const searchVariant = await prisma.variants.update({
-                data: {
-                    name: options.fields.name,
-                    sku: options.fields.sku,
-                    price: options.fields.price,
-                    stock: options.fields.stock
-                },
-                where: {
-                    id: options.id,
-                    userId: options.userId
-                },
-                include: {
-                    user: true,
-                    product: true
-                }
-            })
-            return new Variant({
-                ...searchVariant,
-                price: Number(searchVariant.price),
-                user: new User({ ...searchVariant.user }),
-                product: new Product({ ...searchVariant.product })
-            })
+            await prisma.variants.update({
+                where: options.where,
+                data: options.data
+            });
         } catch (error) {
-            throw baseExceptionHandler(error)
+            throw baseExceptionHandler(error);
         }
     }
 
     /**
-     * Delete a Variant by ID and userId (owner)
+     * Delete a variant by variant's id and user's id
      * @param options 
      */
-    async deleteById(options: { id: string, userId: string }): Promise<void> {
+    async deleteById(options: {
+        where: { id: string, userId: string }
+    }): Promise<void> {
         try {
-            const status = await prisma.variants.delete({
-                where: {
-                    id: options.id,
-                    userId: options.userId
-                }
-            })
+            await prisma.variants.delete({
+                where: options.where
+            });
         } catch (error) {
-            throw baseExceptionHandler(error)
+            throw baseExceptionHandler(error);
         }
     }
 }

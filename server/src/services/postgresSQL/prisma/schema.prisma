@@ -227,7 +227,7 @@ model OrderItems {
   unitPrice Decimal
 
   order Orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  variant Variants @relation(fields: [variantId], references: [id], onDelete: Cascade) // tôi không thể tạo mối quan hệ one to one giữa Order_items và Variant 
+  variant Variants @relation(fields: [variantId], references: [id], onDelete: Cascade) 
   @@unique([orderId, variantId])
   
   @@map("order_items")

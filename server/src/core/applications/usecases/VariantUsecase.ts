@@ -1,5 +1,5 @@
 import { Variant } from "../../../core/entities/index.js"
-import IVariantRepository from "../../../core/applications/interfaces/repositories/IVariantRepository.js"
+import IVariantRepository, { IncludeOption, OrderByOption } from "../../../core/applications/interfaces/repositories/IVariantRepository.js"
 import IVariantUsecase from "../../../core/applications/interfaces/usecases/IVariantUsecase.js"
 import { REPO_ERROR, REPO_ERROR_CODE } from "../../../core/applications/interfaces/repositories/errors.js"
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../../core/applications/interfaces/usecases/errors.js"
@@ -17,7 +17,10 @@ export default class VariantUsecase implements IVariantUsecase {
      * @param options 
      * @returns 
      */
-    async create(options: Omit<Variant, "id"> & { include?: boolean }): Promise<Variant> {
+    async create(options: {
+        data: Omit<Variant, "id">,
+        include?: IncludeOption
+    }): Promise<Variant> {
         try {
             const createdVariant = await this.repo.create(options)
             return createdVariant
@@ -34,7 +37,7 @@ export default class VariantUsecase implements IVariantUsecase {
                             message: "Variant already exist",
                             code: USECASE_ERROR_CODE.EXISTED
                         })
-                    
+
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "author or parent product is wrong",
@@ -55,7 +58,13 @@ export default class VariantUsecase implements IVariantUsecase {
      * @param options 
      * @returns 
      */
-    async findMany(options: { fields: Partial<Pick<Variant, "name" | "sku" | "productId" | "userId">>, orderBy?: [{createdAt: "asc"} | {createdAt: "desc"} | {updatedAt: "asc"} | {updatedAt: "desc"}], limit?: number, offset?: number, include?: boolean }): Promise<Variant[]> {
+    async findMany(options: {
+        where: Partial<Pick<Variant, "name" | "sku" | "productId" | "userId">>,
+        orderBy?: OrderByOption | OrderByOption[],
+        include?: IncludeOption,
+        limit?: number,
+        offset?: number
+    }): Promise<Variant[]> {
         try {
             const searchedVariant = await this.repo.findMany(options)
             return searchedVariant
@@ -81,7 +90,10 @@ export default class VariantUsecase implements IVariantUsecase {
      * @param options 
      * @returns 
      */
-    async findOneBySku(options: { sku: string, include?: boolean }): Promise<Variant | null> {
+    async findOneBySku(options: {
+        where: { sku: string },
+        include?: IncludeOption
+    }): Promise<Variant | null> {
         try {
             const updatedVariant = await this.repo.findOneBySku(options)
             return updatedVariant
@@ -118,7 +130,10 @@ export default class VariantUsecase implements IVariantUsecase {
      * @param id 
      * @param authorId 
      */
-    async findOneById(options: { id: string, include?: boolean }): Promise<Variant | null> {
+    async findOneById(options: {
+        where: { id: string },
+        include?: IncludeOption
+    }): Promise<Variant | null> {
         try {
             return await this.repo.findOneById(options)
         } catch (error) {
@@ -129,7 +144,7 @@ export default class VariantUsecase implements IVariantUsecase {
                             message: error.message,
                             code: USECASE_ERROR_CODE.INITIAL
                         })
-                    case REPO_ERROR_CODE.NOTFOUND: 
+                    case REPO_ERROR_CODE.NOTFOUND:
                         throw new USECASE_ERROR({
                             message: error.message,
                             code: USECASE_ERROR_CODE.NOTFOUND
@@ -147,7 +162,10 @@ export default class VariantUsecase implements IVariantUsecase {
      * Update a variant by ID
      * @param options 
      */
-    async updateById(options: { id: string; userId: string; fields: Partial<Omit<Variant, "id">>; include?: boolean; }): Promise<Variant> {
+    async updateById(options: {
+        where: { id: string, userId: string },
+        data: { name?: string, sku?: string, price?: number, stock?: number },
+    }): Promise<void> {
         try {
             return await this.repo.updateById(options)
         } catch (error) {
@@ -158,7 +176,7 @@ export default class VariantUsecase implements IVariantUsecase {
                             message: error.message,
                             code: USECASE_ERROR_CODE.INITIAL
                         })
-                    case REPO_ERROR_CODE.NOTFOUND: 
+                    case REPO_ERROR_CODE.NOTFOUND:
                         throw new USECASE_ERROR({
                             message: error.message,
                             code: USECASE_ERROR_CODE.NOTFOUND
@@ -168,7 +186,7 @@ export default class VariantUsecase implements IVariantUsecase {
                             message: error.message,
                             code: USECASE_ERROR_CODE.EXISTED
                         })
-                    
+
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: error.message,
@@ -187,7 +205,9 @@ export default class VariantUsecase implements IVariantUsecase {
      * Delete a Variant by ID
      * @param options 
      */
-    async deleteById(options: { id: string; userId: string; }): Promise<void> {
+    async deleteById(options: {
+        where: { id: string, userId: string }
+    }): Promise<void> {
         try {
             await this.repo.deleteById(options)
         } catch (error) {
@@ -198,7 +218,7 @@ export default class VariantUsecase implements IVariantUsecase {
                             message: error.message,
                             code: USECASE_ERROR_CODE.INITIAL
                         })
-                    case REPO_ERROR_CODE.NOTFOUND: 
+                    case REPO_ERROR_CODE.NOTFOUND:
                         throw new USECASE_ERROR({
                             message: error.message,
                             code: USECASE_ERROR_CODE.NOTFOUND

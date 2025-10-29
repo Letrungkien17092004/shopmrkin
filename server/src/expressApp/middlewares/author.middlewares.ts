@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken"
 import { ENV } from "../../config/env.js";
 import { z } from "zod"
 
-export async function authorRefeshToken(req: Request, res: Response, next: NextFunction) {
+export async function requireRefeshToken(req: Request, res: Response, next: NextFunction) {
     try {
         const authorToken = req.headers["authorization"]?req.headers["authorization"].split(" ")[1]:undefined
         if (!authorToken) {
@@ -62,7 +62,7 @@ export async function authorRefeshToken(req: Request, res: Response, next: NextF
     }
 }
 
-export async function authorAccessToken(req: Request, res: Response, next: NextFunction) {
+export async function requireAccessToken(req: Request, res: Response, next: NextFunction) {
     try {
         const authorToken = req.headers["authorization"]?req.headers["authorization"].split(" ")[1]:undefined
         if (!authorToken) {

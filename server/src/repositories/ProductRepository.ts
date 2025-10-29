@@ -1,5 +1,5 @@
 import { Category, Product, User, Variant, Media } from "../core/entities/index.js";
-import IProductRepository from "../core/applications/interfaces/repositories/IProductRepository.js";
+import IProductRepository, { IncludeOption, OrderByOption } from "../core/applications/interfaces/repositories/IProductRepository.js";
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
 import { PrismaClient } from "@prisma/client";
 
@@ -14,130 +14,133 @@ export default class ProductRepository implements IProductRepository {
      * @returns The created Product entity.
      * @throws Throws if an error occurs during creation.
      */
-    async create(options: Omit<Product, "id" | "product_code"> & { include?: boolean }): Promise<Product> {
+    async create(options: {
+        data: { name: string, description: string, categoryId: number, userId: string },
+        include?: IncludeOption
+    }): Promise<Product> {
         try {
-            const include = options.include || false
-            if (include) {
+            if (options.include) {
                 const createdProduct = await prisma.products.create({
-                    data: {
-                        name: options.name,
-                        description: options.description,
-                        categoryId: options.categoryId,
-                        userId: options.userId
-                    },
+                    data: options.data,
                     relationLoadStrategy: "join",
                     include: {
                         user: true,
                         category: true
                     }
                 })
-                var category: Category | null = null
-                if (createdProduct.category) {
-                    category = new Category({
-                        id: createdProduct.category.id,
-                        name: createdProduct.category?.name,
-                        slug: createdProduct.category?.slug
-                    })
-                }
-                return new Product({
-                    ...createdProduct,
-                    user: new User({
-                        ...createdProduct.user
-                    }),
-                    category: category
-                })
+                return new Product(createdProduct)
             }
 
             const createdProduct = await prisma.products.create({
-                data: {
-                    name: options.name,
-                    description: options.description,
-                    categoryId: options.categoryId,
-                    userId: options.userId
-                }
+                data: options.data
             })
-            return new Product({ ...createdProduct, category: null })
+            return new Product(createdProduct)
         } catch (error) {
             throw baseExceptionHandler(error)
         }
     }
 
-    async findMany(options: { fields: Partial<Pick<Product, "userId" | "categoryId">>, orderBy?: [{ createdAt: "asc" } | { createdAt: "desc" } | { updatedAt: "asc" } | { updatedAt: "desc" }], limit?: number, offset?: number, include?: boolean }): Promise<Product[]> {
+    /**
+     * Retrieves a list of Products based on filtering, sorting, and pagination options.
+     * @param options The options for querying the list of Products.
+     * @param options.where The filter conditions, equivalent to Prisma's 'where'. Supports filtering by userId and categoryId.
+     * @param options.orderBy Sorts the results by one or more fields. E.g., [{ createdAt: 'desc' }, { name: 'asc' }].
+     * @param options.take The maximum number of records to return (equivalent to 'limit').
+     * @param options.skip The number of records to skip (equivalent to 'offset').
+     * @param options.include The relations to load along with the list of Products.
+     * @returns A Promise that resolves to an array of Product objects.
+     */
+    async findMany(options: {
+        where?: { product_code?: number, name?: string, description?: string, categoryId?: number, userId?: string },
+        orderBy?: OrderByOption[],
+        limit?: number,
+        offset?: number,
+        include?: IncludeOption
+    }): Promise<Product[]> {
         try {
-            var orderBy = options.orderBy || [{ updatedAt: "desc" }]
-            const include = options.include || false
-            if (include === false) {
-                const products = await prisma.products.findMany({
-                    where: {
-                        userId: options.fields.userId,
-                        categoryId: options.fields.categoryId,
-                    },
-                    orderBy: orderBy,
-                    skip: options.offset || 0,
-                    take: options.limit || 100
-                })
-                return products.map(p => new Product({ ...p, category: null }))
-            }
-
-            const products = await prisma.products.findMany({
-                where: {
-                    userId: options.fields.userId,
-                    categoryId: options.fields.categoryId,
-                },
-                include: {
-                    user: true,
-                    media: {
+            if (options.include) {
+                // if include both media and variant
+                if (options.include.media && options.include.variants) {
+                    const products = await prisma.products.findMany({
+                        where: options.where,
+                        relationLoadStrategy: "join",
                         include: {
-                            media: true
+                            ...options.include,
+                            media: {
+                                include: {
+                                    media: true
+                                }
+                            },
+                            variants: true
                         }
-                    },
-                    variants: true,
-                    category: true
-                },
-                orderBy: orderBy,
-                skip: options.offset || 0,
-                take: options.limit || 10
-            })
-            return products.map(p => {
-                const media = p.media.map(m => new Media({
-                    id: m.media.id,
-                    fileName: m.media.fileName,
-                    filePath: m.media.filePath,
-                    hostname: m.media.hostname,
-                    media_type: m.media.media_type,
-                    size: m.media.size,
-                    status: m.media.status,
-                    userId: m.media.userId,
-                }))
+                    })
+                    return products.map(p => new Product(
+                        {
+                            ...p,
+                            media: p.media.map(pm => new Media(pm.media)),
+                            variants: p.variants.map(pv => new Variant({ ...pv, price: Number(pv.price) }))
+                        }
+                    ))
+                }
 
-                const variants = p.variants.map(v => new Variant({
-                    id: v.id,
-                    name: v.name,
-                    sku: v.sku,
-                    productId: v.productId,
-                    userId: v.userId,
-                    price: Number(v.price),
-                    stock: v.stock,
-                }))
+                // if only include media without variant
+                if (options.include.media && !options.include.variants) {
+                    const products = await prisma.products.findMany({
+                        where: options.where,
+                        relationLoadStrategy: "join",
+                        include: {
+                            ...options.include,
+                            media: {
+                                include: {
+                                    media: true
+                                }
+                            },
+                            variants: undefined
+                        }
+                    })
+                    return products.map(p => new Product(
+                        {
+                            ...p,
+                            media: p.media.map(pm => new Media(pm.media)),
+                        }
+                    ))
+                }
 
-                const user = new User({
-                    id: p.user.id,
-                    username: p.user.username,
-                    account: p.user.account,
-                    password_hash: p.user.password_hash,
-                    email: p.user.email,
-                    roleId: p.user.roleId,
+                // if only include variant without media
+                if (options.include.variants && !options.include.media) {
+                    const products = await prisma.products.findMany({
+                        where: options.where,
+                        relationLoadStrategy: "join",
+                        include: {
+                            ...options.include,
+                            media: undefined,
+                            variants: true
+                        }
+                    })
+                    return products.map(p => new Product(
+                        {
+                            ...p,
+                            variants: p.variants.map(pv => new Variant({ ...pv, price: Number(pv.price) }))
+                        }
+                    ))
+                }
+                const products = await prisma.products.findMany({
+                    where: options.where,
+                    relationLoadStrategy: "join",
+                    include: {
+                        ...options.include,
+                        media: undefined,
+                        variants: undefined
+                    }
                 })
-
-                return new Product({
-                    ...p,
-                    user: user,
-                    media: media,
-                    variants: variants
-                })
+                return products.map(p => new Product(p))
+            } // else
+            const products = await prisma.products.findMany({
+                where: options.where
             })
+
+            return products.map(p => new Product(p))
         } catch (error) {
-            console.log("Log herrrr", error)
             throw baseExceptionHandler(error)
         }
     }
@@ -148,72 +151,91 @@ export default class ProductRepository implements IProductRepository {
      * @returns The Product entity if found, otherwise null.
      * @throws Throws if an error occurs during retrieval.
      */
-    async findOneByCode(options: { product_code: number, include?: boolean }): Promise<Product | null> {
+    async findOneByCode(options: {
+        where: { product_code: number },
+        include?: IncludeOption
+    }): Promise<Product | null> {
         try {
-            const include = options.include || false
-            if (include === false) {
+            if (options.include) {
+                // if include both media and variant
+                if (options.include.media && options.include.variants) {
+                    const searchedProduct = await prisma.products.findUnique({
+                        where: options.where,
+                        relationLoadStrategy: "join",
+                        include: {
+                            ...options.include,
+                            media: {
+                                include: {
+                                    media: true
+                                }
+                            },
+                            variants: true
+                        }
+                    })
+                    if (!searchedProduct) return null
+                    return new Product({
+                        ...searchedProduct,
+                        media: searchedProduct.media.map(pm => new Media(pm.media)),
+                        variants: searchedProduct.variants.map(v => new Variant({ ...v, price: Number(v.price) }))
+                    })
+                }
+
+                // if only include media without variant
+                if (options.include.media && !options.include.variants) {
+                    const searchedProduct = await prisma.products.findUnique({
+                        where: options.where,
+                        relationLoadStrategy: "join",
+                        include: {
+                            ...options.include,
+                            media: {
+                                include: {
+                                    media: true
+                                }
+                            },
+                            variants: undefined
+                        }
+                    })
+                    if (!searchedProduct) return null
+                    return new Product({
+                        ...searchedProduct,
+                        media: searchedProduct.media.map(pm => new Media(pm.media)),
+                    })
+                }
+
+                // if only include variant without media
+                if (options.include.variants && !options.include.media) {
+                    const searchedProduct = await prisma.products.findUnique({
+                        where: options.where,
+                        relationLoadStrategy: "join",
+                        include: {
+                            ...options.include,
+                            media: undefined,
+                            variants: true
+                        }
+                    }) // else
+                    if (!searchedProduct) return null
+                    return new Product({
+                        ...searchedProduct,
+                        variants: searchedProduct.variants.map(v => new Variant({ ...v, price: Number(v.price) }))
+                    })
+                }
                 const searchedProduct = await prisma.products.findUnique({
-                    where: {
-                        product_code: options.product_code
+                    where: options.where,
+                    relationLoadStrategy: "join",
+                    include: {
+                        ...options.include,
+                        media: undefined,
+                        variants: undefined
                     }
                 })
                 if (!searchedProduct) return null
-                return new Product({ ...searchedProduct, category: null })
-            }
-
+                return new Product(searchedProduct)
+            } // else
             const searchedProduct = await prisma.products.findUnique({
-                where: {
-                    product_code: options.product_code
-                },
-                include: {
-                    user: true,
-                    category: true,
-                    variants: true,
-                    media: {
-                        include: {
-                            media: true
-                        }
-                    }
-                }
+                where: options.where
             })
 
-            if (!searchedProduct) return null
-
-            const media = searchedProduct.media.map(m => new Media({
-                id: m.media.id,
-                fileName: m.media.fileName,
-                filePath: m.media.filePath,
-                hostname: m.media.hostname,
-                media_type: m.media.media_type,
-                size: m.media.size,
-                status: m.media.status,
-                userId: m.media.userId,
-            }))
-
-            const variants = searchedProduct.variants.map(v => new Variant({
-                id: v.id,
-                name: v.name,
-                sku: v.sku,
-                productId: v.productId,
-                userId: v.userId,
-                price: Number(v.price),
-                stock: v.stock,
-            }))
-
-            const user = new User({
-                id: searchedProduct.user.id,
-                username: searchedProduct.user.username,
-                account: searchedProduct.user.account,
-                password_hash: searchedProduct.user.password_hash,
-                email: searchedProduct.user.email,
-                roleId: searchedProduct.user.roleId,
-            })
-            return new Product({
-                ...searchedProduct,
-                user: user,
-                media: media,
-                variants: variants
-            })
+            return searchedProduct ? new Product(searchedProduct) : null
         } catch (error) {
             throw baseExceptionHandler(error)
         }
@@ -225,83 +247,87 @@ export default class ProductRepository implements IProductRepository {
      * @returns The Product entity if found, otherwise null.
      * @throws Throws if an error occurs during retrieval.
      */
-    async findOneById(options: { id: string, include?: boolean }): Promise<Product | null> {
+    async findOneById(options: {
+        where: {
+            id: string
+        },
+        include?: IncludeOption
+    }): Promise<Product | null> {
         try {
-            const include = options.include || false
-            if (include === false) {
+            if (options.include) {
+                // if include both media and variant
+                if (options.include.media && options.include.variants) {
+                    const searchedProduct = await prisma.products.findUnique({
+                        where: options.where,
+                        relationLoadStrategy: "join",
+                        include: {
+                            ...options.include,
+                            media: {
+                                include: {
+                                    media: true
+                                }
+                            },
+                            variants: true
+                        }
+                    }) // else
+                    if (!searchedProduct) return null
+                    return new Product({
+                        ...searchedProduct,
+                        media: searchedProduct.media.map(pm => new Media(pm.media)),
+                        variants: searchedProduct.variants.map(v => new Variant({ ...v, price: Number(v.price) }))
+                    })
+                }
+
+                // if only include media without variant
+                if (options.include.media && !options.include.variants) {
+                    const searchedProduct = await prisma.products.findUnique({
+                        where: options.where,
+                        relationLoadStrategy: "join",
+                        include: {
+                            ...options.include,
+                            media: {
+                                include: {
+                                    media: true
+                                }
+                            },
+                            variants: undefined
+                        }
+                    }) // else
+                    if (!searchedProduct) return null
+                    return new Product({
+                        ...searchedProduct,
+                        media: searchedProduct.media.map(pm => new Media(pm.media)),
+                    })
+                }
+
+                // if only include variant without media
+                if (options.include.variants && !options.include.media) {
+                    const searchedProduct = await prisma.products.findUnique({
+                        where: options.where,
+                        relationLoadStrategy: "join",
+                        include: {
+                            ...options.include,
+                            media: undefined,
+                            variants: true
+                        }
+                    }) // else
+                    if (!searchedProduct) return null
+                    return new Product({
+                        ...searchedProduct,
+                        variants: searchedProduct.variants.map(v => new Variant({ ...v, price: Number(v.price) }))
+                    })
+                }
                 const searchedProduct = await prisma.products.findUnique({
-                    where: {
-                        id: options.id
-                    }
+                    where: options.where
                 })
                 if (!searchedProduct) return null
-                return new Product({ ...searchedProduct, category: null })
-            }
-
+                return new Product(searchedProduct)
+            } // else
             const searchedProduct = await prisma.products.findUnique({
-                where: {
-                    id: options.id
-                },
-                include: {
-                    user: true,
-                    category: true,
-                    variants: true,
-                    media: {
-                        include: {
-                            media: true
-                        }
-                    }
-                }
+                where: options.where
             })
 
-            if (!searchedProduct) return null
-
-            const media = searchedProduct.media.map(m => new Media({
-                id: m.media.id,
-                fileName: m.media.fileName,
-                filePath: m.media.filePath,
-                hostname: m.media.hostname,
-                media_type: m.media.media_type,
-                size: m.media.size,
-                status: m.media.status,
-                userId: m.media.userId,
-            }))
-
-            const variants = searchedProduct.variants.map(v => new Variant({
-                id: v.id,
-                name: v.name,
-                sku: v.sku,
-                productId: v.productId,
-                userId: v.userId,
-                price: Number(v.price),
-                stock: v.stock,
-            }))
-
-            const user = new User({
-                id: searchedProduct.user.id,
-                username: searchedProduct.user.username,
-                account: searchedProduct.user.account,
-                password_hash: searchedProduct.user.password_hash,
-                email: searchedProduct.user.email,
-                roleId: searchedProduct.user.roleId,
-            })
-
-            var category: Category | null = null
-            if (searchedProduct.category) {
-                category = new Category({
-                    id: searchedProduct.category.id,
-                    name: searchedProduct.category?.name,
-                    slug: searchedProduct.category?.slug
-                })
-            }
-
-            return new Product({
-                ...searchedProduct,
-                media: media,
-                user: user,
-                variants: variants,
-                category: category
-            })
+            return searchedProduct ? new Product(searchedProduct) : null
         } catch (error) {
             throw baseExceptionHandler(error)
         }
@@ -315,93 +341,14 @@ export default class ProductRepository implements IProductRepository {
      * @returns The updated Product entity.
      * @throws Throws if an error occurs during update.
      */
-    async updateById(options: { id: string, userId: string, fields: Partial<Omit<Product, "id">>, include?: boolean }): Promise<Product> {
+    async updateById(options: {
+        where: { id: string, userId: string },
+        data: { name?: string, description?: string, categoryId?: number },
+    }): Promise<void> {
         try {
-            const include = options.include || false
-            if (include === false) {
-                const updatedProduct = await prisma.products.update({
-                    where: {
-                        id: options.id,
-                        userId: options.userId
-                    },
-                    data: {
-                        name: options.fields.name,
-                        description: options.fields.description,
-                        categoryId: options.fields.categoryId
-                    }
-                })
-                return new Product({ ...updatedProduct, category: null })
-            }
-
-            const updatedProduct = await prisma.products.update({
-                where: {
-                    id: options.id,
-                    userId: options.userId
-                },
-                data: {
-                    name: options.fields.name,
-                    description: options.fields.description,
-                    categoryId: options.fields.categoryId
-                },
-
-                include: {
-                    user: true,
-                    category: true,
-                    variants: true,
-                    media: {
-                        include: {
-                            media: true
-                        }
-                    }
-                }
-            })
-
-
-            const media = updatedProduct.media.map(m => new Media({
-                id: m.media.id,
-                fileName: m.media.fileName,
-                filePath: m.media.filePath,
-                hostname: m.media.hostname,
-                media_type: m.media.media_type,
-                size: m.media.size,
-                status: m.media.status,
-                userId: m.media.userId,
-            }))
-
-            const variants = updatedProduct.variants.map(v => new Variant({
-                id: v.id,
-                name: v.name,
-                sku: v.sku,
-                productId: v.productId,
-                userId: v.userId,
-                price: Number(v.price),
-                stock: v.stock,
-            }))
-
-            const user = new User({
-                id: updatedProduct.user.id,
-                username: updatedProduct.user.username,
-                account: updatedProduct.user.account,
-                password_hash: updatedProduct.user.password_hash,
-                email: updatedProduct.user.email,
-                roleId: updatedProduct.user.roleId,
-            })
-
-            var category: Category | null = null
-            if (updatedProduct.category) {
-                category = new Category({
-                    id: updatedProduct.category.id,
-                    name: updatedProduct.category?.name,
-                    slug: updatedProduct.category?.slug
-                })
-            }
-
-            return new Product({
-                ...updatedProduct,
-                media: media,
-                user: user,
-                variants: variants,
-                category: category
+            await prisma.products.update({
+                where: options.where,
+                data: options.data
             })
         } catch (error) {
             throw baseExceptionHandler(error)
@@ -415,13 +362,12 @@ export default class ProductRepository implements IProductRepository {
     * @returns void
     * @throws Throws if an error occurs during deletion.
     */
-    async deleteById(options: { id: string, userId: string }): Promise<void> {
+    async deleteById(options: {
+        where: { id: string, userId: string }
+    }): Promise<void> {
         try {
-            const status = await prisma.products.delete({
-                where: {
-                    id: options.id,
-                    userId: options.userId
-                }
+            await prisma.products.delete({
+                where: options.where
             })
         } catch (error) {
             throw baseExceptionHandler(error)

@@ -1,4 +1,4 @@
-import IMediaRepository from "../core/applications/interfaces/repositories/IMediaRepository.js";
+import IMediaRepository, { IncludeOption, OrderByOption } from "../core/applications/interfaces/repositories/IMediaRepository.js";
 import { PrismaClient } from "@prisma/client";
 import { Media, User, Role } from "../core/entities/index.js"
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
@@ -11,19 +11,31 @@ export default class MediaRepository implements IMediaRepository {
      * @param options 
      * @returns 
      */
-    async create(options: Omit<Media, "id" | "createdAt" | "updatedAt">): Promise<Media> {
+    async create(options: {
+        data: {
+            fileName: string,
+            filePath: string,
+            hostname: string,
+            media_type: "IMAGE" | "VIDEO",
+            size: number,
+            userId: string
+        },
+        include?: IncludeOption
+    }): Promise<Media> {
         try {
-            const createdMedia = await prisma.media.create({
-                data: {
-                    fileName: options.fileName,
-                    filePath: options.filePath,
-                    hostname: options.hostname,
-                    media_type: options.media_type,
-                    size: options.size,
-                    userId: options.userId
-                }
-            })
+            if (options.include) {
+                const createdMedia = await prisma.media.create({
+                    data: options.data,
+                    relationLoadStrategy: "join",
+                    include: options.include
+                })
+                return new Media(createdMedia)
+            }
 
+
+            const createdMedia = await prisma.media.create({
+                data: options.data
+            })
             return new Media({
                 id: createdMedia.id,
                 fileName: createdMedia.fileName,
@@ -42,113 +54,99 @@ export default class MediaRepository implements IMediaRepository {
     }
 
     /**
-     * Retrieves a Media from Database
-     * @param id 
-     * @returns 
+     * Find many media by attribute name
+     * @param options 
      */
-    async getById(id: string): Promise<Media | null> {
+    async findMany(options: {
+        where: Partial<Omit<Media, 'user'>>,
+        include?: IncludeOption,
+        orderBy?: OrderByOption | OrderByOption[]
+    }): Promise<Media[]> {
         try {
-            const searchedMedia = await prisma.media.findUnique({
-                where: {
-                    id: id
-                }
-            })
 
-            if (!searchedMedia) {
-                return null
+            if (options.include) {
+                const searchedMedia = await prisma.media.findMany({
+                    where: options.where,
+                    relationLoadStrategy: "join",
+                    include: {
+                        user: options.include.user
+                    },
+                    orderBy: options.orderBy
+                })
+                return searchedMedia.map(med => new Media(med))
             }
-
-            return new Media({
-                id: searchedMedia.id,
-                fileName: searchedMedia.fileName,
-                filePath: searchedMedia.filePath,
-                hostname: searchedMedia.hostname,
-                media_type: searchedMedia.media_type,
-                size: searchedMedia.size,
-                status: searchedMedia.status,
-                userId: searchedMedia.userId,
-                createdAt: searchedMedia.createdAt,
-                updatedAt: searchedMedia.updatedAt
+            const searchedMedia = await prisma.media.findMany({
+                where: options.where,
+                orderBy: options.orderBy
             })
-        } catch (error) {
-            throw baseExceptionHandler(error)
-        }
-    }
 
-    async assignMediaToProduct(mediaId: string, productId: string): Promise<Media> {
-        try {
-            const productMedia = await prisma.product_Media.create({
-                data: {
-                    mediaId: mediaId,
-                    productId: productId
-                },
-                relationLoadStrategy: "join",
-                include: {
-                    media: true
-                }
-            })
-            return new Media({
-                id: productMedia.media.id,
-                fileName: productMedia.media.fileName,
-                filePath: productMedia.media.filePath,
-                hostname: productMedia.media.hostname,
-                media_type: productMedia.media.media_type,
-                size: productMedia.media.size,
-                userId: productMedia.media.userId,
-                status: productMedia.media.status,
-                createdAt: productMedia.media.createdAt,
-                updatedAt: productMedia.media.updatedAt
+            return searchedMedia.map(med => new Media(med))
 
-            })
         } catch (error) {
             throw baseExceptionHandler(error)
         }
     }
 
     /**
-     * Modify a media (only can modify media_type, status)
+     * Find one media by media's id
+     * @param options 
+     */
+    async findOneById(options: {
+        where: { id: string },
+        include?: IncludeOption
+    }): Promise<Media | null> {
+        try {
+            if (options.include) {
+                const found = await prisma.media.findUnique({
+                    where: options.where,
+                    relationLoadStrategy: "join",
+                    include: options.include
+                })
+                if (!found) { return null }
+                return new Media(found)
+            }
+
+            const found = await prisma.media.findUnique({
+                where: options.where
+            })
+
+            return found ? new Media(found) : null
+        } catch (error) {
+            throw baseExceptionHandler(error)
+        }
+    }
+
+    /**
+     * Modify a media (can only modify the status)
      * @param id 
      * @param options 
      */
-    async updateById(id: string, options: Partial<Media>): Promise<Media> {
+    async updateById(options: {
+        where: { id: string },
+        data: Partial<Media>
+    }): Promise<void> {
         try {
             const updatedMedia = await prisma.media.update({
-                where: {
-                    id: id
-                },
+                where: options.where,
                 data: {
-                    status: options.status,
+                    status: options.data.status,
                 }
             })
-
-            return new Media({
-                id: updatedMedia.id,
-                fileName: updatedMedia.fileName,
-                filePath: updatedMedia.filePath,
-                hostname: updatedMedia.hostname,
-                media_type: updatedMedia.media_type,
-                size: updatedMedia.size,
-                status: updatedMedia.status,
-                userId: updatedMedia.userId,
-                createdAt: updatedMedia.createdAt,
-                updatedAt: updatedMedia.updatedAt
-            })
-
         } catch (error) {
             throw baseExceptionHandler(error)
         }
     }
 
     /**
-     * Delete a media in Database, throw err if not found
-     * @param id 
+     * Delete a media by media's id  and user's id
+     * @param options 
      */
-    async deleteById(id: string): Promise<void> {
+    async deleteById(options: {
+        where: { id: string, userId: string }
+    }): Promise<void> {
         try {
             await prisma.media.delete({
-                where: {
-                    id: id
-                }
+                where: options.where
             })
         } catch (error) {
             throw baseExceptionHandler(error)
