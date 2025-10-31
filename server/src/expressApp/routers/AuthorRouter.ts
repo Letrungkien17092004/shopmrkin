@@ -25,8 +25,8 @@ const authorRouter = Router()
 
 authorRouter.post("/auth/registor", authorController.register)
 authorRouter.post("/auth/login", authorController.login)
-authorRouter.post("/auth/refesh-access-token", [requireRefeshToken, authorController.createAccessToken])
-authorRouter.post("/auth/verify-access-token", [requireAccessToken, authorController.verifyAccessToken])
+authorRouter.get("/auth/refesh-access-token", [requireRefeshToken, authorController.createAccessToken])
+authorRouter.get("/auth/verify-access-token", [requireAccessToken, authorController.verifyAccessToken])
 
 
 authorRouter.get("/auth/google-redirect-url", authorController.generateOauth2RedirectUrl)

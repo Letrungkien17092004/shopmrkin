@@ -4,10 +4,6 @@ import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/inter
 import { z } from "zod"
 import { CartDTO } from "../../adapter/DTO/index.js"
 
-
-
-
-
 export default class CartController {
     private usecase: ICartUsecase
 
@@ -78,7 +74,6 @@ export default class CartController {
                     }
                     : undefined
             })
-
             if (req.user.role === "administrator") {
                 const cart = await this.usecase.findOneById(findOptionsParsed)
                 if (!cart) {
@@ -219,7 +214,6 @@ export default class CartController {
 
             const BodySchema = z.object({
                 quantity: z.number().int().positive(),
-                variantId: z.string()
             })
 
             const paramsParsed = ParamsSchema.parse({
@@ -250,10 +244,12 @@ export default class CartController {
             }
 
 
-            await this.usecase.createOrUpdateItem({
+            await this.usecase.updateCartItem({
+                where: {
+                    cartItemId: paramsParsed.cartItemId,
+                    cartId: paramsParsed.cartId
+                },
                 data: {
-                    cartId: paramsParsed.cartId,
-                    variantId: bodyParsed.variantId,
                     quantity: bodyParsed.quantity
                 }
             })

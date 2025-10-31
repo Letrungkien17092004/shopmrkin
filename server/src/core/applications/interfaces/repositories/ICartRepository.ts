@@ -53,6 +53,18 @@ export default interface ICartRepository {
     }): Promise<void>
 
     /**
+     * Update a cart item (can only change quantity)
+     * @param options 
+     */
+    updateCartItem(options: {
+        where: {
+            cartId: string
+            cartItemId: string,
+        },
+        data: { quantity: number; },
+    }): Promise<void>
+
+    /**
      * Removes a specific item (CartItem) from the Cart.
      * @param options The options for removing the item.
      * @param options.cartId The ID of the Cart containing the item.

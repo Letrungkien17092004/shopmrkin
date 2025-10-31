@@ -78,7 +78,7 @@ export default class CartRepository implements ICartRepository {
                         ...found,
                         cartItems: cartItems
                     })
-                }
+                } // end if
                 const found = await prisma.carts.findUnique({
                     where: options.where,
                     relationLoadStrategy: "join",
@@ -86,6 +86,9 @@ export default class CartRepository implements ICartRepository {
                         user: options.include.user,
                     }
                 });
+
+                console.log("log in cartRepo 1")
+                console.log(found)
                 if (!found) return null;
                 return new Cart(found);
             }
@@ -93,7 +96,8 @@ export default class CartRepository implements ICartRepository {
             const found = await prisma.carts.findUnique({
                 where: options.where
             })
-
+            console.log("log in cartRepo 2")
+            console.log(found)
             if (!found) { return null }
             return new Cart({
                 id: found.id,
@@ -138,6 +142,27 @@ export default class CartRepository implements ICartRepository {
                     variantId: options.data.variantId,
                     quantity: options.data.quantity,
                 }
+            })
+        } catch (error) {
+            throw baseExceptionHandler(error)
+        }
+    }
+
+
+    async updateCartItem(options: {
+        where: {
+            cartId: string
+            cartItemId: string,
+        },
+        data: { quantity: number; },
+    }): Promise<void> {
+        try {
+            await prisma.cartItems.update({
+                where: {
+                    id: options.where.cartItemId,
+                    cartId: options.where.cartId
+                },
+                data: options.data
             })
         } catch (error) {
             throw baseExceptionHandler(error)

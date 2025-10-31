@@ -5,16 +5,10 @@ import { z } from "zod"
 
 export async function requireRefeshToken(req: Request, res: Response, next: NextFunction) {
     try {
-        const authorToken = req.headers["authorization"]?req.headers["authorization"].split(" ")[1]:undefined
+        const authorToken = req.headers["authorization"] ? req.headers["authorization"].split(" ")[1] : undefined
         if (!authorToken) {
             res.status(401).json({
-                message: "Unauthorized "
-            })
-            return
-        }
-        if (!authorToken) {
-            res.status(401).json({
-                message: "Unauthorized "
+                message: "Unauthorized"
             })
             return
         }
@@ -38,12 +32,18 @@ export async function requireRefeshToken(req: Request, res: Response, next: Next
 
         // token is invalid
         if (
-            error instanceof jwt.JsonWebTokenError ||
             error instanceof jwt.TokenExpiredError ||
             error instanceof jwt.NotBeforeError
         ) {
-            res.status(403).json({
-                message: "Forbidden"
+            res.status(401).json({
+                message: "JWT token has expired"
+            })
+            return
+        }
+
+        if (error instanceof jwt.JsonWebTokenError) {
+            res.status(401).json({
+                message: "JWT has been modified"
             })
             return
         }
@@ -64,10 +64,10 @@ export async function requireRefeshToken(req: Request, res: Response, next: Next
 
 export async function requireAccessToken(req: Request, res: Response, next: NextFunction) {
     try {
-        const authorToken = req.headers["authorization"]?req.headers["authorization"].split(" ")[1]:undefined
+        const authorToken = req.headers["authorization"] ? req.headers["authorization"].split(" ")[1] : undefined
         if (!authorToken) {
             res.status(401).json({
-                message: "Unauthorized "
+                message: "Unauthorized"
             })
             return
         }
@@ -94,9 +94,15 @@ export async function requireAccessToken(req: Request, res: Response, next: Next
             error instanceof jwt.TokenExpiredError ||
             error instanceof jwt.NotBeforeError
         ) {
-            console.log("JWT token has expired")
             res.status(401).json({
                 message: "JWT token has expired"
+            })
+            return
+        }
+
+        if (error instanceof jwt.JsonWebTokenError) {
+            res.status(401).json({
+                message: "JWT has been modified"
             })
             return
         }
@@ -112,5 +118,6 @@ export async function requireAccessToken(req: Request, res: Response, next: Next
         res.status(500).json({
             message: "Somethings wrong"
         })
+        return
     }
 }

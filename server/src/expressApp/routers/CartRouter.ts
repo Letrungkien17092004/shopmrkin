@@ -14,7 +14,7 @@ const cartRouter = Router()
 // cartRouter.post('/cart', [requireAccessToken, controller.create]) // create new cart
 cartRouter.get('/cart/:cartId', [requireAccessToken, controller.findOneById]) // Read a cart
 cartRouter.post('/cart/:cartId/item', [requireAccessToken, controller.addItem]) // Add cartItem to Cart
-cartRouter.patch('/cart/:cartId/item/:cartItemId', [requireAccessToken, controller.updateItem]) // Update cartItem to Cart
+cartRouter.put('/cart/:cartId/item/:cartItemId', [requireAccessToken, controller.updateItem]) // Update cartItem to Cart
 cartRouter.delete('/cart/:cartId/item/:cartItemId', [requireAccessToken, controller.destroyItem])
 // cartRouter.delete('/cart/:id', [requireAccessToken, controller.destroy])
 

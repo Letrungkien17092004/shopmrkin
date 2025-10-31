@@ -68,6 +68,46 @@ export default class CartUsecase implements ICartUsecase {
         }
     }
 
+    /**
+     * Update a cart item (can only change quantity)
+     * @param options 
+     */
+    async updateCartItem(options: {
+        where: {
+            cartId: string
+            cartItemId: string,
+        },
+        data: { quantity: number; },
+    }): Promise<void> {
+        try {
+            await this.cartRepo.updateCartItem(options)
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: "Database error",
+                            code: USECASE_ERROR_CODE.INITIAL
+                        })
+                    
+                    case REPO_ERROR_CODE.NOTFOUND:
+                        throw new USECASE_ERROR({
+                            message: "Cart item is not found",
+                            code: USECASE_ERROR_CODE.NOTFOUND
+                        })
+                }
+                throw new USECASE_ERROR({
+                    message: "is a REPO_ERROR but it is not defined yet",
+                    code: USECASE_ERROR_CODE.UNDEFINED
+                })
+            }
+            throw new USECASE_ERROR({
+                message: "UNKNOW Error",
+                code: USECASE_ERROR_CODE.UNKNOW
+            })
+        }
+    }
+
 
     async removeItem(options: {
         where: {
