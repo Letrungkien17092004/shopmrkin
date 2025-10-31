@@ -1,25 +1,24 @@
-import Cart from "../../core/entities/Cart.js"
-import CartItem from "../../core/entities/CartItem.js"
+import { Cart, CartItem, Product } from "../../core/entities/index.js"
 
 type InputParams = {
     userId: string
 }
-
+type Item = {
+    id: string,
+    variantId: string,
+    quantity: number,
+    variant_name?: string,
+    variant_sku?: string,
+    variant_price?: number,
+    variant_stock?: number,
+    product_id?: string,
+    product_name?: string,
+    product_description?: string,
+}
 type ToOutput = {
     id: string,
     userId: string,
-    cartItems?: {
-        id: string,
-        variantId: string,
-        quantity: number,
-        variant?: {
-            id: string,
-            name: string,
-            sku: string,
-            price: number,
-            stock: number
-        }
-    }[],
+    cartItems?: Item[],
     createdAt?: Date,
     updatedAt?: Date
 }
@@ -33,19 +32,26 @@ export default class CartDTO {
     }
 
     static toOutputSingle(cart: Cart): ToOutput {
-        const items = cart.cartItems ? cart.cartItems.map(ci => ({
-            id: ci.id,
-            variantId: ci.variantId,
-            quantity: (ci as any).quantity || 1,
-            variant: ci.variant ? {
-                id: ci.variant.id,
-                name: ci.variant.name,
-                sku: ci.variant.sku,
-                price: ci.variant.price,
-                stock: ci.variant.stock
-            } : undefined
-        })) : undefined
+        var items: Item[] = []
+        if (cart.cartItems) {
+            items = cart.cartItems.map(ci => {
+                const variant = ci.variant
+                const product = ci.variant?.product
 
+                return {
+                    id: ci.id,
+                    variantId: ci.variantId,
+                    quantity: ci.quantity,
+                    variant_name: variant?.name,
+                    variant_sku: variant?.sku,
+                    variant_price: variant?.price,
+                    variant_stock: variant?.stock,
+                    product_id: variant?.product?.id,
+                    product_name: variant?.product?.name,
+                    product_description: variant?.product?.description,
+                }
+            })
+        }
         return {
             id: cart.id,
             userId: cart.userId,

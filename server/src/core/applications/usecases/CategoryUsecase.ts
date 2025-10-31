@@ -28,7 +28,7 @@ export default class CategoryUsecase implements ICategoryUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "category already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
 
                 }
@@ -81,7 +81,7 @@ export default class CategoryUsecase implements ICategoryUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "data existed",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                 }
             }

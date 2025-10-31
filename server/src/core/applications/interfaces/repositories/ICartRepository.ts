@@ -1,15 +1,14 @@
 // Rewritten ICartRepository
 import Cart from "../../../../core/entities/Cart.js"
 
+
 /**
  * Defines the relations (includes) that can be loaded along with the Cart.
  * Used for findOne/findMany methods.
  */
-export type CartIncludeOption = {
-    /** Whether to load the User entity that owns the cart. */
-    user?: boolean,
-    /** Whether to load the CartItem entities (the items) within the cart. */
+export type IncludeOption = {
     cartItem?: boolean
+    user?: boolean
 };
 
 export default interface ICartRepository {
@@ -22,7 +21,7 @@ export default interface ICartRepository {
      */
     create(options: {
         data: { userId: string },
-        include?: CartIncludeOption
+        include?: IncludeOption
     }): Promise<Cart>
 
     /**
@@ -32,9 +31,9 @@ export default interface ICartRepository {
      * @param options.include The relations to load along with the result.
      * @returns A Promise that resolves to the Cart object if found, or null otherwise.
      */
-    findOneByUserId(options: {
-        userId: string,
-        include?: CartIncludeOption
+    findOneById(options: {
+        where: { id: string },
+        include?: IncludeOption
     }): Promise<Cart | null>
 
     /**
@@ -45,10 +44,12 @@ export default interface ICartRepository {
      * @param options.quantity The quantity to add/update.
      * @returns A Promise that resolves to void.
      */
-    addItem(options: {
-        cartId: string,
-        variantId: string,
-        quantity: number
+    createOrUpdateItem(options: {
+        data: {
+            cartId: string,
+            variantId: string,
+            quantity: number
+        }
     }): Promise<void>
 
     /**
@@ -59,8 +60,11 @@ export default interface ICartRepository {
      * @returns A Promise that resolves to void.
      */
     removeItem(options: {
-        cartId: string,
-        variantId: string
+        where: {
+            cartId: string,
+            cartItemId: string,
+            userId: string
+        }
     }): Promise<void>
 
     /**

@@ -4,18 +4,22 @@ import { requireRefeshToken, requireAccessToken } from "../../expressApp/middlew
 import UserRepository from "../../repositories/UserRepository.js";
 import RolesRepository from "../../repositories/RolesRepository.js";
 import PermissionsRepository from "../../repositories/PermissionsRepository.js";
+import CartRepository from "../../repositories/CartRepository.js";
 import RolePerRepository from "../../repositories/RolePerRepository.js";
 import AdminSystemUsecase from "../../core/applications/usecases/AdminSystemUsecase.js";
 import UserUsecase from "../../core/applications/usecases/UserUsecase.js";
+import CartUsecase from "../../core/applications/usecases/CartUsecase.js";
 
 const userRepo = new UserRepository()
 const roleRepo = new RolesRepository()
 const perRepo = new PermissionsRepository()
 const rolePerRepo = new RolePerRepository()
+const cartRepo = new CartRepository()
 
 const userUsecase = new UserUsecase(userRepo)
 const adminUsecase = new AdminSystemUsecase(roleRepo, perRepo, rolePerRepo)
-const authorController = new AuthorController(userUsecase, adminUsecase)
+const cartUsecase = new CartUsecase(cartRepo)
+const authorController = new AuthorController(userUsecase, adminUsecase, cartUsecase)
 
 const authorRouter = Router()
 

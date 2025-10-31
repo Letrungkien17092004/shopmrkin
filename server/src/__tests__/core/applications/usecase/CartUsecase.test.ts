@@ -120,7 +120,7 @@ describe("CartUsecase", () => {
 
             await usecase.addItem({ cartId: "cart-1", variantId: "var-1", quantity: 3 })
 
-            expect(cartRepo.addItem).toHaveBeenCalledWith({
+            expect(cartRepo.createOrUpdateItem).toHaveBeenCalledWith({
                 cartId: "cart-1",
                 variantId: "var-1",
                 quantity: 3

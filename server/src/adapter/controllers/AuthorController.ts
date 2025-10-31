@@ -2,9 +2,11 @@ import { Request, Response } from "express";
 import axios from "axios"
 import IUserUsecase from "../../core/applications/interfaces/usecases/IUserUsecase.js";
 import IAdminSystemUsecase from "../../core/applications/interfaces/usecases/IAdminSystemUsecase.js";
+import ICartUsecase from "../../core/applications/interfaces/usecases/ICartUsecase.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js";
 import jwt from "jsonwebtoken";
 import { ENV } from "../../config/env.js";
+import { z } from "zod"
 
 interface GoogleUserProfile {
     email: string,
@@ -31,10 +33,12 @@ export default class AuthorController {
 
     private userUsecase: IUserUsecase
     private adminSystemUsecase: IAdminSystemUsecase
+    private cartUsecase: ICartUsecase
 
-    constructor(userUsecase: IUserUsecase, adminSystemUsecase: IAdminSystemUsecase) {
+    constructor(userUsecase: IUserUsecase, adminSystemUsecase: IAdminSystemUsecase, cartUsecase: ICartUsecase) {
         this.userUsecase = userUsecase
         this.adminSystemUsecase = adminSystemUsecase
+        this.cartUsecase = cartUsecase
     }
 
     /**
@@ -45,36 +49,48 @@ export default class AuthorController {
      */
     register = async (req: Request, res: Response): Promise<void> => {
         try {
-            let username = req.body['username']
-            let account = req.body['account']
-            let password = req.body['password']
-            let email = req.body['email']
+            
+            const BodySchema = z.object({
+                username: z.string().min(5).max(50),
+                account: z.email().max(50),
+                password: z.string().min(1),
+                email: z.email().max(50)
+            })
 
-            if (!(username && account && password && email)) {
-                throw new TypeError("can't read username, account, password, email")
-            }
+            const bodyParsed = BodySchema.parse(req.body)
             const createdUser = await this.userUsecase.create({
-                username: username,
-                account: account,
-                password_hash: password,
-                email: email
+                username: bodyParsed.username,
+                account: bodyParsed.account,
+                password_hash: bodyParsed.password,
+                email: bodyParsed.email
+            })
+
+            const createdCart = await this.cartUsecase.create({
+                data: {
+                    userId: createdUser.id
+                }
             })
 
             res.status(200).json({
-                message: "OK"
+                user: {
+                    id: createdUser.id,
+                    username: createdUser.username,
+                    account: createdUser.account,
+                    email: createdUser.email,
+                }
             })
         } catch (error) {
             console.log(error)
-            if (error instanceof TypeError) {
+            if (error instanceof z.ZodError) {
                 res.status(400).json({
-                    message: "Missing data",
+                    message: "Invalid body data",
                 })
                 return
             }
 
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
-                    case USECASE_ERROR_CODE.EXISTED:
+                    case USECASE_ERROR_CODE.CONFLIX:
                         res.status(409).json({
                             message: "User already exist"
                         })
@@ -96,14 +112,15 @@ export default class AuthorController {
      */
     login = async (req: Request, res: Response): Promise<void> => {
         try {
-            const account = req.body['account']
-            const password = req.body['password']
+            const BodySchema = z.object({
+                account: z.email().max(50),
+                password: z.string().min(1).max(255),
+            })
 
-            if (!account || !password) {
-                throw new TypeError("Can't read account or password")
-            }
-            const user = await this.userUsecase.login({ account, password })
-            // no match
+            const bodyParsed = BodySchema.parse(req.body)
+            
+            const user = await this.userUsecase.login(bodyParsed)
+
             if (!user) {
                 res.status(404).json({
                     messsage: "wrong account or password"
@@ -133,9 +150,9 @@ export default class AuthorController {
                 }
             )
             res.status(200).json({
-                message: "OK",
                 refeshToken: refeshToken,
-                accessToken: accessToken
+                accessToken: accessToken,
+                cart: user.cart
             })
             return
         } catch (error) {

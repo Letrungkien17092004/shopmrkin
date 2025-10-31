@@ -4,9 +4,10 @@ export type SortOrder = "asc" | "desc"
 
 export type IncludeOption = {
     user?: boolean,
+    product?: boolean
 }
 
-export type OrderByOption = Partial<Record<keyof Omit<Media, "user">, SortOrder>>
+export type OrderByOption = Partial<Record<keyof Omit<Media, "user" | "product">, SortOrder>>
 
 export default interface IMediaRepository {
 
@@ -21,6 +22,7 @@ export default interface IMediaRepository {
             hostname: string,
             media_type: "IMAGE" | "VIDEO",
             size: number,
+            productId?: string,
             userId: string
         },
         include?: IncludeOption
@@ -31,7 +33,15 @@ export default interface IMediaRepository {
      * @param options 
      */
     findMany(options: {
-        where: Partial<Omit<Media, 'user'>>,
+        where: {
+            fileName?: string,
+            filePath?: string,
+            hostname?: string,
+            media_type?: "IMAGE" | "VIDEO",
+            status?: "ORPHANED" | "ASSIGNED",
+            productId?: string,
+            userId?: string,
+        },
         include?: IncludeOption,
         orderBy?: OrderByOption | OrderByOption[]
     }): Promise<Media[]>
@@ -46,11 +56,11 @@ export default interface IMediaRepository {
     }): Promise<Media | null>
 
     /**
-     * Update media by media's id
+     * Update media by media's id (can only modify media's status and productId)
      */
     updateById(options: {
         where: { id: string },
-        data: Partial<Media>
+        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string }
     }): Promise<void>
 
     /**

@@ -1,4 +1,4 @@
-import User from "./User.js"
+import { User, Product } from "./index.js"
 
 type MediaConstructorParam = {
     id: string
@@ -8,8 +8,11 @@ type MediaConstructorParam = {
     media_type: "IMAGE" | "VIDEO"
     size: number
     status: "ORPHANED" | "ASSIGNED"
+    productId?: string
     userId: string
+
     user?: User
+    product?: Product
     createdAt?: Date
     updatedAt?: Date
 }
@@ -22,10 +25,11 @@ export default class Media {
     media_type: "IMAGE" | "VIDEO"
     size: number
     status: "ORPHANED" | "ASSIGNED"
-    
+    productId?: string
     userId: string
-    user?: User
 
+    user?: User
+    product?: Product
     createdAt?: Date
     updatedAt?: Date
 
@@ -38,7 +42,9 @@ export default class Media {
         this.size = options.size
         this.status = options.status
         this.userId = options.userId
+        this.productId = options.productId
         this.user = options.user
+        this.product = options.product
         this.createdAt = options.createdAt
         this.updatedAt = options.updatedAt
     }

@@ -1,6 +1,6 @@
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js"
 import { PrismaClient } from "@prisma/client";
-import { User, Role, Permission } from "../core/entities/index.js"
+import { User, Role, Permission, Cart } from "../core/entities/index.js"
 import IUsersRepository from "../core/applications/interfaces/repositories/IUsersRepository.js";
 import crypto from 'crypto';
 
@@ -286,7 +286,8 @@ export default class UserRepository implements IUsersRepository {
                                 }
                             }
                         }
-                    }
+                    },
+                    cart: true
                 }
             })
 
@@ -295,7 +296,9 @@ export default class UserRepository implements IUsersRepository {
                 return null
             }
 
-
+            const cart: Cart | undefined = searchedUser.cart
+                ? new Cart({ id: searchedUser.cart.id, userId: searchedUser.id })
+                : undefined
             const permissions = searchedUser.role.permissions.map(per => new Permission({
                 id: per.permission.id,
                 perName: per.permission.perName,
@@ -309,10 +312,11 @@ export default class UserRepository implements IUsersRepository {
                 permissions: permissions
             })
 
-            return {
+            return new User({
                 ...searchedUser,
                 role: role,
-            }
+                cart: cart
+            })
         } catch (error) {
             throw baseExceptionHandler(error)
         }

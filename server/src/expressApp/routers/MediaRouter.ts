@@ -11,8 +11,12 @@ const mediaController = new MediaController(mediaUsecase)
 
 const mediaRouter = Router()
 
-mediaRouter.post("/media/upload", requireAccessToken, uploadMiddleware.array("media"), mediaController.createMany)
-mediaRouter.post("/media/assign-to-product", bodyParser.json(), requireAccessToken, mediaController.assignMediaToProduct)
+mediaRouter.post("/media/upload", requireAccessToken, uploadMiddleware.array("media"), mediaController.upload)
+// mediaRouter.post("/media", bodyParser.json(), requireAccessToken, mediaController.create)
+mediaRouter.get("/media", mediaController.findMany)
+mediaRouter.get("/media/:id", mediaController.findOneById)
+mediaRouter.put("/media/:id", bodyParser.json(), requireAccessToken, mediaController.updateById)
+mediaRouter.delete("/media/:id", bodyParser.json(), requireAccessToken, mediaController.deleteById)
 
 export default mediaRouter
 

@@ -1,6 +1,6 @@
 import IMediaRepository, { IncludeOption, OrderByOption } from "../core/applications/interfaces/repositories/IMediaRepository.js";
 import { PrismaClient } from "@prisma/client";
-import { Media, User, Role } from "../core/entities/index.js"
+import { Media, Product } from "../core/entities/index.js"
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
 
 const prisma = new PrismaClient()
@@ -18,6 +18,7 @@ export default class MediaRepository implements IMediaRepository {
             hostname: string,
             media_type: "IMAGE" | "VIDEO",
             size: number,
+            productId?: string,
             userId: string
         },
         include?: IncludeOption
@@ -29,7 +30,17 @@ export default class MediaRepository implements IMediaRepository {
                     relationLoadStrategy: "join",
                     include: options.include
                 })
-                return new Media(createdMedia)
+
+                const product: Product | undefined = createdMedia.product
+                    ? new Product({
+                        ...createdMedia.product,
+                    })
+                    : undefined
+                return new Media({
+                    ...createdMedia,
+                    productId: createdMedia.productId || undefined,
+                    product: product
+                })
             }
 
 
@@ -58,29 +69,43 @@ export default class MediaRepository implements IMediaRepository {
      * @param options 
      */
     async findMany(options: {
-        where: Partial<Omit<Media, 'user'>>,
+        where: {
+            fileName?: string,
+            filePath?: string,
+            hostname?: string,
+            media_type?: "IMAGE" | "VIDEO",
+            status?: "ORPHANED" | "ASSIGNED",
+            productId?: string,
+            userId?: string,
+        },
         include?: IncludeOption,
         orderBy?: OrderByOption | OrderByOption[]
     }): Promise<Media[]> {
         try {
-
             if (options.include) {
                 const searchedMedia = await prisma.media.findMany({
                     where: options.where,
                     relationLoadStrategy: "join",
-                    include: {
-                        user: options.include.user
-                    },
+                    include: options.include,
                     orderBy: options.orderBy
                 })
-                return searchedMedia.map(med => new Media(med))
-            }
+                return searchedMedia.map(med => {
+                    const product: Product | undefined = med.product ? new Product(med.product) : undefined
+                    return new Media({
+                        ...med,
+                        productId: med.productId || undefined,
+                        product: product
+                    })
+                })
+            } // else
             const searchedMedia = await prisma.media.findMany({
                 where: options.where,
                 orderBy: options.orderBy
             })
-
-            return searchedMedia.map(med => new Media(med))
+            return searchedMedia.map(med => new Media({
+                ...med,
+                productId: med.productId || undefined
+            }))
 
         } catch (error) {
             throw baseExceptionHandler(error)
@@ -103,33 +128,44 @@ export default class MediaRepository implements IMediaRepository {
                     include: options.include
                 })
                 if (!found) { return null }
-                return new Media(found)
+                const product: Product | undefined = found.product
+                    ? new Product({
+                        ...found.product,
+                    })
+                    : undefined
+                return new Media({
+                    ...found,
+                    productId: found.productId || undefined,
+                    product: product
+                })
             }
 
             const found = await prisma.media.findUnique({
                 where: options.where
             })
 
-            return found ? new Media(found) : null
+            return found ? new Media({ ...found, productId: found.productId || undefined }) : null
         } catch (error) {
             throw baseExceptionHandler(error)
         }
     }
 
     /**
-     * Modify a media (can only modify the status)
+     * Modify a media (can only modify the status and productID)
      * @param id 
      * @param options 
      */
     async updateById(options: {
         where: { id: string },
-        data: Partial<Media>
+        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string }
     }): Promise<void> {
         try {
-            const updatedMedia = await prisma.media.update({
+            await prisma.media.update({
                 where: options.where,
                 data: {
-                    status: options.data.status,
+                    // If productId is updated, status will be updated to ASSIGNED.
+                    status: options.data.productId?"ASSIGNED":options.data.status,
+                    productId: options.data.productId
                 }
             })
         } catch (error) {

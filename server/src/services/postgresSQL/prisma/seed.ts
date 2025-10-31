@@ -87,11 +87,17 @@ async function main() {
             roleId: adminRole.id
         }
     })
+    const createdCart = await prisma.carts.create({
+        data: {
+            userId: adminAccount.id
+        }
+    })
 
     console.log({
         adminRole,
         customerRole,
-        adminAccount
+        adminAccount,
+        createdCart
     })
 }
 
@@ -101,6 +107,7 @@ main()
         await prisma.$disconnect()
     })
     .catch(async (e) => {
+        console.error("Seed isn't successfully")
         console.log(e)
         await prisma.$disconnect()
     })

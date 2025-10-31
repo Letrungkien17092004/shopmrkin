@@ -1,5 +1,6 @@
 import { Media } from "../../../../core/entities/index.js"
 import { IncludeOption, OrderByOption } from "../repositories/IMediaRepository.js"
+
 export default interface IMediaUsecase {
 
     /**
@@ -13,6 +14,7 @@ export default interface IMediaUsecase {
             hostname: string,
             media_type: "IMAGE" | "VIDEO",
             size: number,
+            productId?: string,
             userId: string
         },
         include?: IncludeOption
@@ -23,7 +25,15 @@ export default interface IMediaUsecase {
      * @param options 
      */
     findMany(options: {
-        where: Partial<Omit<Media, 'user'>>,
+        where: {
+            fileName?: string,
+            filePath?: string,
+            hostname?: string,
+            media_type?: "IMAGE" | "VIDEO",
+            status?: "ORPHANED" | "ASSIGNED",
+            productId?: string,
+            userId?: string,
+        },
         include?: IncludeOption,
         orderBy?: OrderByOption | OrderByOption[]
     }): Promise<Media[]>
@@ -38,11 +48,11 @@ export default interface IMediaUsecase {
     }): Promise<Media | null>
 
     /**
-     * Update media by media's id
+     * Update media by media's id (can only modify media's status)
      */
     updateById(options: {
         where: { id: string },
-        data: Partial<Media>
+        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string }
     }): Promise<void>
 
     /**
@@ -50,6 +60,6 @@ export default interface IMediaUsecase {
      * @param options 
      */
     deleteById(options: {
-        where: {id: string, userId: string}
+        where: { id: string, userId: string }
     }): Promise<void>
 }

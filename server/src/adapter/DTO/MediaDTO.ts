@@ -1,12 +1,20 @@
 import { Media } from "../../core/entities/index.js"
-
+import { ENV } from "../../config/env.js"
 type ToOutput = {
     id: string,
     fileName: string,
     filePath: string,
     hostname: string,
     media_type: "IMAGE" | "VIDEO",
-    username?: string
+    user?: {
+        username: string,
+        role?: string
+    },
+    product?: {
+        id: string,
+        name: string,
+        description: string,
+    }
 }
 export class MediaDTO {
     /**
@@ -15,22 +23,26 @@ export class MediaDTO {
      * @returns 
      */
     static toOutputOne(media: Media): ToOutput {
-        if (media.user) {
-            return {
-                id: media.id,
-                fileName: media.fileName,
-                filePath: media.filePath,
-                hostname: media.hostname,
-                media_type: media.media_type,
-                username: media.user.username
-            }
-        }
         return {
             id: media.id,
             fileName: media.fileName,
             filePath: media.filePath,
-            hostname: media.hostname,
+            hostname: ENV.SERVER_NAME,
             media_type: media.media_type,
+            user: media.user
+                ? {
+                    username: media.user.username,
+                    role: media.user.role?.roleName
+                }
+                : undefined
+            ,
+            product: media.product
+                ? {
+                    id: media.product.id,
+                    name: media.product.name,
+                    description: media.product.description,
+                }
+                : undefined
         }
     }
 
@@ -47,16 +59,19 @@ export class MediaDTO {
                     id: med.id,
                     fileName: med.fileName,
                     filePath: med.filePath,
-                    hostname: med.hostname,
+                    hostname: ENV.SERVER_NAME,
                     media_type: med.media_type,
-                    username: med.user.username
+                    user: {
+                        username: med.user.username,
+                        role: med.user.role?.roleName
+                    }
                 })
             }
             result.push({
                 id: med.id,
                 fileName: med.fileName,
                 filePath: med.filePath,
-                hostname: med.hostname,
+                hostname: ENV.SERVER_NAME,
                 media_type: med.media_type,
             })
         })

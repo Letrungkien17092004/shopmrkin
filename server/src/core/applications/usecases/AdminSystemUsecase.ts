@@ -28,7 +28,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "role already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                     case REPO_ERROR_CODE.UNKNOW:
                         throw new USECASE_ERROR({
@@ -80,7 +80,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "role already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                 }
             }
@@ -101,7 +101,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "permission already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                 }
             }
@@ -127,7 +127,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "permission already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                 }
             }
@@ -150,7 +150,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "resoucre already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                 }
             }
@@ -174,7 +174,7 @@ export default class AdminSystemUsecase implements IAdminSystemUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "resoucre already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                 }
             }

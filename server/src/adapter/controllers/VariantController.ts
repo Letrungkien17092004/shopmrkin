@@ -86,7 +86,7 @@ export default class VariantController {
             console.log(error)
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
-                    case USECASE_ERROR_CODE.EXISTED:
+                    case USECASE_ERROR_CODE.CONFLIX:
                         res.status(409).json({
                             message: "variant already exist"
                         })

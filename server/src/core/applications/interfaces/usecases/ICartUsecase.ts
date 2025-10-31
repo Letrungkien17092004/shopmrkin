@@ -1,5 +1,5 @@
 import Cart from "../../../../core/entities/Cart.js"
-import { CartIncludeOption } from "../repositories/ICartRepository.js"
+import { IncludeOption } from "../repositories/ICartRepository.js"
 
 export default interface ICartUsecase {
     /**
@@ -11,7 +11,7 @@ export default interface ICartUsecase {
      */
     create(options: {
         data: { userId: string },
-        include?: CartIncludeOption
+        include?: IncludeOption
     }): Promise<Cart>
 
     /**
@@ -21,9 +21,9 @@ export default interface ICartUsecase {
      * @param options.include The relations to load along with the result.
      * @returns A Promise that resolves to the Cart object if found, or null otherwise.
      */
-    findOneByUserId(options: {
-        userId: string,
-        include?: CartIncludeOption
+    findOneById(options: {
+        where: { id: string },
+        include?: IncludeOption
     }): Promise<Cart | null>
 
     /**
@@ -34,10 +34,12 @@ export default interface ICartUsecase {
      * @param options.quantity The quantity to add/update.
      * @returns A Promise that resolves to void.
      */
-    addItem(options: {
-        cartId: string,
-        variantId: string,
-        quantity: number
+    createOrUpdateItem(options: {
+        data: {
+            cartId: string,
+            variantId: string,
+            quantity: number
+        }
     }): Promise<void>
 
     /**
@@ -48,8 +50,11 @@ export default interface ICartUsecase {
      * @returns A Promise that resolves to void.
      */
     removeItem(options: {
-        cartId: string,
-        variantId: string
+        where: {
+            cartId: string,
+            cartItemId: string,
+            userId: string
+        }
     }): Promise<void>
 
     /**

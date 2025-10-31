@@ -59,84 +59,41 @@ export default class ProductRepository implements IProductRepository {
     }): Promise<Product[]> {
         try {
             if (options.include) {
-                // if include both media and variant
-                if (options.include.media && options.include.variants) {
-                    const products = await prisma.products.findMany({
-                        where: options.where,
-                        relationLoadStrategy: "join",
-                        include: {
-                            ...options.include,
-                            media: {
-                                include: {
-                                    media: true
-                                }
-                            },
-                            variants: true
-                        }
-                    })
-                    return products.map(p => new Product(
-                        {
-                            ...p,
-                            media: p.media.map(pm => new Media(pm.media)),
-                            variants: p.variants.map(pv => new Variant({ ...pv, price: Number(pv.price) }))
-                        }
-                    ))
-                }
-
-                // if only include media without variant
-                if (options.include.media && !options.include.variants) {
-                    const products = await prisma.products.findMany({
-                        where: options.where,
-                        relationLoadStrategy: "join",
-                        include: {
-                            ...options.include,
-                            media: {
-                                include: {
-                                    media: true
-                                }
-                            },
-                            variants: undefined
-                        }
-                    })
-                    return products.map(p => new Product(
-                        {
-                            ...p,
-                            media: p.media.map(pm => new Media(pm.media)),
-                        }
-                    ))
-                }
-
-                // if only include variant without media
-                if (options.include.variants && !options.include.media) {
-                    const products = await prisma.products.findMany({
-                        where: options.where,
-                        relationLoadStrategy: "join",
-                        include: {
-                            ...options.include,
-                            media: undefined,
-                            variants: true
-                        }
-                    })
-                    return products.map(p => new Product(
-                        {
-                            ...p,
-                            variants: p.variants.map(pv => new Variant({ ...pv, price: Number(pv.price) }))
-                        }
-                    ))
-                }
                 const products = await prisma.products.findMany({
                     where: options.where,
                     relationLoadStrategy: "join",
-                    include: {
-                        ...options.include,
-                        media: undefined,
-                        variants: undefined
-                    }
+                    include: options.include,
+                    take: options.limit,
+                    skip: options.offset,
+                    orderBy: options.orderBy
                 })
-                return products.map(p => new Product(p))
+
+                return products.map(p => {
+                    const media: Media[] = p.media
+                        ? p.media.map(pm => new Media({
+                            ...pm,
+                            productId: pm.productId ? pm.productId : undefined
+                        }))
+                        : []
+                    const variants: Variant[] = p.variants
+                        ? p.variants.map(pv => new Variant({
+                            ...pv,
+                            price: Number(pv.price)
+                        }))
+                        : []
+
+                    return new Product({
+                        ...p,
+                        media: media,
+                        variants: variants
+                    })
+                })
             } // else
             const products = await prisma.products.findMany({
-                where: options.where
+                where: options.where,
+                take: options.limit,
+                skip: options.offset,
+                orderBy: options.orderBy
             })
 
             return products.map(p => new Product(p))
@@ -157,79 +114,27 @@ export default class ProductRepository implements IProductRepository {
     }): Promise<Product | null> {
         try {
             if (options.include) {
-                // if include both media and variant
-                if (options.include.media && options.include.variants) {
-                    const searchedProduct = await prisma.products.findUnique({
-                        where: options.where,
-                        relationLoadStrategy: "join",
-                        include: {
-                            ...options.include,
-                            media: {
-                                include: {
-                                    media: true
-                                }
-                            },
-                            variants: true
-                        }
-                    })
-                    if (!searchedProduct) return null
-                    return new Product({
-                        ...searchedProduct,
-                        media: searchedProduct.media.map(pm => new Media(pm.media)),
-                        variants: searchedProduct.variants.map(v => new Variant({ ...v, price: Number(v.price) }))
-                    })
-                }
-
-                // if only include media without variant
-                if (options.include.media && !options.include.variants) {
-                    const searchedProduct = await prisma.products.findUnique({
-                        where: options.where,
-                        relationLoadStrategy: "join",
-                        include: {
-                            ...options.include,
-                            media: {
-                                include: {
-                                    media: true
-                                }
-                            },
-                            variants: undefined
-                        }
-                    })
-                    if (!searchedProduct) return null
-                    return new Product({
-                        ...searchedProduct,
-                        media: searchedProduct.media.map(pm => new Media(pm.media)),
-                    })
-                }
-
-                // if only include variant without media
-                if (options.include.variants && !options.include.media) {
-                    const searchedProduct = await prisma.products.findUnique({
-                        where: options.where,
-                        relationLoadStrategy: "join",
-                        include: {
-                            ...options.include,
-                            media: undefined,
-                            variants: true
-                        }
-                    }) // else
-                    if (!searchedProduct) return null
-                    return new Product({
-                        ...searchedProduct,
-                        variants: searchedProduct.variants.map(v => new Variant({ ...v, price: Number(v.price) }))
-                    })
-                }
-                const searchedProduct = await prisma.products.findUnique({
+                const product = await prisma.products.findUnique({
                     where: options.where,
                     relationLoadStrategy: "join",
-                    include: {
-                        ...options.include,
-                        media: undefined,
-                        variants: undefined
-                    }
+                    include: options.include,
                 })
-                if (!searchedProduct) return null
-                return new Product(searchedProduct)
+                if (!product) return null
+
+                const media: Media[] = product.media.map(pm => new Media({
+                    ...pm,
+                    productId: pm.productId || undefined
+                }))
+                const variants: Variant[] = product.variants.map(pv => new Variant({
+                    ...pv,
+                    price: Number(pv.price)
+                }))
+
+                return new Product({
+                    ...product,
+                    media: media,
+                    variants: variants
+                })
             } // else
             const searchedProduct = await prisma.products.findUnique({
                 where: options.where
@@ -255,79 +160,31 @@ export default class ProductRepository implements IProductRepository {
     }): Promise<Product | null> {
         try {
             if (options.include) {
-                // if include both media and variant
-                if (options.include.media && options.include.variants) {
-                    const searchedProduct = await prisma.products.findUnique({
-                        where: options.where,
-                        relationLoadStrategy: "join",
-                        include: {
-                            ...options.include,
-                            media: {
-                                include: {
-                                    media: true
-                                }
-                            },
-                            variants: true
-                        }
-                    })
-                    if (!searchedProduct) return null
-                    return new Product({
-                        ...searchedProduct,
-                        media: searchedProduct.media.map(pm => new Media(pm.media)),
-                        variants: searchedProduct.variants.map(v => new Variant({ ...v, price: Number(v.price) }))
-                    })
-                }
-
-                // if only include media without variant
-                if (options.include.media && !options.include.variants) {
-                    const searchedProduct = await prisma.products.findUnique({
-                        where: options.where,
-                        relationLoadStrategy: "join",
-                        include: {
-                            ...options.include,
-                            media: {
-                                include: {
-                                    media: true
-                                }
-                            },
-                            variants: undefined
-                        }
-                    }) 
-                    if (!searchedProduct) return null
-                    return new Product({
-                        ...searchedProduct,
-                        media: searchedProduct.media.map(pm => new Media(pm.media)),
-                    })
-                }
-
-                // if only include variant without media
-                if (options.include.variants && !options.include.media) {
-                    const searchedProduct = await prisma.products.findUnique({
-                        where: options.where,
-                        relationLoadStrategy: "join",
-                        include: {
-                            ...options.include,
-                            media: undefined,
-                            variants: true
-                        }
-                    }) // else
-                    if (!searchedProduct) return null
-                    return new Product({
-                        ...searchedProduct,
-                        variants: searchedProduct.variants.map(v => new Variant({ ...v, price: Number(v.price) }))
-                    })
-                }
-                const searchedProduct = await prisma.products.findUnique({
+                const product = await prisma.products.findUnique({
                     where: options.where,
                     relationLoadStrategy: "join",
-                    include: {
-                        ...options.include,
-                        media: undefined,
-                        variants: undefined
-                    }
+                    include: options.include,
                 })
-                if (!searchedProduct) return null
-                return new Product(searchedProduct)
+                if (!product) return null
+
+                const media: Media[] = product.media
+                    ? product.media.map(pm => new Media({
+                        ...pm,
+                        productId: pm.productId || undefined
+                    }))
+                    : []
+
+                const variants: Variant[] = product.variants
+                    ? product.variants.map(pv => new Variant({
+                        ...pv,
+                        price: Number(pv.price)
+                    }))
+                    : []
+                return new Product({
+                    ...product,
+                    media: media,
+                    variants: variants
+                })
             } // else
             const searchedProduct = await prisma.products.findUnique({
                 where: options.where

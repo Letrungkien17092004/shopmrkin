@@ -36,7 +36,7 @@ export default class ProductUsecase implements IProductUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "Product already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                     
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
@@ -180,7 +180,7 @@ export default class ProductUsecase implements IProductUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "Product already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                     case REPO_ERROR_CODE.NOTFOUND:
                         throw new USECASE_ERROR({

@@ -1,10 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js"
-import Cart from "../core/entities/Cart.js"
-import CartItem from "../core/entities/CartItem.js"
-import User from "../core/entities/User.js"
-import Variant from "../core/entities/Variant.js"
-import ICartRepository, {CartIncludeOption} from "../core/applications/interfaces/repositories/ICartRepository.js"
+import { Cart, CartItem, Product, User, Variant } from "../core/entities/index.js"
+import ICartRepository, { IncludeOption } from "../core/applications/interfaces/repositories/ICartRepository.js"
 
 const prisma = new PrismaClient()
 
@@ -17,12 +14,13 @@ export default class CartRepository implements ICartRepository {
      * @param options.include The relations (user, cartItem) to load along with the created result.
      * @returns A Promise that resolves to the newly created Cart object.
      */
-    async create(options: { 
-            data: { userId: string },
-            include?: CartIncludeOption
-        }): Promise<Cart> {
+    async create(options: {
+        data: { userId: string },
+    }): Promise<Cart> {
         try {
-            const created = await prisma.carts.create(options)
+            const created = await prisma.carts.create({
+                data: options.data,
+            })
             return new Cart({ ...created })
         } catch (error) {
             throw baseExceptionHandler(error)
@@ -36,63 +34,64 @@ export default class CartRepository implements ICartRepository {
      * @param options.include The relations to load along with the result.
      * @returns A Promise that resolves to the Cart object if found, or null otherwise.
      */
-    async findOneByUserId(options: {
-        userId: string,
-        include?: CartIncludeOption
+    async findOneById(options: {
+        where: { id: string },
+        include?: IncludeOption
     }): Promise<Cart | null> {
         try {
             if (options.include) {
-                const found = await prisma.carts.findUnique({
-                    where: { userId: options.userId },
-                    relationLoadStrategy: "join",
-                    include: {
-                        user: options.include.user,
-                        cartItems: options.include.cartItem
-                            ? { include: { variant: true } }
-                            : false
-                    }
-                });
-                if (!found) return null;
-
-                type CartItemWithVariant = Prisma.CartItemsGetPayload<{
-                    include: { variant: true }
-                }>
-
-                const cartItems = options.include.cartItem && found.cartItems
-                    ? (found.cartItems as CartItemWithVariant[]).map(ci => new CartItem({
+                if (options.include.cartItem) {
+                    const found = await prisma.carts.findUnique({
+                        where: options.where,
+                        relationLoadStrategy: "join",
+                        include: {
+                            user: options.include.user,
+                            cartItems: {
+                                include: {
+                                    variant: {
+                                        include: {
+                                            product: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    if (!found) return null;
+                    const cartItems = found.cartItems.map(ci => new CartItem({
                         id: ci.id,
                         cartId: ci.cartId,
                         variantId: ci.variantId,
                         quantity: ci.quantity,
-                        variant: ci.variant ? new Variant({
+                        variant: new Variant({
                             id: ci.variant.id,
                             name: ci.variant.name,
-                            sku: ci.variant.id,
+                            sku: ci.variant.sku,
+                            price: Number(ci.variant.price),
+                            stock: ci.variant.stock,
                             productId: ci.variant.productId,
                             userId: ci.variant.userId,
-                            price: Number(ci.variant.price),
-                            stock: ci.variant.stock
+                            product: new Product(ci.variant.product)
                         })
-                            : undefined
                     }))
-                    : undefined
-
-                // Map user if included
-                const user = found.user
-                    ? new User({ ...found.user })
-                    : undefined;
-
-                return new Cart({
-                    ...found,
-                    cartItems: cartItems,
-                    user: user
+                    return new Cart({
+                        ...found,
+                        cartItems: cartItems
+                    })
+                }
+                const found = await prisma.carts.findUnique({
+                    where: options.where,
+                    relationLoadStrategy: "join",
+                    include: {
+                        user: options.include.user,
+                    }
                 });
+                if (!found) return null;
+                return new Cart(found);
             }
 
             const found = await prisma.carts.findUnique({
-                where: {
-                    userId: options.userId
-                }
+                where: options.where
             })
 
             if (!found) { return null }
@@ -108,16 +107,38 @@ export default class CartRepository implements ICartRepository {
     }
 
     /**
-     * Adds a new item (CartItem) to the Cart or updates the quantity if the item already exists.
+     * Adds a new item (CartItem) to the Cart or updates the quantity if the item already exists.  
+     * NOTE: this is upsert query
      * @param options The options for adding the item.
      * @param options.cartId The ID of the Cart to add the item to.
      * @param options.variantId The ID of the ProductVariant to add.
      * @param options.quantity The quantity to add/update.
      * @returns A Promise that resolves to void.
      */
-    async addItem(options: { cartId: string, variantId: string, quantity: number }): Promise<void> {
+    async createOrUpdateItem(options: {
+        data: {
+            cartId: string,
+            variantId: string,
+            quantity: number
+        }
+    }): Promise<void> {
         try {
-            await prisma.cartItems.create({ data: { cartId: options.cartId, variantId: options.variantId, quantity: options.quantity } })
+            await prisma.cartItems.upsert({
+                where: {
+                    cartId_variantId: {
+                        cartId: options.data.cartId,
+                        variantId: options.data.variantId
+                    },
+                },
+                update: {
+                    quantity: options.data.quantity
+                },
+                create: {
+                    cartId: options.data.cartId,
+                    variantId: options.data.variantId,
+                    quantity: options.data.quantity,
+                }
+            })
         } catch (error) {
             throw baseExceptionHandler(error)
         }
@@ -130,10 +151,24 @@ export default class CartRepository implements ICartRepository {
      * @param options.variantId The ID of the ProductVariant to remove.
      * @returns A Promise that resolves to void.
      */
-    async removeItem(options: { cartId: string, variantId: string }): Promise<void> {
+    async removeItem(options: {
+        where: {
+            cartId: string,
+            cartItemId: string,
+            userId: string
+        }
+    }): Promise<void> {
         try {
-            // use deleteMany to avoid needing composite key input name
-            await prisma.cartItems.deleteMany({ where: { cartId: options.cartId, variantId: options.variantId } })
+            await prisma.cartItems.delete({
+                where: {
+                    cart: {
+                        id: options.where.cartId,
+                        userId: options.where.userId
+                    },
+                    id: options.where.cartItemId,
+                    cartId: options.where.cartId
+                }
+            })
         } catch (error) {
             throw baseExceptionHandler(error)
         }

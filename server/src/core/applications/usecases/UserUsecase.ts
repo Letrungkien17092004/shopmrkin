@@ -38,7 +38,7 @@ export default class UserUsecase implements IUserUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "User is already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                 }
             }
@@ -113,7 +113,7 @@ export default class UserUsecase implements IUserUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "the new data to be updated already exists",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                 }
             }

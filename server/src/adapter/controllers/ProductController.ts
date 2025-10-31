@@ -96,7 +96,7 @@ export default class ProductController {
                             message: "Server Internal Error!"
                         })
                         return
-                    case USECASE_ERROR_CODE.EXISTED:
+                    case USECASE_ERROR_CODE.CONFLIX:
                         res.status(409).json({
                             message: "Product already exist"
                         })
@@ -243,7 +243,6 @@ export default class ProductController {
             })
 
             const queryParsed = QuerySchema.parse(req.query)
-            console.log(queryParsed)
             const findOptionParsed = FindOptionSchema.parse({
                 where: {
                     id: req.params["id"]
@@ -257,7 +256,6 @@ export default class ProductController {
                     }
                     : undefined
             })
-            console.log(findOptionParsed)
 
             const searchedProduct = await this.productUsecase.findOneById(findOptionParsed)
             if (!searchedProduct) {

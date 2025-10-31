@@ -17,7 +17,7 @@ export default class MediaUsecase implements IMediaUsecase {
      * @description Reference to the Media Repository for data interaction.
      */
     private repo: IMediaRepository
-    
+
     /**
      * @constructor
      * @param {IMediaRepository} repo - The instance of the Media Repository.
@@ -43,6 +43,7 @@ export default class MediaUsecase implements IMediaUsecase {
             hostname: string,
             media_type: "IMAGE" | "VIDEO",
             size: number,
+            productId?: string,
             userId: string
         },
         include?: IncludeOption
@@ -60,7 +61,7 @@ export default class MediaUsecase implements IMediaUsecase {
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "Media already exist",
-                            code: USECASE_ERROR_CODE.EXISTED
+                            code: USECASE_ERROR_CODE.CONFLIX
                         })
                     case REPO_ERROR_CODE.UNKNOW:
                         throw new USECASE_ERROR({
@@ -88,7 +89,15 @@ export default class MediaUsecase implements IMediaUsecase {
      * @throws {USECASE_ERROR} If a database or unknown repository error occurs during the search.
      */
     async findMany(options: {
-        where: Partial<Omit<Media, 'user'>>,
+        where: {
+            fileName?: string,
+            filePath?: string,
+            hostname?: string,
+            media_type?: "VIDEO" | "IMAGE",
+            status?: "ORPHANED" | "ASSIGNED",
+            productId?: string,
+            userId?: string,
+        },
         include?: IncludeOption,
         orderBy?: OrderByOption | OrderByOption[]
     }): Promise<Media[]> {
@@ -140,6 +149,11 @@ export default class MediaUsecase implements IMediaUsecase {
                             message: "Database error",
                             code: USECASE_ERROR_CODE.INITIAL
                         })
+                    case REPO_ERROR_CODE.NOTFOUND:
+                        throw new USECASE_ERROR({
+                            message: "Media isn't found",
+                            code: USECASE_ERROR_CODE.NOTFOUND
+                        })
                     case REPO_ERROR_CODE.UNKNOW:
                         throw new USECASE_ERROR({
                             message: "something wrong with repo",
@@ -166,7 +180,7 @@ export default class MediaUsecase implements IMediaUsecase {
      */
     async updateById(options: {
         where: { id: string },
-        data: Partial<Media>
+        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string }
     }): Promise<void> {
         try {
             return await this.repo.updateById(options)

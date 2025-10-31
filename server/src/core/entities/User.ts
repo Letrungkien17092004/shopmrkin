@@ -1,7 +1,4 @@
-import Role from "./Role.js"
-import Product from "./Product.js"
-import Variant from "./Variant.js"
-import Media from "./Media.js"
+import { Role, Cart } from "./index.js"
 
 export type UserConstructorParam = {
     id: string
@@ -10,6 +7,7 @@ export type UserConstructorParam = {
     password_hash: string
     email: string
     roleId: number
+    cart?: Cart
     role?: Role
 
     createdAt?: Date
@@ -29,7 +27,7 @@ export default class User {
     password_hash: string
     email: string
     roleId: number
-    
+    cart?: Cart
     role?: Role
 
     createdAt?: Date
@@ -47,6 +45,7 @@ export default class User {
         this.email = options.email
         this.roleId = options.roleId
         this.role = options.role
+        this.cart = options.cart
         this.createdAt = options.createdAt
         this.updatedAt = options.updatedAt
     }
