@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt"
 import { PrismaClient } from "@prisma/client/index.js";
+import { ENV } from "../../../config/env";
 
 const prisma = new PrismaClient()
 async function main() {
@@ -77,13 +78,13 @@ async function main() {
         }
     })
 
-    const hashedPassword = await bcrypt.hash("12345678", 10);
+    const hashedPassword = await bcrypt.hash(ENV.DEFAULT_ADMIN_PASSWORD, 10);
     const adminAccount = await prisma.users.create({
         data: {
-            username: "admin",
-            account: "shopmrkin@gmail.com",
+            username: ENV.DEFAULT_USERNAME,
+            account: ENV.DEFAULT_ACCOUNT,
             password_hash: hashedPassword,
-            email: "ammenki31@gmail.com",
+            email: ENV.DEFAULT_EMAIL,
             roleId: adminRole.id
         }
     })
