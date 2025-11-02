@@ -270,6 +270,11 @@ export default class ProductController {
             })
             return
         } catch (error) {
+            if (error instanceof z.ZodError) {
+                res.status(400).json({
+                    message: "invalid request"
+                })
+            }
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
                     case USECASE_ERROR_CODE.INITIAL:
