@@ -53,7 +53,11 @@ export default class ProductService {
      * @param options 
      * @returns 
      */
-    async create(options: Omit<Product, "id" | "productCode" | "variants" | "createdAt" | "updatedAt" | "stock" | "minPrice" | "maxPrice" | "product_code" | "media">): Promise<Product> {
+    async create(data: {
+        name: string,
+        description: string,
+        categoryId: number
+    }): Promise<Product> {
         try {
             if (authService.accessIsExpired()) {
                 await authService.refeshAccess()
@@ -61,9 +65,9 @@ export default class ProductService {
             const response = await axios.post<CreateProductResponse>(
                 `${ENV.BACK_END_HOST}/api/product/`,
                 {
-                    name: options.name,
-                    description: options.description,
-                    categoryId: 1
+                    name: data.name,
+                    description: data.description,
+                    categoryId: data.categoryId
                 },
                 {
                     headers: {
@@ -141,9 +145,28 @@ export default class ProductService {
      * Find many product
      * @returns 
      */
-    async getAll(): Promise<Product[]> {
+    async getAll(options:{
+        include?: {
+            user?: boolean,
+            variants?: boolean,
+            media?: boolean
+        }
+    }): Promise<Product[]> {
         try {
-            const response = await axios.get<GetAllProductResponse>(`${ENV.BACK_END_HOST}/api/product?include=1`)
+            var includeQuery = ""
+            if (options?.include?.user) {
+                includeQuery += "include[user]=true&"
+            }
+            if (options?.include?.variants) {
+                includeQuery += "include[variants]=true&"
+            }
+            if (options?.include?.media) {
+                includeQuery += "include[media]=true&"
+            }
+            if (includeQuery.length !== 0) {
+                includeQuery = includeQuery.slice(0, -1)
+            }
+            const response = await axios.get<GetAllProductResponse>(`${ENV.BACK_END_HOST}/api/products?${includeQuery}`)
             const products = response.data.products
             return products.map(p => {
                 const media = p.media.length !== 0 ? p.media : [DEFAULT_MEDIA]
@@ -168,6 +191,7 @@ export default class ProductService {
                 })
             })
         } catch (error) {
+            console.log(error)
             throw new Error("ProductService Error: getData")
         }
     }
@@ -207,7 +231,7 @@ export default class ProductService {
      */
     async findById(id: string): Promise<Product | null> {
         try {
-            const response = await axios.get<{ product: ProductResponse }>(`${ENV.BACK_END_HOST}/api/product/${id}?include=1`)
+            const response = await axios.get<{ product: ProductResponse }>(`${ENV.BACK_END_HOST}/api/product/${id}?include[user]=true&include[variants]=true&include[media]=true`)
             const productData = response.data.product
             return new Product({
                 id: productData.id,

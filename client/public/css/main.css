@@ -280,13 +280,17 @@ html {
 }
 
 .product__item__image {
-    padding: 10px;
+    padding-top: 100%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
 }
-.product__item__image img {
+
+/* .product__item__image img {
     object-fit: contain;
     aspect-ratio: 1/1;
     width: 100%;
-}
+} */
 
 
 .product__item__info {

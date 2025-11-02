@@ -6,7 +6,7 @@ import Loading from "../../../components/Loading.tsx";
 import { NormalButton } from "../../../components/buttons/Button.tsx";
 import { CreateProductProvider, useCreateProduct } from "../../../contexts/CreateProductContext.tsx";
 import { MediaService, ProductService, VariantService } from "../../../services/index.ts"
-import { Variant } from "../../../services/VariantService.ts";
+
 const mediaService = new MediaService()
 const productService = new ProductService()
 const variantService = new VariantService()
@@ -21,15 +21,14 @@ function CreateProductWrapper() {
         if (!isSaving) { return }
         const postData = async () => {
             try {
-                console.log("saving")
                 // upload media
-                const uploadedMedia = await mediaService.uploadMedia(media.map(med => med.file))
+                const uploadedMedia = await mediaService.upload(media.map(med => med.file))
 
                 // create product
                 const createdProduct = await productService.create({
                     name: product.name,
                     description: product.description,
-                    category: "NOCATEGORY"
+                    categoryId: 1
                 })
 
                 // create variants
@@ -46,7 +45,9 @@ function CreateProductWrapper() {
 
                 // assign media to product
                 const listMediaId = uploadedMedia.map(item => item.id)
-                await mediaService.assignMediaToProduct(listMediaId, createdProduct.id)
+                for (let i = 0; i < listMediaId.length; i++) {
+                    await mediaService.updateById(listMediaId[i], { productId: createdProduct.id })
+                }
                 setIsSaving(false)
             } catch (error) {
                 console.log(error)
@@ -59,9 +60,6 @@ function CreateProductWrapper() {
     // Create event handler when user click to save button
     const onClickSave = useCallback((e: React.MouseEvent) => {
         e.stopPropagation()
-        console.log({
-            product, variants, media
-        })
 
         // if saving then skip
         if (isSaving) { return }

@@ -8,15 +8,19 @@ interface ProductCardProps {
     price: number
 }
 
-export default function ProductCard({imgURL, discount, starPoint, name, price}: ProductCardProps) {
+export default function ProductCard({ imgURL, discount, starPoint, name, price }: ProductCardProps) {
     return (
         <div className="product__item">
-            <div className="product__item__image">
-                <img src={imgURL} alt={name} />
+            <div style={{ backgroundImage: `url(${imgURL})` }} className="product__item__image">
             </div>
-            <div className="product__discount">
-                {discount} %
-            </div>
+            {/* if discount == 0 then hide discount */}
+            {
+                discount > 0 && <>
+                    <div className="product__discount">
+                        {discount} %
+                    </div>
+                </>
+            }
             <div className="product__item__info">
                 <div className="product__item__info--score">
                     <img src="/public/svg/star-solid-full.svg" alt="" />
@@ -26,12 +30,23 @@ export default function ProductCard({imgURL, discount, starPoint, name, price}: 
                     <span>{name}</span>
                 </div>
                 <div className="product__item__info__wraper">
-                    <span className="product__item__info--priceAfterDiscount">
-                        {price * ((100 - discount) / 100)}
-                    </span>
-                    <span className="product__item__info--origin-price">
-                        {price}
-                    </span>
+                    {/* if discount <=0 then hiden origin price */}
+                    {
+                        discount > 0
+                            ? <>
+                                <span className="product__item__info--priceAfterDiscount">
+                                    {price * ((100 - discount) / 100)}
+                                </span>
+                                <span className="product__item__info--origin-price">
+                                    {price}
+                                </span>
+                            </>
+                            : <>
+                                <span className="product__item__info--priceAfterDiscount">
+                                    {price}
+                                </span>
+                            </>
+                    }
                 </div>
             </div>
         </div>

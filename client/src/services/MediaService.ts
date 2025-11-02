@@ -22,7 +22,7 @@ export default class MediaService {
      * 
      * @param media list file
      */
-    uploadMedia = async (media: File[]): Promise<Media[]> => {
+    upload = async (media: File[]): Promise<Media[]> => {
         try {
             if (authService.accessIsExpired()) {
                 await authService.refeshAccess()
@@ -48,17 +48,19 @@ export default class MediaService {
         }
     }
 
-    assignMediaToProduct = async (listMediaId: string[], productId: string): Promise<Media[]> => {
+    updateById = async (
+        mediaId: string,
+        data: {
+            productId?: string,
+            status?: "ORPHANED" | "ASSIGNED"
+        }): Promise<void> => {
         try {
             if (authService.accessIsExpired()) {
                 await authService.refeshAccess()
             }
-            const response = await axios.post<{media: Media[]}>(
-                `${ENV.BACK_END_HOST}/api/media/assign-to-product`,
-                {
-                    listMediaId: listMediaId,
-                    productId: productId
-                },
+            await axios.put<void>(
+                `${ENV.BACK_END_HOST}/api/media/${mediaId}`,
+                data,
                 {
                     headers: {
                         "Content-Type": "application/json",
@@ -66,7 +68,6 @@ export default class MediaService {
                     }
                 }
             )
-            return response.data.media
         } catch (error) {
             throw error
         }

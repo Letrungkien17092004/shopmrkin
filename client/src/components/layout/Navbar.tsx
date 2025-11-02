@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { useAuthContext } from "../../contexts/AuthContext.tsx"
 export default function Navbar() {
-    const {isLogin, profile} = useAuthContext()
+    const { profile } = useAuthContext()
     return (<>
         <nav className="navbar">
             <div className="grid">
@@ -34,7 +34,7 @@ export default function Navbar() {
                     <div className="col c-4 m-2 l-3">
                         <div className="navbar__actions">
                             {
-                                isLogin
+                                profile
                                     ?
                                     <>
                                         <div className="navbar__actions-cart-icon">
@@ -44,12 +44,12 @@ export default function Navbar() {
                                             <img style={{ width: "30px" }} className="image-avatar" src={`${profile?.picture}`} alt="cart-image" />
                                         </div>
                                     </>
-                                    : 
+                                    :
                                     <>
                                         <div className="navbar__actions__items">
                                             <Link className="disable-link text-base font-semibold text-hover-highlight" to="/login">Đăng nhập</Link>
                                         </div>
-                                        
+
                                         <div className="navbar__actions__items">
                                             <Link className="disable-link text-base font-semibold text-hover-highlight" to="/register">Đăng ký</Link>
                                         </div>

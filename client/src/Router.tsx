@@ -8,6 +8,7 @@ import AuthGoogleCallback from "./pages/auth/AuthGoogleCallback.tsx"
 // manager
 import { Manager, Dashboard, OrderManager } from "./pages/admin/index.tsx"
 import {ProductManager, ProductDetail, CreateProduct, ModifyProduct} from "./pages/admin/product/index.ts"
+import Test from "./pages/test/Test.tsx"
 
 export default function Router() {
     return (<>
@@ -32,6 +33,9 @@ export default function Router() {
                     <Route path="products/modify/:id" element={<ModifyProduct />} />
                     <Route path="orders" element={<OrderManager />} />
                 </Route>
+
+                
+                <Route path="/test" element={<Test />} />
             </Routes>
         </BrowserRouter>
     </>)

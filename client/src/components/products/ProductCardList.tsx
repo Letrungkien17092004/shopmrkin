@@ -13,7 +13,12 @@ export default function ProductCardList() {
     // fetching products
     useEffect(() => {
         const fetchData = async () => {
-            const fetchedProduct = await productService.getAll()
+            const fetchedProduct = await productService.getAll({
+                include: {
+                    variants: true,
+                    media: true
+                }
+            })
             setProducts(fetchedProduct)
         }
         fetchData()
@@ -39,7 +44,7 @@ export default function ProductCardList() {
                                 <Link className="text-base disable-link" to={`/product-detail/${p.id}`}>
                                     <ProductCard
                                         imgURL={`${p.thumbnailURL}`}
-                                        discount={50}
+                                        discount={0}
                                         starPoint={5}
                                         name={p.name}
                                         price={p.maxPrice || 0}
