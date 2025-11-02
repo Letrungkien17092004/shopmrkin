@@ -1,3 +1,4 @@
+import "./table.css"
 import ProductTable from "./ProductTable.tsx";
 import Table from "./Table.tsx";
 import TableHead from "./TableHead.tsx";

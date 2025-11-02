@@ -3,7 +3,7 @@ import VariantService from "./VariantService.ts"
 import { Variant, Product } from "../entities/index.ts"
 import AuthService from "./AuthService.ts"
 import { ENV } from "../config/ENV.ts"
-const variantService = new VariantService()
+// const variantService = new VariantService()
 const authService = new AuthService()
 
 type ProductResponse = {

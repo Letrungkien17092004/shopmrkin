@@ -2,17 +2,6 @@ import React, { useCallback, useState } from "react";
 interface Image {
     url: string
 }
-const demoImages: Image[] = [
-    {
-        url: "http://localhost:8000/public/upload/40229b6700724185b04899e4316046db-1760882755816.webp"
-    },
-    {
-        url: "http://localhost:8000/public/upload/acf1ae271e8044809fbf204c10973c9d-1760882755819.webp"
-    },
-    {
-        url: "http://localhost:8000/public/upload/2edfeb36b85a4adab1099d4b51e8f89e-1760882755816.webp"
-    },
-]
 
 interface ProductImageSliderProps {
     images: Image[]

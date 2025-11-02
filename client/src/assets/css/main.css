@@ -1,8 +1,27 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 :root {
+    --navbar-height: 50px;
+    --primary-color: #2D6A4F;
+    --text-color-when-primary: #fff;
+    --text-color: #22223B;
+    --background-color: #F8F9FA;
+    --max-width-container: 1000px;
+    --text-price-highlight: #ee4d2d;
+    --text-origin-cost: gray;
     --bg-color-gray: #cbcbcb;
     --bg-color-white: #fff
 }
 
+html {
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+}
 /* background */
 .bg-primary {
     background-color: var(--primary-color);
@@ -206,6 +225,10 @@
 
 .text-center {
     text-align: center;
+}
+
+.text-color-priceHightlight {
+    color: var(--text-price-highlight);
 }
 .text-xs {
     /* 12px */

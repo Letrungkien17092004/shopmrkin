@@ -1,3 +1,4 @@
+import "./notification.css"
 import React, { useState } from "react";
 import type { NotificationType } from "../../hooks/useNotificationController.ts";
 

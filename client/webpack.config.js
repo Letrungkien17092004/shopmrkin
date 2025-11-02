@@ -26,6 +26,13 @@ const config = {
                 use: "babel-loader",
                 exclude: /node_modules/
             },
+            {
+                test: /\.css$/, // Áp dụng cho các file kết thúc bằng .css
+                use: [
+                    'style-loader', // 1. Chèn CSS vào DOM
+                    'css-loader',   // 2. Dịch @import và url()
+                ],
+            },
         ]
     },
     plugins: [

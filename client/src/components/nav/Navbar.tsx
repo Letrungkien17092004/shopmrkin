@@ -20,13 +20,13 @@ export default function Navbar() {
                                 <span>Home</span>
                             </div>
                             <div className="navbar__menu-item">
-                                <span>Đồ gia dụng</span>
+                                <span>Thời trang nam</span>
                             </div>
                             <div className="navbar__menu-item">
-                                <span>Đồ nội thất</span>
+                                <span>Thời trang nữ</span>
                             </div>
                             <div className="navbar__menu-item">
-                                <span>Dụng cụ phòng bếp</span>
+                                <span>Phụ kiện nam nữ</span>
                             </div>
                         </div>
                     </div>

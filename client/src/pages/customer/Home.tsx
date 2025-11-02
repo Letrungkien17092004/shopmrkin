@@ -1,5 +1,6 @@
+import "./style.css"
 import React, { useEffect } from "react";
-import Navbar from "../../components/layout/Navbar.tsx";
+import { Navbar } from "../../components/nav/index.tsx";
 import ProductCardList from "../../components/products/ProductCardList.tsx";
 import ProductFilter from "../../components/products/ProductFilter.tsx";
 import { AuthProvider } from "../../contexts/AuthContext.tsx";

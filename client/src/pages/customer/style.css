@@ -1,97 +1,5 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-:root {
-    --navbar-height: 50px;
-    --primary-color: #2D6A4F;
-    --text-color-when-primary: #fff;
-    --text-color: #22223B;
-    --background-color: #F8F9FA;
-    --max-width-container: 1000px;
-    --text-real-cost: #ee4d2d;
-    --text-origin-cost: gray;
-}
-
-html {
-    font-family: "Open Sans", sans-serif;
-    font-size: 16px;
-    font-weight: 400;
-}
-
-.navbar {
-    color: var(--text-color);
-    max-width: var(--max-width-container);
-    margin: 0 auto;
-    height: var(--navbar-height);
-    box-shadow: 0px 1px 10px 1px rgba(0, 0, 0, 0.15);
-}
-
-.navbar__logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: var(--navbar-height);
-    background-color: var(--primary-color);
-    color: var(--text-color-when-primary);
-    font-weight: 700;
-    font-size: 1.5rem;
-}
-
-.navbar__menu {
-    display: flex;
-    padding: 0 16px;
-    align-items: center;
-    justify-content: center;
-    height: var(--navbar-height);
-    font-size: 1rem;
-    font-weight: bolder;
-}
-
-.navbar__menu-item:not(:last-child) {
-    cursor: pointer;
-    margin-right: 12px;
-}
-
-.navbar__menu-item:hover {
-    color: var(--primary-color);
-}
-
-.navbar__actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: var(--navbar-height);
-}
-
-.navbar__actions__items {
-    padding: 4px 8px;
-}
-.navbar__actions-cart-icon,
-.navbar__actions-user-icon {
-    padding: 8px;
-}
-
-/* HEADING */
-.heading-1 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--text-color);
-    display: flex;
-    align-items: center;
-}
-
-.heading-2 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-color);
-}
-
 
 /* HOME-MAIN-CONTENT */
-
 .home-main-content {
     max-width: var(--max-width-container);
     margin: 0 auto;
@@ -329,7 +237,7 @@ html {
 .product__item__info--priceAfterDiscount {
     margin-right: 6px;
     font-weight: 600;
-    color: var(--text-real-cost);
+    color: var(--text-price-highlight);
 }
 
 .product__item__info--origin-price {

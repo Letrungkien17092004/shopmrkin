@@ -1,6 +1,7 @@
+import "./style.css"
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Navbar from "../../components/layout/Navbar.tsx";
+import { Navbar } from "../../components/nav/index.tsx";
 import { AuthProvider } from "../../contexts/AuthContext.tsx";
 import { ProductImageSlider } from "../../components/products/index.tsx"
 import Loading from "../../components/Loading.tsx";
@@ -15,6 +16,8 @@ const containerStyle: React.CSSProperties = {
 export default function CustomerProductDetail() {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [product, setProduct] = useState<Product | undefined>(undefined)
+    const [defaultPrice, setDefaultPrice] = useState<string | undefined>(undefined)
+    const [price, setPrice] = useState<number | undefined>(undefined)
     const { productId } = useParams()
 
     useEffect(() => {
@@ -22,6 +25,7 @@ export default function CustomerProductDetail() {
             const productData = await productService.findById(productId!)
             if (productData) {
                 setProduct(productData)
+                setDefaultPrice(`${productData.minPrice} ${productData.maxPrice}`)
             }
             setIsLoading(false)
         }
@@ -55,12 +59,17 @@ export default function CustomerProductDetail() {
                                 <div className="col c-11 m-6 l-6">
                                     <ProductImageSlider images={product.media.map(med => ({ url: `${med.hostname}${med.filePath}` }))} />
                                 </div>
-                                {/* info (name, variant, ...) */}
+                                {/* info (name, price, variant, ...) */}
                                 <div className="col c-11 m-6 l-4">
                                     <div className="w-full">
                                         <p className="text-xl font-semibold">
                                             {product.name}
                                         </p>
+
+                                        <p className="text-xl font-semibold text-color-priceHightlight">
+                                            {defaultPrice}
+                                        </p>
+
                                         {/* variant options */}
                                         <div className="w-full mar-top-12px">
                                             <p className="text-base font-normal">Tùy chọn:</p>
