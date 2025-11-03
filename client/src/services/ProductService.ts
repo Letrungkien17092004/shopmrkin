@@ -241,7 +241,7 @@ export default class ProductService {
                 category: productData.category,
                 media: productData.media.length!==0?productData.media:[DEFAULT_MEDIA],
                 variants: productData.variants.map(v => new Variant({
-                    id: "",
+                    id: v.id,
                     name: v.name,
                     sku: v.sku,
                     price: v.price,

@@ -8,6 +8,9 @@ import Variant from "../../core/entities/Variant.js";
 import Media from "./Media.js";
 import Cart from "./Cart.js";
 import CartItem from "./CartItem.js";
+import Order from "./Order.js";
+import OrderItem from "./OrderItem.js";
+import Payment from "./Payment.js";
 export {
     User,
     Role,
@@ -18,5 +21,8 @@ export {
     Variant,
     Media,
     Cart,
-    CartItem
+    CartItem,
+    Order,
+    OrderItem,
+    Payment
 }

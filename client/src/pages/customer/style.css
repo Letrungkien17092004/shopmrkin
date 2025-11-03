@@ -245,3 +245,22 @@
     color: var(--text-origin-cost);
     text-decoration: line-through;
 }
+
+/* CustomerProductDetail */
+/* ==== Variants ==== */
+.variant-options {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.variant-options:hover {
+    user-select: none;
+    filter: brightness(110%);
+    transform: scale(1.05);
+}
+
+.variant-options--selected {
+    background-color: var(--primary-color);
+    color: var(--text-color-when-primary);
+}

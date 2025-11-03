@@ -151,6 +151,7 @@ html {
     padding-top: 24px;
 }
 
+/* padding left */
 .pad-left-24px {
     padding-left: 24px;
 }
@@ -163,6 +164,29 @@ html {
     padding-left: 8px;
 }
 
+.pad-left-4px {
+    padding-left: 8px;
+}
+
+/* padding right */
+
+.pad-right-24px {
+    padding-right: 24px;
+}
+
+.pad-right-12px {
+    padding-right: 8px;
+}
+
+.pad-right-8px {
+    padding-right: 8px;
+}
+
+.pad-right-4px {
+    padding-right: 8px;
+}
+
+/* padding bot */
 .pad-bot-12px {
     padding-bottom: 12px;
 }
@@ -187,13 +211,6 @@ html {
     padding-right: 24px;
 }
 
-.pad-left-24px {
-    padding-left: 24px;
-}
-
-.pad-left-8px {
-    padding-left: 8px;
-}
 
 /* ==== Border ==== */
 .no-border {
@@ -299,6 +316,10 @@ html {
 /* ==== Special Text ====  */
 .text-error {
     color: #ff3b3b;
+}
+
+.text-color-notify {
+    color: #ee4d2d;
 }
 
 .text-color-price {

@@ -33,8 +33,6 @@ export default function ProductImageSlider({ images }: ProductImageSliderProps) 
 
     return (<>
         {/* link css */}
-        <link rel="stylesheet" href="/public/css/ProductImageSlider.css" />
-
         <section className="w-full">
             {/* slider */}
             <div className="w-full">

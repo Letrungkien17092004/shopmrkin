@@ -46,7 +46,80 @@
 .navbar__actions__items {
     padding: 4px 8px;
 }
-.navbar__actions-cart-icon,
-.navbar__actions-user-icon {
+
+.navbar__actions__cart,
+.navbar__actions__user {
     padding: 8px;
+}
+
+
+.navbar__actions__cart img {
+    width: 25px;
+}
+
+.navbar__actions__user {
+    position: relative;
+}
+
+.navbar__actions__user__menu {
+    z-index: 1;
+    padding: 12px 24px 12px 24px;
+    text-align: center;
+    position: absolute;
+    width: max-content;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fff;
+    opacity: 1;
+}
+
+.navbar__actions__user__menu p {
+    cursor: pointer;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.navbar__actions__user__menu p:hover {
+    color: var(--primary-color);
+}
+
+.navbar__actions__cart {
+    cursor: pointer;
+    position: relative;
+}
+
+.navbar__actions__cart__notify {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    background-color: red;
+    color: #fff;
+    padding-left: 2px;
+    padding-right: 2px;
+    text-align: center;
+    border-radius: 50%;
+}
+
+.navbar__actions__cart__list {
+    right: 0%;
+    top: 100%;
+    position: absolute;
+    background-color: #fff;
+    z-index: 1;
+    width: 320px;
+    text-align: justify;
+    padding: 8px;
+}
+
+.cart__items {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.cart__items__thumbnail img {
+    width: 50px;
+    object-fit: contain;
+    border-radius: 8px;
 }

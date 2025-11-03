@@ -1,23 +1,55 @@
 import "./style.css"
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Navbar } from "../../components/nav/index.tsx";
 import { AuthProvider } from "../../contexts/AuthContext.tsx";
 import { ProductImageSlider } from "../../components/products/index.tsx"
 import Loading from "../../components/Loading.tsx";
 import ProductService from "../../services/ProductService.ts";
-import { Product } from "../../entities/index.ts";
+import { Product, Variant } from "../../entities/index.ts";
 
 const productService = new ProductService()
 const containerStyle: React.CSSProperties = {
     maxWidth: "1000px",
     margin: "0 auto"
 }
+
+interface VariantListProps {
+    variants: Variant[],
+    selectedVariant: Variant | undefined,
+    createSelectedEvent: (id: string) => ((e: React.MouseEvent) => void) | undefined
+}
+
+function VariantList({ variants, selectedVariant, createSelectedEvent }: VariantListProps) {
+    return <>
+        {variants.map(v => {
+
+            return (
+                <div onClick={createSelectedEvent(v.id)} key={v.sku} className="col l-6 mar-top-4px">
+                    {
+                        selectedVariant && selectedVariant.id === v.id
+                            ? <>
+                                <div className="w-full pad-4px border-radius-4px text-center text-sm variant-options variant-options--selected">
+                                    {v.name}
+                                </div>
+                            </>
+                            : <>
+                                <div className="w-full pad-4px border-radius-4px text-center text-sm variant-options">
+                                    {v.name}
+                                </div>
+                            </>
+                    }
+                </div>
+            )
+        })}
+    </>
+}
+
 export default function CustomerProductDetail() {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [product, setProduct] = useState<Product | undefined>(undefined)
     const [defaultPrice, setDefaultPrice] = useState<string | undefined>(undefined)
-    const [price, setPrice] = useState<number | undefined>(undefined)
+    const [selectedVariant, setSelectedVariant] = useState<Variant | undefined>(undefined)
     const { productId } = useParams()
 
     useEffect(() => {
@@ -31,6 +63,19 @@ export default function CustomerProductDetail() {
         }
         fetchData()
     }, [])
+
+    const createSelectedEvent = useCallback((id: string) => {
+        if (!product) { return }
+        if (product.variants.length <= 0) { return }
+        return (e: React.MouseEvent) => {
+            e.stopPropagation()
+            if (selectedVariant && selectedVariant.id === id) {
+                setSelectedVariant(undefined)
+                return
+            }
+            setSelectedVariant(product.variants.find(v => v.id === id))
+        }
+    }, [product, selectedVariant])
     if (isLoading) {
         return (
             <div className="w-full h-full-vh flex flex-center">
@@ -57,7 +102,9 @@ export default function CustomerProductDetail() {
                             <div className="row justify-center">
                                 {/* Slider */}
                                 <div className="col c-11 m-6 l-6">
-                                    <ProductImageSlider images={product.media.map(med => ({ url: `${med.hostname}${med.filePath}` }))} />
+                                    <ProductImageSlider
+                                    images={product.media.map(med => ({ url: `${med.hostname}${med.filePath}` }))}
+                                    />
                                 </div>
                                 {/* info (name, price, variant, ...) */}
                                 <div className="col c-11 m-6 l-4">
@@ -67,7 +114,7 @@ export default function CustomerProductDetail() {
                                         </p>
 
                                         <p className="text-xl font-semibold text-color-priceHightlight">
-                                            {defaultPrice}
+                                            {selectedVariant ? `${selectedVariant.price}` : defaultPrice}
                                         </p>
 
                                         {/* variant options */}
@@ -75,15 +122,11 @@ export default function CustomerProductDetail() {
                                             <p className="text-base font-normal">Tùy chọn:</p>
                                             <div className="grid">
                                                 <div className="row">
-                                                    {product.variants.map(v => {
-                                                        return (
-                                                            <div key={v.sku} className="col l-6 mar-top-4px">
-                                                                <div className="w-full pad-4px border-radius-4px text-center border-style1 text-sm box-hover-style1">
-                                                                    {v.name}
-                                                                </div>
-                                                            </div>
-                                                        )
-                                                    })}
+                                                    <VariantList
+                                                    variants={product.variants}
+                                                    selectedVariant={selectedVariant}
+                                                    createSelectedEvent={createSelectedEvent}
+                                                    />
                                                 </div>
                                             </div>
                                         </div>
