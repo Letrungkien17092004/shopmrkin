@@ -42,7 +42,7 @@ export default class ProductUsecase implements IProductUsecase {
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "author or category is wrong",
-                            code: USECASE_ERROR_CODE.CONSTRAINT
+                            code: USECASE_ERROR_CODE.FK_CONSTRAINT
                         })
 
                 }
@@ -190,7 +190,7 @@ export default class ProductUsecase implements IProductUsecase {
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "User or Category not found",
-                            code: USECASE_ERROR_CODE.CONSTRAINT
+                            code: USECASE_ERROR_CODE.FK_CONSTRAINT
                         })
 
                 }

@@ -157,22 +157,6 @@ model Media {
 
 
 
-// Order Enum
-enum OrderStatus {
-  PENDING
-  PROCESSING
-  SHIPPED
-  DELIVERED
-  CANCELLED
-}
-
-enum PaymentStatus {
-  PENDING
-  PAID
-  FAILED
-  REFUNED
-}
-
 model Carts {
   id String @id @default(uuid(7))
   userId String @unique
@@ -195,10 +179,20 @@ model CartItems {
   @@map("cart_items")
 }
 
+
+// Order Enum
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
 model Orders {
   id String @id @default(uuid(7))
   userId String
-  totalAmout Decimal
+  totalAmount Decimal
   status OrderStatus @default(PENDING)
 
   // relation ship
@@ -225,12 +219,22 @@ model OrderItems {
   @@map("order_items")
 }
 
+// Payment num
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNED
+}
+
 model Payments {
   id String @id @default(uuid(7))
   transactionId String @unique
   amount Decimal
   orderId String
   userId String
+  status PaymentStatus @default(PENDING)
   createdAt DateTime @default(now())
 
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -41,7 +41,7 @@ export default class VariantUsecase implements IVariantUsecase {
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "author or parent product is wrong",
-                            code: USECASE_ERROR_CODE.CONSTRAINT
+                            code: USECASE_ERROR_CODE.FK_CONSTRAINT
                         })
 
                 }
@@ -190,7 +190,7 @@ export default class VariantUsecase implements IVariantUsecase {
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: error.message,
-                            code: USECASE_ERROR_CODE.CONSTRAINT
+                            code: USECASE_ERROR_CODE.FK_CONSTRAINT
                         })
                 }
             }

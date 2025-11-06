@@ -18,11 +18,10 @@ export default interface IOrderRepository {
     create(options: {
         data: {
             userId: string,
-            totalAmout: number,
+			totalAmount: number,
             orderItems: {
                 variantId: string
                 quantity: number
-                unitPrice: number
             }[]
         },
         include?: IncludeOption

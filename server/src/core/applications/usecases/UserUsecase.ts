@@ -33,7 +33,7 @@ export default class UserUsecase implements IUserUsecase {
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
                         throw new USECASE_ERROR({
                             message: "role is invalid",
-                            code: USECASE_ERROR_CODE.CONSTRAINT
+                            code: USECASE_ERROR_CODE.FK_CONSTRAINT
                         })
                     case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
                         throw new USECASE_ERROR({

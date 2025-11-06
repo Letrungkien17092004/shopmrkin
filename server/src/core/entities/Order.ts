@@ -5,7 +5,7 @@ type OrderStatus = "PENDING" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELL
 interface OrderConstructor {
     id: string
     userId: string
-    totalAmout: number
+    totalAmount: number
     status: OrderStatus
 
     user?: User
@@ -18,7 +18,7 @@ interface OrderConstructor {
 export default class Order {
     id: string
     userId: string
-    totalAmout: number
+    totalAmount: number
     status: OrderStatus
 
     user?: User
@@ -30,7 +30,7 @@ export default class Order {
     constructor(options: OrderConstructor) {
         this.id = options.id
         this.userId = options.userId
-        this.totalAmout = options.totalAmout
+        this.totalAmount = options.totalAmount
         this.status = options.status
 
         this.user = options.user

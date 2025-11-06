@@ -61,7 +61,7 @@ export default class CartUsecase implements ICartUsecase {
                     case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({ message: error.message, code: USECASE_ERROR_CODE.INITIAL })
                     case REPO_ERROR_CODE.FOREIGNKEY_CONSTRAINT:
-                        throw new USECASE_ERROR({ message: "Cart or Variant not found", code: USECASE_ERROR_CODE.CONSTRAINT })
+                        throw new USECASE_ERROR({ message: "Cart or Variant not found", code: USECASE_ERROR_CODE.FK_CONSTRAINT })
                 }
             }
             throw new USECASE_ERROR({ message: (error as Error).message || "", code: USECASE_ERROR_CODE.UNDEFINED })

@@ -93,6 +93,33 @@ export default class VariantRepository implements IVariantRepository {
     }
 
     /**
+    * Find many variants by Id list
+    * @param options 
+    */
+    async findManyByIds(options: {
+        where: {
+            id: string[]
+        }
+    }): Promise<Variant[]> {
+        try {
+            const found = await prisma.variants.findMany({
+                where: {
+                    id: {
+                        in: options.where.id
+                    }
+                }
+            })
+            
+            return found.map(variant => new Variant({
+                ...variant,
+                price: Number(variant.price)
+            }))
+        } catch (error) {
+            throw baseExceptionHandler(error)
+        }
+    }
+
+    /**
      * Find one variant by sku value
      * @param options 
      */

@@ -6,6 +6,7 @@ interface PaymentConstructor {
     amount: number
     orderId: string
     userId: string
+    status: "PENDING" | "PAID" | "FAILED" | "REFUNED"
     createdAt?: Date
     user?: User
     order?: Order
@@ -17,6 +18,7 @@ export default class Payment {
     amount: number
     orderId: string
     userId: string
+    status: "PENDING" | "PAID" | "FAILED" | "REFUNED"
     createdAt?: Date
     user?: User
     order?: Order
@@ -27,7 +29,8 @@ export default class Payment {
         this.amount = options.amount
         this.orderId = options.orderId
         this.userId = options.userId
-        
+        this.status = options.status
+
         this.createdAt = options.createdAt
         this.user = options.user
         this.order = options.order

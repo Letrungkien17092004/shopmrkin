@@ -9,13 +9,12 @@ export default interface IOrderUsecase {
     create(options: {
         data: {
             userId: string,
-            totalAmout: number,
             orderItems: {
                 variantId: string
                 quantity: number
-                unitPrice: number
             }[]
-        }
+        },
+        include?: IncludeOption
     }): Promise<Order>
 
     /**

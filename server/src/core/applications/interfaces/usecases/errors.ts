@@ -11,12 +11,13 @@
  * @property {string} EXIST    - Resource already exists error.
  */
 export enum USECASE_ERROR_CODE {
-    INITIAL = "UC_000", // connection error, prisma client, initial database
-    UNDEFINED = "UC_001", // this error only occurs when it does not belong to the remaining errors
-    UNKNOW = "UC_002", // unknow error(connection, internet, ...)
-    NOTFOUND = "UC_003", // resource not found
-    CONFLIX = "UC_004", // resource already exist
-    CONSTRAINT = "UC_005", // foreign key error
+    INITIAL = "INITIAL_DATABASE_ERROR", // connection error, prisma client, initial database
+    UNDEFINED = "UNDEFINED", // this error only occurs when it does not belong to the remaining errors
+    UNKNOW = "UNKNOW", // unknow error(connection, internet, ...)
+    NOTFOUND = "NOTFOUND", // resource not found
+    CONFLIX = "CONFLIX_DATA", // resource already exist
+    FK_CONSTRAINT = "CONSTRAINT", // foreign key error, unique error
+    INVALID_DATA = "INVALID_DATA", // foreign key error, unique error
 }
 
 

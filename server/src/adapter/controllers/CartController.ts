@@ -181,7 +181,7 @@ export default class CartController {
                     case USECASE_ERROR_CODE.INITIAL:
                         res.status(500).json({ message: "Server Internal Error!" })
                         return
-                    case USECASE_ERROR_CODE.CONSTRAINT:
+                    case USECASE_ERROR_CODE.FK_CONSTRAINT:
                         res.status(404).json({ message: "Cart or Variant not found" })
                         return
                     case USECASE_ERROR_CODE.CONFLIX:
@@ -260,7 +260,7 @@ export default class CartController {
                 return
             }
             if (error instanceof USECASE_ERROR) {
-                if (error.code === USECASE_ERROR_CODE.CONSTRAINT) {
+                if (error.code === USECASE_ERROR_CODE.FK_CONSTRAINT) {
                     res.status(404).json({ message: "Cart or Variant not found" })
                     return
                 }

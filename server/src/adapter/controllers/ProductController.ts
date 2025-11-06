@@ -101,7 +101,7 @@ export default class ProductController {
                             message: "Product already exist"
                         })
                         return
-                    case USECASE_ERROR_CODE.CONSTRAINT:
+                    case USECASE_ERROR_CODE.FK_CONSTRAINT:
                         res.status(404).json({
                             message: "User or Category not found"
                         })
@@ -348,7 +348,7 @@ export default class ProductController {
                             message: "Product not found, or User not match with authorId"
                         })
                         return
-                    case USECASE_ERROR_CODE.CONSTRAINT:
+                    case USECASE_ERROR_CODE.FK_CONSTRAINT:
                         res.status(404).json({
                             message: "wrong constrant (authorId, categoryId,...)"
                         })

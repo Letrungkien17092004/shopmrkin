@@ -33,6 +33,16 @@ export default interface IVariantRepository {
     }): Promise<Variant[]>
 
     /**
+     * Find many variants by Id list
+     * @param options 
+     */
+    findManyByIds(options: {
+        where: {
+            id: string[]
+        }
+    }): Promise<Variant[]>
+
+    /**
      * Find one variant by sku value
      * @param options 
      */

@@ -21,7 +21,7 @@ export default class OrderRepository implements IOrderRepository {
 	async create(options: {
 		data: {
 			userId: string,
-			totalAmout: number,
+			totalAmount: number,
 			orderItems: {
 				variantId: string
 				quantity: number
@@ -35,7 +35,7 @@ export default class OrderRepository implements IOrderRepository {
 			const created = await prisma.orders.create({
 				data: {
 					userId: options.data.userId,
-					totalAmout: options.data.totalAmout,
+					totalAmount: options.data.totalAmount,
 					orderItems: {
 						create: options.data.orderItems.map(ordItem => ({
 							variantId: ordItem.variantId,
@@ -51,7 +51,7 @@ export default class OrderRepository implements IOrderRepository {
 
 			return new Order({
 				...createdTyped,
-				totalAmout: Number(createdTyped.totalAmout),
+				totalAmount: Number(createdTyped.totalAmount),
 				user: createdTyped.user ? new User(createdTyped.user) : undefined,
 				orderItems: createdTyped.orderItems ? createdTyped.orderItems.map((oi: PrismaOrderItem) => new OrderItem({
 					...oi,
@@ -91,7 +91,7 @@ export default class OrderRepository implements IOrderRepository {
 
 			return new Order({
 				...foundTyped,
-				totalAmout: Number(foundTyped.totalAmout),
+				totalAmount: Number(foundTyped.totalAmount),
 				user: foundTyped.user ? new User(foundTyped.user) : undefined,
 				orderItems: foundTyped.orderItems ? foundTyped.orderItems.map((oi: PrismaOrderItem) => new OrderItem({
 					...oi,
@@ -131,7 +131,7 @@ export default class OrderRepository implements IOrderRepository {
 
 			return ordersTyped.map(order => new Order({
 				...order,
-				totalAmout: Number(order.totalAmout),
+				totalAmount: Number(order.totalAmount),
 				user: order.user ? new User(order.user) : undefined,
 				orderItems: order.orderItems ? order.orderItems.map((oi: PrismaOrderItem) => new OrderItem({
 					...oi,

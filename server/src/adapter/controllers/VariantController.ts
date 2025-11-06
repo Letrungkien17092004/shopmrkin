@@ -91,7 +91,7 @@ export default class VariantController {
                             message: "variant already exist"
                         })
                         return
-                    case USECASE_ERROR_CODE.CONSTRAINT:
+                    case USECASE_ERROR_CODE.FK_CONSTRAINT:
                         res.status(404).json({
                             message: "product or user not found"
                         })

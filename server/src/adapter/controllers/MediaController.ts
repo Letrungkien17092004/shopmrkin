@@ -90,7 +90,7 @@ export default class MediaController {
             console.log(error)
             if (error instanceof USECASE_ERROR) {
                 switch (error.code) {
-                    case USECASE_ERROR_CODE.CONSTRAINT:
+                    case USECASE_ERROR_CODE.FK_CONSTRAINT:
                         res.status(409).json({
                             message: "conflix"
                         })
