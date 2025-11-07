@@ -10,7 +10,7 @@ type PaymentWithRelations = Payments & {
     order?: Orders
 }
 
-export class PaymentRepository implements IPaymentRepository {
+export default class PaymentRepository implements IPaymentRepository {
     /**
      * Create a Payment
      * @param options 
