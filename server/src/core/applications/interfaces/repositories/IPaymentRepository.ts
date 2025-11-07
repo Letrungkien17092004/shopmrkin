@@ -18,7 +18,6 @@ export default interface IPaymentRepository {
      */
     create(options: {
         data: {
-            id: string
             transactionId: string
             amount: number
             orderId: string

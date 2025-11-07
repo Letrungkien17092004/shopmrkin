@@ -8,7 +8,6 @@ export default interface IPaymentUsecase {
      */
     create(options: {
         data: {
-            id: string
             transactionId: string
             orderId: string
             userId: string

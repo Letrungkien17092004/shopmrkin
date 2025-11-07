@@ -21,7 +21,6 @@ export default class PaymentUsecase implements IPaymentUsecase {
      */
     async create(options: {
         data: {
-            id: string,
             transactionId: string,
             orderId: string,
             userId: string,

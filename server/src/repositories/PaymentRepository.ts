@@ -17,7 +17,6 @@ export class PaymentRepository implements IPaymentRepository {
      */
     async create(options: {
         data: {
-            id: string,
             transactionId: string,
             amount: number,
             orderId: string,
