@@ -6,7 +6,8 @@ type UserProfile = {
     email: string,
     account: string,
     username: string,
-    picture: string
+    picture: string,
+    cartId: string
 }
 
 export default class AuthService {
