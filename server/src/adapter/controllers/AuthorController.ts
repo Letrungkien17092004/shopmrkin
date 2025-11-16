@@ -152,7 +152,7 @@ export default class AuthorController {
             res.status(200).json({
                 refeshToken: refeshToken,
                 accessToken: accessToken,
-                cart: user.cart
+                cart: user.cart?.id
             })
             return
         } catch (error) {
