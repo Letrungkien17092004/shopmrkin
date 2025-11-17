@@ -7,7 +7,7 @@ interface Props {
 export default function TableDataActions({children, className}: Props) {
     className = className || ""
     return (<>
-        <td className={`table-data-actions ${className}`}>
+        <td className={`flex flex-col gap-y-2 justify-center items-center py-4 ${className}`}>
             {children}
         </td>
     </>)

@@ -52,26 +52,27 @@ export default function CreateVariantForm() {
     return (<>
         <section className="w-full">
             {/* variant input */}
-            <div className="w-full flex flex-center justify-start pad-12px">
-                <div className="mar-right-12px">
-                    <h4>SKU</h4>
+            <div className="p-3 flex">
+                <div className="ml-3">
+                    <label>SKU</label>
                     <Input type="text" onChange={createFormDataEventHandler("sku")} />
                 </div>
-                <div className="mar-right-12px">
-                    <h4>Tên phân loại</h4>
+                <div className="ml-3">
+                    <label>Tên phân loại</label>
                     <Input type="text" onChange={createFormDataEventHandler("name")} />
                 </div>
-                <div className="mar-right-12px">
-                    <h4>Giá</h4>
+                <div className="ml-3">
+                    <label>Giá</label>
                     <Input type="number" onChange={createFormDataEventHandler("price")} />
                 </div>
-                <div className="mar-right-12px">
-                    <h4>Stock</h4>
+                <div className="ml-3">
+                    <label>Stock</label>
                     <Input type="number" onChange={createFormDataEventHandler("stock")} />
                 </div>
-            </div>
-            <div className="w-full pad-12px">
-                <NormalButton onClick={onAddVariant}>Thêm</NormalButton>
+
+                <div className="ml-3 content-center pt-4">
+                    <NormalButton onClick={onAddVariant}>Thêm</NormalButton>
+                </div>
             </div>
 
             {/* variant list */}

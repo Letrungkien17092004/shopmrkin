@@ -1,18 +1,12 @@
-import "./style.css"
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Navbar } from "../../components/nav/index.tsx";
-import { AuthProvider } from "../../contexts/AuthContext.tsx";
+import { Navivation } from "../../components/nav/index.tsx";
 import { ProductImageSlider } from "../../components/products/index.tsx"
 import Loading from "../../components/Loading.tsx";
 import ProductService from "../../services/ProductService.ts";
 import { Product, Variant } from "../../entities/index.ts";
 
 const productService = new ProductService()
-const containerStyle: React.CSSProperties = {
-    maxWidth: "1000px",
-    margin: "0 auto"
-}
 
 interface VariantListProps {
     variants: Variant[],
@@ -23,24 +17,25 @@ interface VariantListProps {
 function VariantList({ variants, selectedVariant, createSelectedEvent }: VariantListProps) {
     return <>
         {variants.map(v => {
-
-            return (
-                <div onClick={createSelectedEvent(v.id)} key={v.sku} className="col l-6 mar-top-4px">
-                    {
-                        selectedVariant && selectedVariant.id === v.id
-                            ? <>
-                                <div className="w-full pad-4px border-radius-4px text-center text-sm variant-options variant-options--selected">
+            return <>
+                {
+                    selectedVariant && selectedVariant.id === v.id
+                        ? <>
+                            <div onClick={createSelectedEvent(v.id)} key={v.sku} className="cursor-pointer select-none bg-green-400 rounded shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                                <div className="w-full p-1 px-2 text-sm text-white text-center text-nowrap">
                                     {v.name}
                                 </div>
-                            </>
-                            : <>
-                                <div className="w-full pad-4px border-radius-4px text-center text-sm variant-options">
+                            </div>
+                        </>
+                        : <>
+                            <div onClick={createSelectedEvent(v.id)} key={v.sku} className="cursor-pointer select-none hover:ring hover:ring-green-500 rounded shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                                <div className="w-full p-1 px-2 text-sm text-black text-center  text-nowrap">
                                     {v.name}
                                 </div>
-                            </>
-                    }
-                </div>
-            )
+                            </div>
+                        </>
+                }
+            </>
         })}
     </>
 }
@@ -57,7 +52,7 @@ export default function CustomerProductDetail() {
             const productData = await productService.findById(productId!)
             if (productData) {
                 setProduct(productData)
-                setDefaultPrice(`${productData.minPrice} ${productData.maxPrice}`)
+                setDefaultPrice(`${productData.minPrice} - ${productData.maxPrice}`)
             }
             setIsLoading(false)
         }
@@ -77,80 +72,73 @@ export default function CustomerProductDetail() {
         }
     }, [product, selectedVariant])
     if (isLoading) {
-        return (
-            <div className="w-full h-full-vh flex flex-center">
+        return <>
+            <Navivation />
+            <div className="w-full h-100 flex justify-center items-center">
                 <Loading />
             </div>
-        )
+        </>
     }
 
     if (isLoading === false && product === undefined) {
-        return (
-            <div className="w-full h-full-vh flex flex-center">
-                <h1>Không tìm thấy sản phẩm bạn yêu cầu</h1>
+        return <>
+            <Navivation />
+            <div className="w-full h-100 flex justify-center items-center">
+                <h1 className="text-xl">Không tìm thấy sản phẩm bạn yêu cầu</h1>
             </div>
-        )
+        </>
     }
-
     if (product) {
         return (
-            <AuthProvider>
-                <div style={containerStyle}>
-                    <Navbar />
-                    <div className="w-full mar-top-12px">
-                        <div className="grid">
-                            <div className="row justify-center">
-                                {/* Slider */}
-                                <div className="col c-11 m-6 l-6">
-                                    <ProductImageSlider
-                                    images={product.media.map(med => ({ url: `${med.hostname}${med.filePath}` }))}
-                                    />
-                                </div>
-                                {/* info (name, price, variant, ...) */}
-                                <div className="col c-11 m-6 l-4">
-                                    <div className="w-full">
-                                        <p className="text-xl font-semibold">
-                                            {product.name}
-                                        </p>
 
-                                        <p className="text-xl font-semibold text-color-priceHightlight">
-                                            {selectedVariant ? `${selectedVariant.price}` : defaultPrice}
-                                        </p>
+            <div className="max-w-[1000px] mx-auto">
+                <Navivation />
+                {/* slider and variant options */}
+                <div className="w-full mt-3 sm:flex sm:justify-end">
+                    {/* Slider */}
+                    <div className="w-[70%] mx-auto sm:w-1/3 sm:mr-24">
+                        <ProductImageSlider
+                            images={product.media.map(med => ({ url: `${med.hostname}${med.filePath}` }))}
+                        />
+                    </div>
+                    {/* info (name, price, variant, ...) */}
+                    <div className="w-[70%] mx-auto sm:w-1/3">
+                        <div className="w-full">
+                            <p title={product.name} className="text-lg text-black line-clamp-4">
+                                {product.name}
+                            </p>
 
-                                        {/* variant options */}
-                                        <div className="w-full mar-top-12px">
-                                            <p className="text-base font-normal">Tùy chọn:</p>
-                                            <div className="grid">
-                                                <div className="row">
-                                                    <VariantList
-                                                    variants={product.variants}
-                                                    selectedVariant={selectedVariant}
-                                                    createSelectedEvent={createSelectedEvent}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </div>
+                            <p className="text-2xl font-semibold text-orange-500">
+                                {selectedVariant ? `${selectedVariant.price}` : defaultPrice}
+                            </p>
 
-                                        {/* actions */}
-                                        <div className="w-full mar-top-8px">
-                                            <div className="text-base font-normal add-card-btn">
-                                                Thêm vào giỏ hàng
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            {/* variant options */}
+                            <div className="w-full mt-3 flex justify-start items-center flex-wrap gap-2">
+                                <p className="text-base font-bold flex items-center">
+                                    Tùy chọn:
+                                </p>
+                                <VariantList
+                                    variants={product.variants}
+                                    selectedVariant={selectedVariant}
+                                    createSelectedEvent={createSelectedEvent}
+                                />
                             </div>
-                            <div className="dash-dark"></div>
-                            {/* description */}
-                            <div className="row no-gutters justify-center">
-                                <div className="col l-10">
-                                    <p className="text-base font-light">{product.description}</p>
+
+                            {/* actions */}
+                            <div className="w-full mt-4">
+                                <div className="inline-block rounded p-2 text-base font-normal bg-orange-500 text-white cursor-pointer hover:scale-105 transition">
+                                    Thêm vào giỏ hàng
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <div className="dash-dark"></div>
                 </div>
-            </AuthProvider>
+                {/* description */}
+                <div className="w-full">
+                    <p className="text-base font-light">{product.description}</p>
+                </div>
+            </div>
         )
     }
 }

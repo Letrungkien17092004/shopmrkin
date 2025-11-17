@@ -2,28 +2,50 @@ import React from "react"
 
 export default function ProductFilter() {
     return (<>
-        <section className="home-filter">
-            <div className="heading-1"><span>Lựa chọn lọc</span></div>
-
-            <div className="home-filter-by">
-                <div className="heading-2"><span>Lọc theo danh mục</span></div>
-                <ul className="home-filter-by__list">
-                    <li className="filter-list-items"> Điện thoại </li>
-                    <li className="filter-list-items"> Máy tính </li>
-                    <li className="filter-list-items"> Laptop </li>
-                    <li className="filter-list-items"> PC </li>
-                    <li className="filter-list-items"> Thời trang nam </li>
-                    <li className="filter-list-items"> Thời trang nữ </li>
-                </ul>
+        <section className="w-full p-4 shadow md:shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+            <div className="text-lg font-bold text-center border-b border-gray-300">
+                <span>Lựa chọn lọc</span>
             </div>
 
-            <div className="home-filter-by">
-                <div className="heading-2">Lọc theo tình trạng</div>
-                <ul className="home-filter-by__list">
-                    <li className="filter-list-items"> Đồ cũ </li>
-                    <li className="filter-list-items"> Like new </li>
-                    <li className="filter-list-items"> Mới </li>
-                </ul>
+            <div className="w-full flex md:block">
+                <div className="w-full">
+                    <div className="text-base font-bold"><span>Lọc theo danh mục</span></div>
+                    <ul className="w-full pl-2">
+                        <li className="text-base hover:text-green-500 cursor-pointer">
+                            Điện thoại
+                        </li>
+                        <li className="text-base hover:text-green-500 cursor-pointer">
+                            Máy tính
+                        </li>
+                        <li className="text-base hover:text-green-500 cursor-pointer">
+                            Laptop
+                        </li>
+                        <li className="text-base hover:text-green-500 cursor-pointer">
+                            PC
+                        </li>
+                        <li className="text-base hover:text-green-500 cursor-pointer">
+                            Thời trang nam
+                        </li>
+                        <li className="text-base hover:text-green-500 cursor-pointer">
+                            Thời trang nữ
+                        </li>
+                    </ul>
+                </div>
+
+                <div className="w-full">
+                    <div className="text-base font-bold">Lọc theo tình trạng</div>
+                    <ul className="w-full pl-2">
+                        <li className="text-base hover:text-green-500 cursor-pointer">
+                            Đồ cũ
+                        </li>
+                        <li className="text-base hover:text-green-500 cursor-pointer">
+                            Like new
+                        </li>
+                        <li className="text-base hover:text-green-500 cursor-pointer">
+                            Mới
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
     </>)

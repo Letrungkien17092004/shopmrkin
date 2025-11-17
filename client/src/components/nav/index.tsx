@@ -1,6 +1,5 @@
-import "./navbar.css"
-import Navbar from "./Navbar.tsx";
+import Navivation from "./Navigation.tsx";
 
 export {
-    Navbar
+    Navivation
 }

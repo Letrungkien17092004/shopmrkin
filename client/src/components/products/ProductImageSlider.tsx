@@ -32,50 +32,49 @@ export default function ProductImageSlider({ images }: ProductImageSliderProps) 
     }, [])
 
     return (<>
-        {/* link css */}
         <section className="w-full">
             {/* slider */}
-            <div className="w-full">
-                <div className="grid">
-                    <div className="row">
-                        <div className="col l-1">
-                            <div className="w-full h-full flex flex-center">
-                                <span onClick={goToPrevious} className="productImageSlider-button">&lt;</span>
-                            </div>
-                        </div>
-                        <div className="col l-10">
-                            <img className="productImageSlider-currentImage" src={images[currentIdx].url} alt="" />
-                        </div>
-                        <div className="col l-1">
-                            <div className="w-full h-full flex flex-center">
-                                <span onClick={goToNext} className="productImageSlider-button">&gt;</span>
-                            </div>
-                        </div>
-
+            <div className="w-full grid grid-cols-12">
+                <div className="col-span-1">
+                    <div className="w-full h-full mr-2 flex justify-center items-center select-none">
+                        <span onClick={goToPrevious} className="p-2 rounded-full hover:-translate-x-1 hover:bg-gray-200 transition cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+                                <path fillRule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+                            </svg>
+                        </span>
                     </div>
                 </div>
+                <div className="col-span-10">
+                    <img className=" max-w-[90%] mx-auto object-contain" src={images[currentIdx].url} alt={images[currentIdx].url} />
+                </div>
+                <div className="col-span-1">
+                    <div className="w-full h-full ml-2 flex justify-center items-center select-none">
+                        <span onClick={goToNext} className="p-2 rounded-full  hover:translate-x-1 hover:bg-gray-200 transition cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+                                <path fillRule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clipRule="evenodd" />
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+
             </div>
 
             {/* image items */}
-            <div className="w-full">
-                <div className="grid">
-                    <div className="row justify-center">
-                        {images.map((img, idx) => {
-                            if (idx === currentIdx) {
-                                return (
-                                    <div key={`${img.url}`} onClick={setByItem(idx)} className="col c-2 m-2 l-2">
-                                        <img className="productImageSlider-imageItem productImageSlider-imageItem--selected" src={img.url} alt="" />
-                                    </div>
-                                )
-                            }
-                            return (
-                                <div key={`${img.url}`} onClick={setByItem(idx)} className="col c-2 m-2 l-2" >
-                                    <img className="productImageSlider-imageItem" src={img.url} alt="" />
-                                </div>
-                            )
-                        })}
-                    </div>
-                </div>
+            <div className="w-full mt-4 flex gap-x-2">
+                {images.map((img, idx) => {
+                    if (idx === currentIdx) {
+                        return (
+                            <div key={`${img.url}`} onClick={setByItem(idx)} className="w-1/3 overflow-hidden rounded cursor-pointer ring-2 ring-green-500 transition">
+                                <img className="object-cover shadow-[0_4px_12px_rgba(0,0,0,0.5)]" src={img.url} alt="" />
+                            </div>
+                        )
+                    }
+                    return (
+                        <div key={`${img.url}`} onClick={setByItem(idx)} className="w-1/3 overflow-hidden rounded cursor-pointer  transition">
+                            <img className="object-cover shadow-[0_4px_12px_rgba(0,0,0,0.5)]" src={img.url} alt="" />
+                        </div>
+                    )
+                })}
             </div>
         </section >
     </>

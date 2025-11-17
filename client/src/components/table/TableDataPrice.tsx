@@ -11,14 +11,14 @@ type Props = {
 export default function TableDataPrice({ price, className }: Props) {
     if (!price.minPrice && !price.maxPrice) {
         return (<>
-            <td className={`table-data-price ${className}`}>
+            <td className={`text-center text-red-500 ${className}`}>
                 Chưa có giá
             </td>
         </>)
     }
     if (!price.minPrice && price.maxPrice) {
         return (<>
-            <td className={`table-data-price ${className}`}>
+            <td className={`text-center text-green-500 ${className}`}>
                 {price.maxPrice}
             </td>
         </>)
@@ -26,14 +26,14 @@ export default function TableDataPrice({ price, className }: Props) {
 
     if (price.minPrice && !price.maxPrice) {
         return (<>
-            <td className={`table-data-price ${className}`}>
+            <td className={`text-center text-green-500 ${className}`}>
                 {price.minPrice}
             </td>
         </>)
     }
 
     return (<>
-        <td className={`table-data-price ${className}`}>
+        <td className={`text-center text-green-500 ${className}`}>
             {price.minPrice} - {price.maxPrice}
         </td>
     </>)

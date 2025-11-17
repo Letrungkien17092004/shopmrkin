@@ -1,13 +1,12 @@
 import React from "react";
 
 type Props = {
-    children: React.ReactElement[] | React.ReactElement
+    children: React.ReactNode
     className?: string
 }
 export default function TableBody({children, className}: Props) {
-    className = className || ""
     return (<>
-        <tbody className={className}>
+        <tbody className="">
             {children}
         </tbody>
     </>)

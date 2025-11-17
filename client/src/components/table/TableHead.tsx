@@ -1,13 +1,11 @@
 import React from "react";
 
 type Props = {
-    children: React.ReactElement[] | React.ReactElement,
-    className?: string
+    children: React.ReactNode,
 }
-export default function TableHead({children, className}: Props) {
-    className = className || "" 
+export default function TableHead({children}: Props) {
     return (<>
-        <thead className={className}>
+        <thead className="bg-gray-200">
             {children}
         </thead>
     </>)

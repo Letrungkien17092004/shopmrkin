@@ -8,7 +8,7 @@ type Props = {
 export default function TableDataImage({ imageURL, alt, className }: Props) {
     className = className || ""
     return (<>
-        <td className={`table-data-image ${className}`}>
+        <td className={`size-24 ${className}`}>
             <img src={`${imageURL}`} alt={`${alt || imageURL}`} />
         </td>
     </>)

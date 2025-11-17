@@ -16,50 +16,44 @@ export default function Manager() {
         }
     }, [])
 
-    const tabs = listNameTab.map(tabName=> (
-        <div key={tabName} className={selectedTab==tabName ? "cursor-pointer selected-style-1 w-full pad-8px" : "cursor-pointer hover-style w-full pad-8px"}>
-            <Link onClick={changeTab(tabName)} to={tabName.toLowerCase()} className="disable-link text-base font-normal">
+    const tabs = listNameTab.map(tabName => (
+        <li key={tabName} className={selectedTab == tabName ? "cursor-pointer w-full p-1 text-green-400" : "cursor-pointer w-full p-1"}>
+            <Link onClick={changeTab(tabName)} to={tabName.toLowerCase()} className="block size-full text-base font-semibold">
                 {tabName}
             </Link>
-        </div>
+        </li>
     ))
     return (<>
-        <main className="w-full">
-            <div className="grid">
-                <div className="row no-gutters">
-                    <div className="col l-2">
-                        <div className="w-full h-full-vh pad-vertical-12px pad-top-24px box-shadow-1">
-                            {/* User info */}
-                            <div className="w-full">
-                                <div className="flex flex-col flex-center">
-                                    <img className="avatar-40px" src={`${authService.getProfile().picture}`} />
-                                </div>
-                                <div className="text-ac text-sm mar-top-8px font-bold">
-                                    {
-                                        authService.getProfile().username
-                                    }
-                                </div>
-                            </div>
-                            <div className="dash-dark"></div>
-
-                            {/* Tabs */}
-                            <div className="flex flex-col">
-                                {tabs}
-                            </div>
-                            <div className="dash-dark"></div>
-
-                            {/* logout */}
-                            <div className="w-full">
-                                <button className="button-red text-xs font-normal text-ac">
-                                    Đăng xuất
-                                </button>
-                            </div>
+        <main className="w-full grid grid-cols-12 p-6">
+            <div className="col-span-2">
+                <div className="w-full h-[90vh] rounded shadow-2xl p-2">
+                    {/* User info */}
+                    <div className="w-full">
+                        <div className="size-10 mx-auto rounded-full overflow-hidden shadow-2xl">
+                            <img className="size-full " src={`${authService.getProfile()?.picture}`} />
                         </div>
+                        <p className="text-base font-semibold mt-2 text-center">
+                            {
+                                authService.getProfile()?.username
+                            }
+                        </p>
                     </div>
-                    <div className="col l-10">
-                        <Outlet />
+                    <div className="border border-orange-400"></div>
+
+                    {/* Tabs */}
+                    <ul className="w-full">
+                        {tabs}
+                    </ul>
+                    {/* logout */}
+                    <div className="w-full">
+                        <button className="underline pl-1 pr-2 cursor-pointer py-1 text-xs font-normal text-red-500">
+                            Đăng xuất
+                        </button>
                     </div>
                 </div>
+            </div>
+            <div className="col-span-10">
+                <Outlet />
             </div>
         </main>
     </>)

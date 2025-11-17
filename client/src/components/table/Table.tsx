@@ -2,13 +2,11 @@ import React from "react";
 
 type Props = {
     children: React.ReactNode,
-    className?: string
 }
-export default function Table({children, className}: Props) {
-    className = className || ""
+export default function Table({ children }: Props) {
     return (<>
-    <table className={`table text-sm font-normal ${className}`}>
-        {children}
-    </table>
+        <table className="border-separate border-spacing-0 rounded-lg overflow-hidden text-sm font-normal w-full">
+            {children}
+        </table>
     </>)
 }

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ProductService from "../../../services/ProductService.ts";
-import type { Product } from "../../../services/ProductService.ts";
+import { Product } from "../../../entities/Product.ts";
 import { NormalButton } from "../../../components/buttons/Button.tsx";
 import Loading from "../../../components/Loading.tsx";
 import Notification from "../../../components/notifications/Notification.tsx";
@@ -17,7 +17,7 @@ export default function ProductManager() {
     // initial data
     useEffect(() => {
         const fetch = async () => {
-            setProducts(await productService.getAll())
+            setProducts(await productService.getAll({}))
         }
 
         fetch()
@@ -29,7 +29,7 @@ export default function ProductManager() {
         const deleteData = async () => {
             try {
                 await productService.deleteById(toDelete)
-                setProducts(await productService.getAll())
+                setProducts(await productService.getAll({}))
                 pushNotification({
                     message: "Xóa thành công",
                     type: "bottom-right"
@@ -68,34 +68,33 @@ export default function ProductManager() {
                 onClose={removeNotification(notice.id)}
             />
         ))}
-        <div className="pad-24px h-full-vh">
-            <div className="h-5pt">
-                <span className="text-3xl font-normal">
+        <div className="w-full">
+            <div className="p-2">
+                <span className="text-xl font-normal">
                     Danh sách sản phẩm
                 </span>
             </div>
-            <div className="h-5pt flex justify-end">
+            <div className="flex justify-end mb-4">
                 <NormalButton>
-                    <Link className="disable-link" to="new">Thêm mới</Link>
+                    <Link className="text-base" to="new">Thêm mới</Link>
                 </NormalButton>
             </div>
-            <div className="dash-dark"></div>
             {
                 isDeleting
                     ? (
                         <Loading />
                     )
                     : (
-                        <div className="h-90pt product-table-wrapper overflow-scroll-y">
+                        <div className="w-full p-2">
                             <ProductTable
-                            listProduct={products.map(p => ({
-                                ...p,
-                                imageURL: `${p.media[0]?.hostname}${p.media[0]?.filePath}`,
-                                minPrice: p.minPrice,
-                                maxPrice: p.maxPrice,
-                                stock: p.stock
-                            }))}
-                            createDeleteEventHandler={createDeleteEventHandler}
+                                listProduct={products.map(p => ({
+                                    ...p,
+                                    imageURL: `${p.media[0]?.hostname}${p.media[0]?.filePath}`,
+                                    minPrice: p.minPrice,
+                                    maxPrice: p.maxPrice,
+                                    stock: p.stock
+                                }))}
+                                createDeleteEventHandler={createDeleteEventHandler}
                             />
                         </div>
                     )

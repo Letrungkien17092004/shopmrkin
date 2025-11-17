@@ -5,7 +5,7 @@ type Props = {
 }
 export default function TableHeading({text}: Props) {
     return (<>
-        <th>
+        <th className="p-3">
             {text}
         </th>
     </>)

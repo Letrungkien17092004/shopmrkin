@@ -103,7 +103,6 @@ export default function ProductModifyForm({ id }: { id: string }) {
 
     if (loaded && prod) {
         return (<>
-            <link rel="stylesheet" href="/public/css/product-form.css" />
             <section className="w-full">
                 <div className="product-form-field w-full">
                     <h3>Thêm ảnh</h3>

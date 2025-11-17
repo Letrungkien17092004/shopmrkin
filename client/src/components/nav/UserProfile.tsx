@@ -15,22 +15,21 @@ export default function UserProfile({ profile }: { profile: Profile }) {
         setIsShowMenu(!isShowMenu)
     }, [isShowMenu])
     return <>
-        <div onClick={toggleMenu} className="navbar__actions__user">
-            <img style={{ width: "30px" }} className="image-avatar" src={`${profile?.picture}`} alt="cart-image" />
+        <div onClick={toggleMenu} className="relative z-9999">
+            <img className="size-7 cursor-pointer rounded-full shadow-2xl" src={`${profile?.picture}`} alt="cart-image" />
             {
                 isShowMenu ? <>
-                    <div className="navbar__actions__user__menu box-shadow-1">
-                        <p className="w-full text-base font-semiBold">
+                    <ul className="absolute w-36 top-[120%] right-0 rounded bg-white shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+                        <li  className="text-base text-center cursor-pointer hover:text-green-500">
                             {profile.username}
-                        </p>
-                        <div className="dash-dark"></div>
-                        <p className="w-full text-base font-semiBold">
+                        </li>
+                        <li  className="text-base text-center cursor-pointer hover:text-green-500">
                             Tài khoản
-                        </p>
-                        <p className="w-full text-base font-semiBold">
+                        </li>
+                        <li  className="text-base text-center cursor-pointer hover:text-green-500">
                             Đăng xuất
-                        </p>
-                    </div>
+                        </li>
+                    </ul>
                 </>
                     : null
             }

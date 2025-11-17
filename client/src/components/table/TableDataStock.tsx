@@ -7,8 +7,10 @@ type Props = {
 }
 export default function TableDataStock({ stock, className }: Props) {
     return (<>
-        <td className={`table-data-stock ${className}`}>
-            {stock}
+        <td className={`text-center ${className}`}>
+            {
+                stock>=10?<span className="text-green-400">{stock}</span>:<span className="text-red-400">{stock}</span>
+            }
         </td>
     </>)
 }

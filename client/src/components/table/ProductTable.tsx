@@ -17,9 +17,9 @@ type Props = {
         id: string,
         product_code: number,
         name: string,
-        imageURL: string
-        minPrice?: number,
-        maxPrice?: number
+        imageURL: string,
+        minPrice?: number | null,
+        maxPrice?: number | null,
         stock: number
     }[],
     createDeleteEventHandler: (id: string) => (e: React.MouseEvent) => void
@@ -39,21 +39,15 @@ export default function ProductTable({ listProduct, createDeleteEventHandler }: 
             </TableHead>
             <TableBody>
                 {listProduct.map(p => (
-                    <TableRow key={p.id}>
-                        <TableData data={p.product_code} className="table-data-code" />
+                    <TableRow key={p.id} className="odd:bg-white even:bg-gray-100">
+                        <TableData data={p.product_code}/>
                         <TableData data={p.name} />
                         <TableDataImage imageURL={p.imageURL} />
-                        <TableDataPrice price={{minPrice: p.minPrice, maxPrice: p.maxPrice}} />
+                        <TableDataPrice price={{ minPrice: p.minPrice || undefined, maxPrice: p.maxPrice || undefined}} />
                         <TableDataStock stock={p.stock} />
                         <TableDataActions>
                             <NormalButton>
                                 <Link
-                                    style={
-                                        {
-                                            fontSize: 'inherit',
-                                            textDecoration: "none",
-                                            color: "inherit"
-                                        }}
                                     to={p.id}
                                 >
                                     Chi tiết

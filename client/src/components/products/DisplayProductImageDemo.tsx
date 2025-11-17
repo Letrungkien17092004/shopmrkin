@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-// import './ImageSlider.css'; // Import file CSS
 
 // Định nghĩa kiểu cho dữ liệu ảnh
 interface Image {

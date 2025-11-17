@@ -1,9 +1,11 @@
 import React from "react";
 import Router from "./Router.tsx";
-import "./assets/css/grid.css"
-import "./assets/css/main.css"
+import { AuthProvider } from "./contexts/AuthContext.tsx";
+
 export default function MyApp() {
 	return (<>
-		<Router />
+		<AuthProvider>
+			<Router />
+		</AuthProvider>
 	</>)
 }

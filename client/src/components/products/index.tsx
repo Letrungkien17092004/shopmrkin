@@ -1,4 +1,3 @@
-import "./product.css"
 import ProductCard from "./ProductCard.tsx";
 import ProductCardList from "./ProductCardList.tsx";
 import ProductFilter from "./ProductFilter.tsx";

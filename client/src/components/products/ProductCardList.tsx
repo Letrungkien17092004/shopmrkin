@@ -24,10 +24,10 @@ export default function ProductCardList() {
         fetchData()
     }, [])
     return (<>
-        <section className="home-product-list">
+        <section className="w-full mt-4 px-4 pb-12">
             {/* header */}
-            <section className="home-product-list__header">
-                <div className="home-product-list__header__result-count">
+            <section className="flex justify-between">
+                <div className="flex justify-center items-center text-sm text-gray-500">
                     <span>Tìm thấy {products.length} kết quả</span>
                 </div>
                 <ProductSortingOptions />
@@ -35,24 +35,21 @@ export default function ProductCardList() {
 
             <ProductFilteringInfo />
 
-            <section className="home-product-list__items">
-                <div className="grid">
-                    <div className="row">
-
-                        {products.map(p => (
-                            <div key={p.id} className="col c-6 m-6 l-3">
-                                <Link className="text-base disable-link" to={`/product-detail/${p.id}`}>
-                                    <ProductCard
-                                        imgURL={`${p.thumbnailURL}`}
-                                        discount={0}
-                                        starPoint={5}
-                                        name={p.name}
-                                        price={p.maxPrice || 0}
-                                    />
-                                </Link>
-                            </div>
-                        ))}
-                    </div>
+            <section className="mt-2 w-full">
+                <div className="grid grid-cols-12 gap-y-4 gap-x-3">
+                    {products.map(p => (
+                        <div key={p.id} className="col-span-6 sm:col-span-4 lg:col-span-3">
+                            <Link className="text-base no-underline" to={`/product-detail/${p.id}`}>
+                                <ProductCard
+                                    imgURL={`${p.thumbnailURL}`}
+                                    discount={0}
+                                    starPoint={5}
+                                    name={p.name}
+                                    price={p.maxPrice || 0}
+                                />
+                            </Link>
+                        </div>
+                    ))}
                 </div>
             </section>
         </section>

@@ -79,22 +79,22 @@ function CreateProductWrapper() {
         </>)
     }
     return (<>
-        <div className="pad-12px h-full-vh  overflow-scroll-y">
-            <h1>Thêm sản phẩm</h1>
+        <div className="p-3">
+            <h1 className="text-xl text-gray-500 py-2">Thêm sản phẩm</h1>
 
-            <div className="dash-dark"></div>
-            <h3>Thêm ảnh</h3>
+            <div className="border border-green-400"></div>
+            <h3 className="text-xl text-gray-500 py-1">Thêm ảnh</h3>
             <CreateImageForm />
 
-            <div className="dash-dark"></div>
-            <h3>Thông tin sản phẩm</h3>
+            <div className="border border-green-400"></div>
+            <h3 className="text-xl text-gray-500 py-1">Thông tin sản phẩm</h3>
             <CreateProductForm />
 
-            <div className="dash-dark"></div>
-            <h3>Thêm biến thể</h3>
+            <div className="border border-green-400"></div>
+            <h3 className="text-xl text-gray-500 py-1">Thêm biến thể</h3>
             <CreateVariantForm />
 
-            <div className="dash-dark"></div>
+            <div className="border border-green-400"></div>
             <div className="w-full flex flex-center justify-start">
                 <NormalButton className="text-xl" onClick={onClickSave}>Lưu</NormalButton>
             </div>

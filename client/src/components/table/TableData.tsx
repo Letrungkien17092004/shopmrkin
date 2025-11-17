@@ -8,7 +8,7 @@ type Props = {
 }
 export default function TableData({ data, className }: Props) {
     return (<>
-        <td className={className}>
+        <td className={`p-3 ${className} text-center`}>
             {data}
         </td>
     </>)
