@@ -102,27 +102,15 @@ export default class UserRepository implements IUsersRepository {
                 },
                 relationLoadStrategy: 'join',
                 include: {
-                    role: {
-                        include: {
-                            permissions: {
-                                include: {
-                                    permission: true
-                                }
-                            }
-                        }
-                    }
+                    role: true
                 }
             })
             if (searchedUser) {
-                const permission: Permission[] = searchedUser.role.permissions.map(per => new Permission({
-                    id: per.permission.id,
-                    perName: per.permission.perName
-                }))
                 const role: Role = new Role({
                     id: searchedUser.role.id,
                     roleName: searchedUser.role.roleName,
                     description: searchedUser.role.description,
-                    permissions: permission
+                    permissions: []
                 })
                 return new User({
                     id: searchedUser.id,

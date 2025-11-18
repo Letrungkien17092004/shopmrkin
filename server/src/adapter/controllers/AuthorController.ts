@@ -333,7 +333,7 @@ export default class AuthorController {
                     username: userInDB.username,
                     email: userInDB.email,
                     role: userInDB.role!.roleName,
-                    permissions: (userInDB.role?.permissions?.map(p => p.perName)) || []
+                    permissions: [] // TODO
                 }
                 const refeshToken = jwt.sign(
                     payload,
@@ -356,7 +356,8 @@ export default class AuthorController {
                         account: payload.account,
                         username: payload.username,
                         email: payload.email,
-                        picture: profile.picture
+                        picture: profile.picture,
+                        role: userInDB.role?.roleName
                     },
                     refeshToken: refeshToken,
                     accessToken: accessToken,
