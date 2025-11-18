@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+
 import AuthService from "../services/AuthService.ts";
 const authService = new AuthService()
 
@@ -8,7 +9,8 @@ interface Profile {
     email: string,
     account: string,
     username: string,
-    picture: string
+    picture: string,
+    role: string
 }
 
 interface AuthContextType {

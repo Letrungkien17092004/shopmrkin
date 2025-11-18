@@ -7,7 +7,8 @@ type UserProfile = {
     account: string,
     username: string,
     picture: string,
-    cartId: string
+    cartId: string,
+    role: string
 }
 enum AuthLocalStoreFieldNames {
     profile = "profile",
