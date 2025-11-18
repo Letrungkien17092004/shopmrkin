@@ -9,7 +9,7 @@ export default function AuthGoogleCallback() {
     const [state, setState] = useState<"pending" | "done" | "error">("pending")
     const fragment = window.location.hash.substring(1)
     const params = new URLSearchParams(fragment)
-    
+
     useEffect(() => {
         const state = params.get("state")
         const access_token = params.get("access_token")
@@ -26,13 +26,13 @@ export default function AuthGoogleCallback() {
     }, [])
     if (state === "pending") {
         return (<>
-            <main className="w-full h-full-vh flex flex-center">
+            <main className="w-screen h-screen">
                 <Loading />
             </main>
         </>)
     } else if (state === "error") {
         return (<>
-            <main className="w-full h-full-vh  flex flex-col flex-center">
+            <main className="w-screen h-screen flex justify-center items-center">
                 <h1>Đăng nhập thất bại! Vui lòng thử lai sau</h1>
                 <Link to="/">Về trang chủ</Link>
             </main>
@@ -40,9 +40,11 @@ export default function AuthGoogleCallback() {
     }
 
     return (<>
-        <main className="w-full h-full-vh  flex flex-col flex-center">
-            <h1>Đăng nhập thành công!</h1>
-            <Link to="/">Xong</Link>
+        <main className="w-screen h-screen flex justify-center items-center">
+            <div className="text-center">
+                <h1 className="text-2xl text-black font-bold">Đăng nhập thành công!</h1>
+                <Link to="/" className="underline text-lg text-green-500">Về trang chủ</Link>
+            </div>
         </main>
     </>)
 }

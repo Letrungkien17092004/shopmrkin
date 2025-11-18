@@ -44,12 +44,9 @@ export default function Navivation() {
                                 </>
                                 :
                                 <>
-                                    <div className="navbar__actions__items">
-                                        <Link className="disable-link text-base font-semibold text-hover-highlight" to="/login">Đăng nhập</Link>
-                                    </div>
-
-                                    <div className="navbar__actions__items">
-                                        <Link className="disable-link text-base font-semibold text-hover-highlight" to="/register">Đăng ký</Link>
+                                    <div className="flex items-center gap-x-1">
+                                        <Link className="text-black hover:text-green-500" to="/login">Đăng nhập</Link>
+                                        <Link className="text-black hover:text-green-500" to="/sign-in">Đăng ký</Link>
                                     </div>
                                 </>
                         }

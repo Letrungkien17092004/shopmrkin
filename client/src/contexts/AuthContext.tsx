@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import AuthService from "../services/AuthService.ts";
 const authService = new AuthService()
 
@@ -13,6 +13,7 @@ interface Profile {
 
 interface AuthContextType {
     profile?: Profile,
+    logout: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -20,13 +21,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [profile, setProfile] = useState<Profile | undefined>(undefined)
 
+    const logout = useCallback(() => {
+        authService.logout()
+        setProfile(undefined)
+    }, [])
+
     useEffect(() => {
             const profile_ = authService.getProfile()
             setProfile(profile_)
     }, [])
 
     return (
-        <AuthContext.Provider value={{ profile: profile}}>
+        <AuthContext.Provider value={{ profile: profile, logout: logout}}>
             {children}
         </AuthContext.Provider>
     )

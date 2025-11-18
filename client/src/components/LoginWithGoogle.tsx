@@ -5,20 +5,26 @@ const authService = new AuthService()
 
 
 export default function LoginWithGoogle() {
-    const [state, setState] = useState<"pending" | "processing">("pending")
+    const [state, setState] = useState<"idle" | "pending">("idle")
 
     const onClick = useCallback((e: React.MouseEvent) => {
         e.stopPropagation()
-        if (state === "processing") { return }
-        setState("processing")
+        if (state === "pending") { return } // if pending then skip
+        setState("pending")
     }, [state])
 
     // redirect to Google Oauth
     useEffect(() => {
-        if (state !== "processing") { return }
+        if (state === "idle") { return }  // if idle then skip
         const fetchData = async () => {
-            const googleOauthUrl = await authService.getGoogleOauth2Url()
-            window.location.href = googleOauthUrl
+            try {
+                const googleOauthUrl = await authService.getGoogleOauth2Url()
+                window.location.href = googleOauthUrl
+            } catch (error) {
+                window.alert("Có lỗi xảy ra vui lòng thử lại sau!")
+            } finally {
+                setState("idle")
+            }
         }
         fetchData()
     }, [state])

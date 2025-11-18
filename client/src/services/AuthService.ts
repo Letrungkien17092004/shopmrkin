@@ -9,7 +9,13 @@ type UserProfile = {
     picture: string,
     cartId: string
 }
-
+enum AuthLocalStoreFieldNames {
+    profile = "profile",
+    refeshToken = "refesh_token",
+    refeshTokenCreatedAt = "refesh_token_createdAt",
+    accessToken = "access_token",
+    accessTokenCreatedAt = "access_token_createdAt",
+}
 export default class AuthService {
 
     /**
@@ -25,7 +31,7 @@ export default class AuthService {
      * @returns 
      */
     getProfile(): UserProfile | undefined {
-        const profile: UserProfile | null = JSON.parse(localStorage.getItem("profile") || "null")
+        const profile: UserProfile | null = JSON.parse(localStorage.getItem(AuthLocalStoreFieldNames.profile) || "null")
         return profile ?? undefined
     }
 
@@ -34,8 +40,8 @@ export default class AuthService {
      * @param refeshToken 
      */
     storeRefeshToken(refeshToken: string): void {
-        localStorage.setItem("refesh_token", refeshToken)
-        localStorage.setItem("refesh_token_createdAt", new Date(Date.now()).toString())
+        localStorage.setItem(AuthLocalStoreFieldNames.refeshToken, refeshToken)
+        localStorage.setItem(AuthLocalStoreFieldNames.refeshTokenCreatedAt, new Date(Date.now()).toString())
     }
 
     /**
@@ -43,7 +49,7 @@ export default class AuthService {
      * @returns {string}
      */
     getRefeshToken(): string {
-        const token = localStorage.getItem("refesh_token") || ""
+        const token = localStorage.getItem(AuthLocalStoreFieldNames.refeshToken) || ""
         return token
     }
 
@@ -52,8 +58,8 @@ export default class AuthService {
      * @param accessToken 
      */
     storeAccessToken(accessToken: string): void {
-        localStorage.setItem("access_token", accessToken)
-        localStorage.setItem("access_token_createdAt", new Date(Date.now()).toString())
+        localStorage.setItem(AuthLocalStoreFieldNames.accessToken, accessToken)
+        localStorage.setItem(AuthLocalStoreFieldNames.accessTokenCreatedAt, new Date(Date.now()).toString())
     }
 
     /**
@@ -61,7 +67,7 @@ export default class AuthService {
      * @returns {string}
      */
     getAccessToken(): string {
-        const token = localStorage.getItem("access_token") || ""
+        const token = localStorage.getItem(AuthLocalStoreFieldNames.accessToken) || ""
         return token
     }
 
@@ -71,7 +77,7 @@ export default class AuthService {
      */
     accessIsExpired(): boolean {
         const currentTime = new Date(Date.now())
-        const createdAtString = localStorage.getItem("access_token_createdAt") || ""
+        const createdAtString = localStorage.getItem(AuthLocalStoreFieldNames.accessTokenCreatedAt) || ""
         const tokenCreatedAtTime = new Date(createdAtString)
         // if createdAtString is invalid, tokenCreatedAtTime will be null
         if (!tokenCreatedAtTime) { throw new Error("access_token is null") }
@@ -85,7 +91,7 @@ export default class AuthService {
      */
     refeshIsExpired(): boolean {
         const currentTime = new Date(Date.now())
-        const createdAtString = localStorage.getItem("refesh_token_createdAt") || ""
+        const createdAtString = localStorage.getItem(AuthLocalStoreFieldNames.refeshTokenCreatedAt) || ""
         const tokenCreatedAtTime = new Date(createdAtString)
         // if createdAtString is invalid, tokenCreatedAtTime will be null
         if (!tokenCreatedAtTime) { throw new Error("refesh_token is null") }
@@ -149,7 +155,7 @@ export default class AuthService {
      */
     async veriyAccessToken(): Promise<boolean> {
         try {
-            const token = localStorage.getItem("accessToken");
+            const token = this.getAccessToken()
             const response = await axios.get("http://localhost:8000/api/auth/verify-access-token", {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -186,11 +192,14 @@ export default class AuthService {
                 }
             )
             this.storeAccessToken(response.data.accessToken)
-            console.log(response)
             return true
         } catch (error) {
             console.log(error)
             return false
         }
+    }
+
+    logout(): void {
+        localStorage.clear()
     }
 }

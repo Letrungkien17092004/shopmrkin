@@ -2,21 +2,29 @@ import React from "react";
 import { Link } from "react-router-dom";
 import LoginWithGoogle from "../../components/LoginWithGoogle.tsx";
 
-export default function Login() {
+export default function Register() {
     return (
         <main className="min-h-screen flex items-center justify-center py-6 bg-gray-50">
             <section className="w-full max-w-md bg-white rounded-lg shadow p-8">
                 <h1 className="text-center text-2xl font-semibold mb-6">
-                    Đăng nhập
+                    Đăng ký tài khoản
                 </h1>
 
                 <form className="flex flex-col gap-4">
                     {/* error message */}
                     <div className="text-red-500 text-sm pl-2">
-                        ** <span>Tài khoản không hợp lệ</span>
+                        <span>**Tài khoản đã tồn tại</span>
                     </div>
 
                     {/* inputs */}
+                    <input
+                        autoComplete="on"
+                        name="username"
+                        type="text"
+                        placeholder="Tên người dùng"
+                        className="w-full h-12 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+
                     <input
                         autoComplete="on"
                         name="email"
@@ -33,7 +41,7 @@ export default function Login() {
                         className="w-full h-12 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
-                    {/* terms */}
+                    {/* terms & policy */}
                     <label className="flex items-center text-sm mt-2 cursor-pointer">
                         <input
                             type="checkbox"
@@ -50,10 +58,10 @@ export default function Login() {
                         </a>
                     </label>
 
-                    {/* link register */}
+                    {/* link to login */}
                     <div className="text-sm mt-1">
-                        Chưa có tài khoản? <b>đăng ký</b>&nbsp;
-                        <Link to="/register" className="text-blue-600 underline">
+                        Đã có tài khoản? <b>đăng nhập</b>&nbsp;
+                        <Link to="/login" className="text-blue-600 underline">
                             tại đây
                         </Link>
                     </div>
@@ -64,7 +72,7 @@ export default function Login() {
                         onClick={(e) => e.preventDefault()}
                         className="mt-4 h-12 w-full bg-blue-600 text-white rounded-md text-lg font-medium hover:bg-blue-700 transition"
                     >
-                        Đăng nhập
+                        Đăng ký
                     </button>
                 </form>
 
