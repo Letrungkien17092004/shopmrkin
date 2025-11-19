@@ -28,6 +28,16 @@ interface JWTPayload {
 
 }
 
+interface InternalProfile {
+    id: string,
+    account: string,
+    username: string,
+    email: string,
+    picture: string,
+    role: string,
+    cartId: string
+}
+
 
 export default class AuthorController {
 
@@ -49,7 +59,7 @@ export default class AuthorController {
      */
     register = async (req: Request, res: Response): Promise<void> => {
         try {
-            
+
             const BodySchema = z.object({
                 username: z.string().min(5).max(50),
                 account: z.email().max(50),
@@ -59,10 +69,12 @@ export default class AuthorController {
 
             const bodyParsed = BodySchema.parse(req.body)
             const createdUser = await this.userUsecase.create({
-                username: bodyParsed.username,
-                account: bodyParsed.account,
-                password_hash: bodyParsed.password,
-                email: bodyParsed.email
+                data: {
+                    username: bodyParsed.username,
+                    account: bodyParsed.account,
+                    password: bodyParsed.password,
+                    email: bodyParsed.email
+                }
             })
 
             const createdCart = await this.cartUsecase.create({
@@ -118,22 +130,32 @@ export default class AuthorController {
             })
 
             const bodyParsed = BodySchema.parse(req.body)
-            
-            const user = await this.userUsecase.login(bodyParsed)
 
-            if (!user) {
+            const foundUser = await this.userUsecase.login(bodyParsed)
+
+            if (!foundUser) {
                 res.status(404).json({
                     messsage: "wrong account or password"
                 })
                 return
             }
             const payload: JWTPayload = {
-                id: user.id,
-                account: user.account,
-                username: user.username,
-                email: user.email,
-                role: user.role!.roleName,
-                permissions: user.role!.permissions!.map(per => per.perName)
+                id: foundUser.id,
+                account: foundUser.account,
+                username: foundUser.username,
+                email: foundUser.email,
+                role: foundUser.role!.roleName,
+                permissions: foundUser.role!.permissions!.map(per => per.perName)
+            }
+
+            const profile: InternalProfile = {
+                id: foundUser.id,
+                username: foundUser.username,
+                account: foundUser.account,
+                email: foundUser.email,
+                picture: "",
+                role: foundUser.role?.roleName || "undefined",
+                cartId: foundUser.cart!.id
             }
             const refeshToken = jwt.sign(
                 payload,
@@ -150,9 +172,9 @@ export default class AuthorController {
                 }
             )
             res.status(200).json({
+                profile: profile,
                 refeshToken: refeshToken,
                 accessToken: accessToken,
-                cart: user.cart?.id
             })
             return
         } catch (error) {
@@ -318,22 +340,71 @@ export default class AuthorController {
 
             try {
                 // get profile from google
-                const userRes = await axios.get<GoogleUserProfile>(
+                const googleUser = await axios.get<GoogleUserProfile>(
                     `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`
                 )
-                const profile = userRes.data
-                const userInDB = await this.userUsecase.getOrCreate({
-                    username: profile.name,
-                    account: profile.email,
-                    email: profile.email,
+                const googleProfile = googleUser.data
+                const foundUser = await this.userUsecase.findByEmail({
+                    where: {
+                        email: googleProfile.email
+                    }
                 })
-                const payload: JWTPayload = {
-                    id: userInDB.id,
-                    account: userInDB.account,
-                    username: userInDB.username,
-                    email: userInDB.email,
-                    role: userInDB.role!.roleName,
-                    permissions: [] // TODO
+
+                var payload: JWTPayload | null = null
+                var profile: InternalProfile | null = null
+                // if user wasn't found
+                if (!foundUser) {
+                    const createdUser = await this.userUsecase.create({
+                        data: {
+                            username: googleProfile.name,
+                            account: googleProfile.email,
+                            password: new Date().toString(),
+                            email: googleProfile.email
+                        }
+                    })
+                    const createdCart = await this.cartUsecase.create({
+                        data: {
+                            userId: createdUser.id
+                        }
+                    })
+
+                    payload = {
+                        id: createdUser.id,
+                        username: createdUser.username,
+                        account: createdUser.account,
+                        email: createdUser.email,
+                        role: createdUser.role?.roleName || "undefined",
+                        permissions: []
+                    }
+
+                    profile = {
+                        id: createdUser.id,
+                        username: createdUser.username,
+                        account: createdUser.account,
+                        email: createdUser.email,
+                        picture: googleProfile.picture,
+                        role: createdUser.role?.roleName || "undefined",
+                        cartId: createdCart.id
+                    }
+                } else { // user was found
+                    payload = {
+                        id: foundUser.id,
+                        username: foundUser.username,
+                        account: foundUser.account,
+                        email: foundUser.email,
+                        role: foundUser.role?.roleName || "undefined",
+                        permissions: []
+                    }
+
+                    profile = {
+                        id: foundUser.id,
+                        username: foundUser.username,
+                        account: foundUser.account,
+                        email: foundUser.email,
+                        picture: googleProfile.picture,
+                        role: foundUser.role!.roleName || "undefined",
+                        cartId: foundUser.cart!.id
+                    }
                 }
                 const refeshToken = jwt.sign(
                     payload,
@@ -351,24 +422,15 @@ export default class AuthorController {
                 )
 
                 res.status(200).json({
-                    profile: {
-                        id: payload.id,
-                        account: payload.account,
-                        username: payload.username,
-                        email: payload.email,
-                        picture: profile.picture,
-                        role: userInDB.role?.roleName
-                    },
+                    profile: profile,
                     refeshToken: refeshToken,
                     accessToken: accessToken,
                 })
-                return
             } catch (error) {
-                console.log(error)
+                console.log("error in AuthorController", error)
                 res.status(500).json({
                     message: "Something went wrong"
                 })
-                return
             }
         } catch (error) {
             console.log(error)
@@ -377,5 +439,6 @@ export default class AuthorController {
             })
         }
     }
-
 }
+
+

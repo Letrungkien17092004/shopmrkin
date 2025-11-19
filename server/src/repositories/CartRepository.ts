@@ -111,6 +111,29 @@ export default class CartRepository implements ICartRepository {
     }
 
     /**
+     * Finds a single Cart by the unique ID of the owning user.
+     * @param options 
+     */
+    async findOneByUserId(options: {
+        where: { userId: string },
+        include?: IncludeOption
+    }): Promise<Cart | null> {
+        try {
+            const found = await prisma.carts.findUnique({
+                where: options.where
+            })
+
+            if (!found) { return null }
+            return new Cart({
+                id: found.id,
+                userId: found.userId
+            })
+        } catch (error) {
+            throw baseExceptionHandler(error)
+        }
+    }
+
+    /**
      * Adds a new item (CartItem) to the Cart or updates the quantity if the item already exists.  
      * NOTE: this is upsert query
      * @param options The options for adding the item.

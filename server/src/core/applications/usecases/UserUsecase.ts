@@ -12,15 +12,26 @@ export default class UserUsecase implements IUserUsecase {
         this.repository = repo;
     }
 
-    async create(options: Omit<User, "id" | "roleId">): Promise<User> {
+    async create(options: {
+        data: {
+            username: string,
+            account: string,
+            password: string,
+            email: string
+        }
+    }): Promise<User> {
         try {
             // hash password
-            const password_hashed = await bcrypt.hash(options.password_hash, 10)
-            
-            // asign hashed password
-            options.password_hash = password_hashed
+            const password_hashed = await bcrypt.hash(options.data.password, 10)
 
-            const newUser = await this.repository.create(options)
+            const newUser = await this.repository.create({
+                data: {
+                    username: options.data.username,
+                    account: options.data.account,
+                    password_hashed: password_hashed,
+                    email: password_hashed,
+                }
+            })
             return newUser
         } catch (error) {
             if (error instanceof REPO_ERROR) {
@@ -73,14 +84,23 @@ export default class UserUsecase implements IUserUsecase {
         }
     }
 
-    async getOrCreate(options: { account: string, email: string, username: string }): Promise<User> {
+    async findByEmail(options: {
+        where: {
+            email: string
+        }
+    }): Promise<User | null> {
         try {
-            const searchedUser = await this.repository.getOrCreate(options)
+            const searchedUser = await this.repository.findByEmail(options)
             return searchedUser
         } catch (error) {
             if (error instanceof REPO_ERROR) {
                 switch (error.code) {
                     case REPO_ERROR_CODE.DATABASE_NOT_EXIST:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.INITIAL
+                        })
+                    case REPO_ERROR_CODE.INITIAL:
                         throw new USECASE_ERROR({
                             message: error.message,
                             code: USECASE_ERROR_CODE.INITIAL
@@ -148,10 +168,12 @@ export default class UserUsecase implements IUserUsecase {
 
     }
 
-    async login({account, password}: { account: string; password: string; }): Promise<User | null> {
+    async login({ account, password }: { account: string; password: string; }): Promise<User | null> {
         try {
             const searchedUser = await this.repository.findWithAccount({
-                account: account
+                where: {
+                    account: account
+                }
             })
             if (!searchedUser) return null
             let isMatch = await bcrypt.compare(password, searchedUser.password_hash)

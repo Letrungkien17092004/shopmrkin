@@ -27,6 +27,15 @@ export default interface ICartUsecase {
     }): Promise<Cart | null>
 
     /**
+    * Finds a single Cart by the unique ID of the owning user.
+    * @param options 
+    */
+    findOneByUserId(options: {
+        where: { userId: string },
+        include?: IncludeOption
+    }): Promise<Cart | null>
+
+    /**
      * Adds a new item (CartItem) to the Cart or updates the quantity if the item already exists.
      * @param options The options for adding the item.
      * @param options.cartId The ID of the Cart to add the item to.

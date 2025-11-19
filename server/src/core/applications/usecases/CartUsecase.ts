@@ -46,6 +46,27 @@ export default class CartUsecase implements ICartUsecase {
         }
     }
 
+    /**
+    * Finds a single Cart by the unique ID of the owning user.
+    * @param options 
+    */
+    findOneByUserId(options: {
+        where: { userId: string },
+        include?: IncludeOption
+    }): Promise<Cart | null> {
+        try {
+            return this.cartRepo.findOneByUserId(options)
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({ message: error.message, code: USECASE_ERROR_CODE.INITIAL })
+                }
+            }
+            throw new USECASE_ERROR({ message: (error as Error).message || "", code: USECASE_ERROR_CODE.UNDEFINED })
+        }
+    }
+
     async createOrUpdateItem(options: {
         data: {
             cartId: string,
@@ -89,7 +110,7 @@ export default class CartUsecase implements ICartUsecase {
                             message: "Database error",
                             code: USECASE_ERROR_CODE.INITIAL
                         })
-                    
+
                     case REPO_ERROR_CODE.NOTFOUND:
                         throw new USECASE_ERROR({
                             message: "Cart item is not found",

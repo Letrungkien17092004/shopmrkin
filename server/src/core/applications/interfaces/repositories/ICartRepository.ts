@@ -25,7 +25,7 @@ export default interface ICartRepository {
     }): Promise<Cart>
 
     /**
-     * Finds a single Cart by the unique ID of the owning user.
+     * Finds a single Cart by the unique ID of the cart
      * @param options The search options.
      * @param options.userId The ID of the user to find the Cart for.
      * @param options.include The relations to load along with the result.
@@ -33,6 +33,15 @@ export default interface ICartRepository {
      */
     findOneById(options: {
         where: { id: string },
+        include?: IncludeOption
+    }): Promise<Cart | null>
+
+    /**
+     * Finds a single Cart by the unique ID of the owning user.
+     * @param options 
+     */
+    findOneByUserId(options: {
+        where: { userId: string },
         include?: IncludeOption
     }): Promise<Cart | null>
 

@@ -1,10 +1,21 @@
-import User, {UserConstructorParam} from "../../../../core/entities/User.js"
+import User, { UserConstructorParam } from "../../../../core/entities/User.js"
 
 export default interface IUserUsecase {
-    create(options: Omit<User, "id" | "roleId">): Promise<User>
+    create(options: {
+        data: {
+            username: string,
+            account: string,
+            password: string,
+            email: string
+        }
+    }): Promise<User>
     getById(id: string): Promise<User | null>
-    getOrCreate(options: {account: string, email: string, username: string}): Promise<User>
+    findByEmail(options: {
+        where: {
+            email: string
+        }
+    }): Promise<User | null>
     update(options: Partial<UserConstructorParam>): Promise<User>
     deleteById(id: string): Promise<boolean>
-    login(options: {account: string, password: string}): Promise<User | null>
+    login(options: { account: string, password: string }): Promise<User | null>
 }
