@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import ICartUsecase from "../../core/applications/interfaces/usecases/ICartUsecase.js"
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js"
-import { z } from "zod"
+import { z, ZodError } from "zod"
 import { CartDTO } from "../../adapter/DTO/index.js"
 
 export default class CartController {
@@ -11,26 +11,6 @@ export default class CartController {
         this.usecase = usecase
     }
 
-    /**
-     * Create cart  
-     * POST: /cart
-     * @param req 
-     * @param res 
-     * @returns 
-     */
-    create = async (req: Request, res: Response): Promise<void> => {
-        try {
-            if (!req.user) return void res.status(401).json({ message: "Unauthorized" })
-
-            const created = await this.usecase.create({ data: { userId: req.user.id } })
-            res.status(201).json({ cart: CartDTO.toOutputSingle(created) })
-        } catch (error) {
-            if (error instanceof USECASE_ERROR && error.code === USECASE_ERROR_CODE.INITIAL) {
-                return void res.status(500).json({ message: "Server Internal Error!" })
-            }
-            res.status(500).json({ message: "Server Internal Error!" })
-        }
-    }
 
     /**
      * Retrieves a cart by cartId  
@@ -280,11 +260,11 @@ export default class CartController {
      * @param res 
      * @returns 
      */
-    destroyItem = async (req: Request, res: Response): Promise<void> => {
+    deleteItem = async (req: Request, res: Response): Promise<void> => {
         try {
             if (!req.user) return void res.status(401).json({ message: "Unauthorized" })
 
-            
+
             const ownCart = await this.usecase.findOneById({
                 where: {
                     id: req.params["cartId"]
@@ -299,7 +279,7 @@ export default class CartController {
             }
             if (ownCart.userId !== req.user.id) {
                 res.status(403).json({ message: "Forbidden" })
-                return 
+                return
             }
 
             await this.usecase.removeItem({
@@ -330,6 +310,62 @@ export default class CartController {
                 }
             }
             res.status(500).json({ message: "Server Internal Error!" })
+        }
+    }
+
+    /**
+     * Clear all cartItem with cartId
+     * DELETE: /cart/:cartId/items
+     * @param req 
+     * @param res 
+     */
+    clearCart = async (req: Request, res: Response): Promise<void> => {
+        try {
+            if (!req.user) {
+                res.status(401).json({ message: "Unauthorized" })
+                return
+            }
+
+            const ParamsSchema = z.object({
+                cartId: z.string()
+            })
+
+            const paramsParsed = ParamsSchema.parse(req.params)
+
+            const ownCart = await this.usecase.findOneById({
+                where: {
+                    id: paramsParsed.cartId
+                }
+            })
+
+            if (!ownCart) {
+                res.status(404).json({
+                    message: "Cart is not found"
+                })
+                return
+            }
+            if (ownCart.userId !== req.user.id) {
+                res.status(403).json({ message: "Forbidden" })
+                return
+            }
+
+            this.usecase.clear({
+                where: {
+                    cartId: ownCart.id
+                }
+            })
+            res.status(200).json({
+                message: "Delete successful"
+            })
+        } catch (error) {
+            if (error instanceof ZodError) {
+                res.status(400).json({
+                    message: "invalid params"
+                })
+            }
+            res.status(500).json({
+                message: "Something went wrong"
+            })
         }
     }
 }

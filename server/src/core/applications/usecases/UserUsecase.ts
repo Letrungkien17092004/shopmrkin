@@ -12,6 +12,10 @@ export default class UserUsecase implements IUserUsecase {
         this.repository = repo;
     }
 
+    /**
+     * Create a new user
+     * @param options 
+     */
     async create(options: {
         data: {
             username: string,
@@ -59,6 +63,10 @@ export default class UserUsecase implements IUserUsecase {
         }
     }
 
+    /**
+     * Retrieves an user with user's id
+     * @param id 
+     */
     async getById(id: string): Promise<User | null> {
         try {
             const user = await this.repository.getById(id)
@@ -84,6 +92,10 @@ export default class UserUsecase implements IUserUsecase {
         }
     }
 
+    /**
+     * Retrieves an user with user's email
+     * @param email 
+     */
     async findByEmail(options: {
         where: {
             email: string
@@ -113,6 +125,10 @@ export default class UserUsecase implements IUserUsecase {
         }
     }
 
+    /**
+     * Update an user
+     * @param options 
+     */
     async update(options: Partial<User> & Pick<User, "id">): Promise<User> {
         try {
             const user = await this.repository.update(options)
@@ -143,6 +159,10 @@ export default class UserUsecase implements IUserUsecase {
         }
     }
 
+    /**
+     * Delete an user with user's id
+     * @param id 
+     */
     async deleteById(id: string): Promise<boolean> {
         try {
             return this.repository.deleteById(id)
@@ -168,6 +188,10 @@ export default class UserUsecase implements IUserUsecase {
 
     }
 
+    /**
+     * check correct user with account and password
+     * @param options 
+     */
     async login({ account, password }: { account: string; password: string; }): Promise<User | null> {
         try {
             const searchedUser = await this.repository.findWithAccount({

@@ -11,24 +11,6 @@ export default class CartUsecase implements ICartUsecase {
         this.cartRepo = cartRepo
     }
 
-    async create(options: {
-        data: { userId: string },
-        include?: IncludeOption
-    }): Promise<Cart> {
-        try {
-            const created = await this.cartRepo.create(options)
-            return created
-        } catch (error) {
-            if (error instanceof REPO_ERROR) {
-                switch (error.code) {
-                    case REPO_ERROR_CODE.INITIAL:
-                        throw new USECASE_ERROR({ message: error.message, code: USECASE_ERROR_CODE.INITIAL })
-                }
-            }
-            throw new USECASE_ERROR({ message: (error as Error).message || "", code: USECASE_ERROR_CODE.UNDEFINED })
-        }
-    }
-
     async findOneById(options: {
         where: { id: string },
         include?: IncludeOption
@@ -152,11 +134,13 @@ export default class CartUsecase implements ICartUsecase {
         }
     }
 
-    async deleteById(options: {
-        where: { id: string, userId: string }
+    async clear(options: {
+        where: {
+            cartId: string
+        }
     }): Promise<void> {
         try {
-            return await this.cartRepo.deleteById(options)
+            return await this.cartRepo.clear(options)
         } catch (error) {
             if (error instanceof REPO_ERROR) {
                 switch (error.code) {

@@ -2,7 +2,6 @@ import { baseExceptionHandler } from "../core/applications/interfaces/repositori
 import { PrismaClient, Users as PrismaUser, Roles as PrismaRoles, Carts as PrismaCarts } from "@prisma/client";
 import { User, Role, Permission, Cart } from "../core/entities/index.js"
 import IUsersRepository from "../core/applications/interfaces/repositories/IUsersRepository.js";
-import crypto from 'crypto';
 
 const prisma = new PrismaClient()
 
@@ -14,7 +13,7 @@ type UserWithRoleAndCart = PrismaUser & {
 export default class UserRepository implements IUsersRepository {
 
     /**
-     * Creates a new user with the provided attributes (excluding id and roleId).
+     * Creates a new user and add role and cart.
      * @param attributes - Information of the user to be created.
      * @returns The newly created User.
      * @throws REPO_ERROR
@@ -28,20 +27,28 @@ export default class UserRepository implements IUsersRepository {
         }
     }): Promise<User> {
         try {
-            const createdUser = await prisma.users.create({
+            const createdUser: UserWithRoleAndCart = await prisma.users.create({
                 data: {
                     username: options.data.username,
                     account: options.data.account,
                     password_hash: options.data.password_hashed,
                     email: options.data.email,
-                    roleId: 2
+                    roleId: 2,
+                    cart: {
+                        create: {}
+                    }
                 },
                 include: {
-                    role: true
+                    role: true,
+                    cart: true
                 }
             })
 
-            return new User(createdUser)
+            return new User({
+                ...createdUser,
+                role: new Role({ ...createdUser.role }),
+                cart: createdUser.cart ? new Cart({ ...createdUser.cart }) : undefined
+            })
         } catch (error) {
             console.log("log in Repo")
             console.table(error)

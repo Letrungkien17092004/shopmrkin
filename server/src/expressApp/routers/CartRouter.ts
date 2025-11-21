@@ -11,11 +11,10 @@ const controller = new CartController(usecase)
 const cartRouter = Router()
 
 // RESTful
-// cartRouter.post('/cart', [requireAccessToken, controller.create]) // create new cart
-cartRouter.get('/cart/:cartId', [requireAccessToken, controller.findOneById]) // Read a cart
-cartRouter.post('/cart/:cartId/item', [requireAccessToken, controller.addItem]) // Add cartItem to Cart
-cartRouter.put('/cart/:cartId/item/:cartItemId', [requireAccessToken, controller.updateItem]) // Update cartItem to Cart
-cartRouter.delete('/cart/:cartId/item/:cartItemId', [requireAccessToken, controller.destroyItem])
-// cartRouter.delete('/cart/:id', [requireAccessToken, controller.destroy])
+cartRouter.get('/carts/:cartId', [requireAccessToken, controller.findOneById]) // Read a cart
+cartRouter.post('/carts/:cartId/items', [requireAccessToken, controller.addItem]) // Add cartItem to Cart
+cartRouter.put('/carts/:cartId/items/:cartItemId', [requireAccessToken, controller.updateItem]) // Update cartItem to Cart
+cartRouter.delete('/carts/:cartId/items/:cartItemId', [requireAccessToken, controller.deleteItem])
+cartRouter.delete('/carts/:cartId/items', [requireAccessToken, controller.clearCart]) // clear all cartItem
 
 export default cartRouter

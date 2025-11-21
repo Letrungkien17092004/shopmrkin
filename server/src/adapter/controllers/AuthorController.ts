@@ -77,12 +77,6 @@ export default class AuthorController {
                 }
             })
 
-            const createdCart = await this.cartUsecase.create({
-                data: {
-                    userId: createdUser.id
-                }
-            })
-
             res.status(200).json({
                 user: {
                     id: createdUser.id,
@@ -362,11 +356,6 @@ export default class AuthorController {
                             email: googleProfile.email
                         }
                     })
-                    const createdCart = await this.cartUsecase.create({
-                        data: {
-                            userId: createdUser.id
-                        }
-                    })
 
                     payload = {
                         id: createdUser.id,
@@ -384,7 +373,7 @@ export default class AuthorController {
                         email: createdUser.email,
                         picture: googleProfile.picture,
                         role: createdUser.role?.roleName || "undefined",
-                        cartId: createdCart.id
+                        cartId: createdUser.cart?.id || ""
                     }
                 } else { // user was found
                     payload = {
@@ -402,8 +391,8 @@ export default class AuthorController {
                         account: foundUser.account,
                         email: foundUser.email,
                         picture: googleProfile.picture,
-                        role: foundUser.role!.roleName || "undefined",
-                        cartId: foundUser.cart!.id
+                        role: foundUser.role?.roleName || "undefined",
+                        cartId: foundUser.cart?.id || ""
                     }
                 }
                 const refeshToken = jwt.sign(
