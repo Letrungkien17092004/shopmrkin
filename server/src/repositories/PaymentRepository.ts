@@ -1,6 +1,6 @@
 import IPaymentRepository, { IncludeOption, OrderByOption } from "../core/applications/interfaces/repositories/IPaymentRepository";
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js"
-import { Payment, User, Order } from "../core/entities";
+import { Payment, User, Order } from "../core/entities/index.js";
 import { PrismaClient, Payments, Users, Orders } from "@prisma/client";
 
 const prisma = new PrismaClient()

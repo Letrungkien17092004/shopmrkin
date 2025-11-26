@@ -3,7 +3,7 @@ import IVariantRepository from "../interfaces/repositories/IVariantRepository.js
 import IOrderUsecase from "../interfaces/usecases/IOrderUsecase.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../interfaces/usecases/errors.js";
 import { Order, Variant } from "../../entities/index.js";
-import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors";
+import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.js";
 
 export default class OrderUsecase implements IOrderUsecase {
     private orderRepo: IOrderRepository
@@ -15,7 +15,7 @@ export default class OrderUsecase implements IOrderUsecase {
     }
 
     /**
-     * Create a Order
+     * Create a OrderPaymentRepository.js
      * @param options 
      */
     async create(options: {
