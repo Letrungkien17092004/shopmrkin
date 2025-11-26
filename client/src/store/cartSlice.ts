@@ -1,25 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import CartService from "../services/CartService.ts";
-
+import { Cart } from "../entities/index.ts"
+import axios from "axios";
 const cartService = new CartService()
-// Minimal types to represent cart and items returned by API
-export type CartItem = {
-    id: string;
-    cartId?: string;
-    variantId?: string;
-    quantity: number;
-    // optional product fields if backend returns embedded product info
-    productId?: string;
-    productName?: string;
-    productImage?: string;
-    price?: number;
-}
-
-export type Cart = {
-    id: string;
-    userId?: string;
-    items?: CartItem[];
-}
 
 type CartState = {
     cart: Cart | null;
@@ -33,50 +16,64 @@ const initialState: CartState = {
     error: null,
 };
 
-export const fetchCart = createAsyncThunk("cart/fetchCart", async (cartId: string, thunkAPI) => {
+export const fetchCart = createAsyncThunk<
+    Cart,
+    string,
+    { rejectValue: string }
+>("cart/fetchCart", async (cartId: string, thunkAPI) => {
     try {
-        const result = await cartService.getCart(cartId, true);
-        // backend returns { cart: ... }
-        return result.cart as Cart;
+        const cart = await cartService.getCart(cartId);
+        return cart
     } catch (err: any) {
-        return thunkAPI.rejectWithValue(err?.message || "Failed to fetch cart");
+        return thunkAPI.rejectWithValue("Failed to fetch cart");
     }
 });
 
-export const addCartItem = createAsyncThunk(
+export const addCartItem = createAsyncThunk<
+    void,
+    { cartId: string; variantId: string; quantity: number },
+    { rejectValue: string }
+>(
     "cart/addItem",
-    async ({ cartId, variantId, quantity }: { cartId: string; variantId: string; quantity: number }, thunkAPI) => {
+    async ({ cartId, variantId, quantity }, thunkAPI) => {
         try {
             await cartService.addItem(cartId, variantId, quantity);
-            // refresh cart
-            const action = await thunkAPI.dispatch(fetchCart(cartId));
-            return action.payload as Cart;
+            // refesh cart
+            const cart = await thunkAPI.dispatch(fetchCart(cartId)).unwrap();
         } catch (err: any) {
-            return thunkAPI.rejectWithValue(err?.message || "Failed to add item");
+            return thunkAPI.rejectWithValue("Failed to add item");
         }
     }
 );
 
-export const updateCartItem = createAsyncThunk(
+export const updateCartItem = createAsyncThunk<
+    void,
+    { cartId: string; cartItemId: string; quantity: number },
+    { rejectValue: string }
+>(
     "cart/updateItem",
-    async ({ cartId, cartItemId, quantity }: { cartId: string; cartItemId: string; quantity: number }, thunkAPI) => {
+    async ({ cartId, cartItemId, quantity }, thunkAPI) => {
         try {
             await cartService.updateItem(cartId, cartItemId, quantity);
-            const action = await thunkAPI.dispatch(fetchCart(cartId));
-            return action.payload as Cart;
+            // refesh cart
+            const cart = await thunkAPI.dispatch(fetchCart(cartId)).unwrap();
         } catch (err: any) {
-            return thunkAPI.rejectWithValue(err?.message || "Failed to update item");
+            return thunkAPI.rejectWithValue("Failed to update item");
         }
     }
 );
 
-export const removeCartItem = createAsyncThunk(
+export const removeCartItem = createAsyncThunk<
+    void,
+    { cartId: string; cartItemId: string },
+    { rejectValue: string }
+>(
     "cart/removeItem",
-    async ({ cartId, cartItemId }: { cartId: string; cartItemId: string }, thunkAPI) => {
+    async ({ cartId, cartItemId }, thunkAPI) => {
         try {
             await cartService.removeItem(cartId, cartItemId);
-            const action = await thunkAPI.dispatch(fetchCart(cartId));
-            return action.payload as Cart;
+            // refesh cart
+            const cart = await thunkAPI.dispatch(fetchCart(cartId)).unwrap();
         } catch (err: any) {
             return thunkAPI.rejectWithValue(err?.message || "Failed to remove item");
         }
@@ -95,6 +92,7 @@ const cartSlice = createSlice({
     },
     extraReducers(builder) {
         builder
+            // fetchCart
             .addCase(fetchCart.pending, (state) => {
                 state.status = "loading";
                 state.error = null;
@@ -105,46 +103,46 @@ const cartSlice = createSlice({
             })
             .addCase(fetchCart.rejected, (state, action) => {
                 state.status = "failed";
-                state.error = (action.payload as string) || action.error.message || "Failed to fetch cart";
+                state.error = action.error.message || null;
             })
 
+            // addCartItem
             .addCase(addCartItem.pending, (state) => {
                 state.status = "loading";
                 state.error = null;
             })
-            .addCase(addCartItem.fulfilled, (state, action: PayloadAction<Cart>) => {
+            .addCase(addCartItem.fulfilled, (state) => {
                 state.status = "succeeded";
-                state.cart = action.payload;
             })
             .addCase(addCartItem.rejected, (state, action) => {
                 state.status = "failed";
-                state.error = (action.payload as string) || action.error.message || "Failed to add item";
+                state.error = action.error.message || null;
             })
 
+            // updateCartItem
             .addCase(updateCartItem.pending, (state) => {
                 state.status = "loading";
                 state.error = null;
             })
-            .addCase(updateCartItem.fulfilled, (state, action: PayloadAction<Cart>) => {
+            .addCase(updateCartItem.fulfilled, (state) => {
                 state.status = "succeeded";
-                state.cart = action.payload;
             })
             .addCase(updateCartItem.rejected, (state, action) => {
                 state.status = "failed";
-                state.error = (action.payload as string) || action.error.message || "Failed to update item";
+                state.error = action.error.message || null;
             })
 
+            // removeCartItem
             .addCase(removeCartItem.pending, (state) => {
                 state.status = "loading";
                 state.error = null;
             })
-            .addCase(removeCartItem.fulfilled, (state, action: PayloadAction<Cart>) => {
+            .addCase(removeCartItem.fulfilled, (state) => {
                 state.status = "succeeded";
-                state.cart = action.payload;
             })
             .addCase(removeCartItem.rejected, (state, action) => {
                 state.status = "failed";
-                state.error = (action.payload as string) || action.error.message || "Failed to remove item";
+                state.error = action.error.message || null;
             });
     }
 });
