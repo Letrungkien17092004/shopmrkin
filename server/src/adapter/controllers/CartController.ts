@@ -68,11 +68,7 @@ export default class CartController {
                 return
             }
             // verify cart ownership
-            const cart = await this.usecase.findOneById({
-                where: {
-                    id: req.params['cartId']
-                }
-            })
+            const cart = await this.usecase.findOneById(findOptionsParsed)
 
             if (!cart) {
                 res.status(404).json({
