@@ -29,12 +29,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [])
 
     useEffect(() => {
-            const profile_ = authService.getProfile()
+        const isRefeshTokenExpired = authService.refeshIsExpired()
+        const profile_ = authService.getProfile()
+
+        if (isRefeshTokenExpired) {
+            setProfile(undefined)
+        } else {
             setProfile(profile_)
+        }
     }, [])
 
     return (
-        <AuthContext.Provider value={{ profile: profile, logout: logout}}>
+        <AuthContext.Provider value={{ profile: profile, logout: logout }}>
             {children}
         </AuthContext.Provider>
     )

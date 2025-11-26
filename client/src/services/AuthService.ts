@@ -97,8 +97,7 @@ export default class AuthService {
         // if createdAtString is invalid, tokenCreatedAtTime will be null
         if (!tokenCreatedAtTime) { throw new Error("refesh_token is null") }
         const minutesPassed = (currentTime.getTime() - tokenCreatedAtTime.getTime()) / 1000 / 60
-
-        return minutesPassed > (7 * 24 * 60 * 60) // 7 days
+        return minutesPassed > (7 * 24 * 60) // 7 days
     }
 
     /**
