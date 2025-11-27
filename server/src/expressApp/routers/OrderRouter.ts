@@ -10,9 +10,9 @@ const usecase = new OrderUsecase(orderRepo, variantRepo)
 const controller = new OrderController(usecase)
 
 const orderRouter = Router()
-orderRouter.post("/cart", controller.create) // create new order
-orderRouter.get("/cart/:id", controller.findOneById) // find one
-orderRouter.get("/carts", controller.findMany) // find many
-orderRouter.put("/cart/:id", controller.updateById) // update
+orderRouter.post("/orders", controller.create) // create new order
+orderRouter.get("/orders/:id", controller.findOneById) // find one
+orderRouter.get("/orders", controller.findMany) // find many
+orderRouter.put("/orders/:id", controller.updateById) // update
 
 export default orderRouter
