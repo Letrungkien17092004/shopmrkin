@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-
+import Loading from "../components/Loading.tsx";
 import AuthService from "../services/AuthService.ts";
 const authService = new AuthService()
 
@@ -10,11 +10,13 @@ interface Profile {
     account: string,
     username: string,
     picture: string,
+    cartId: string,
     role: string
 }
 
 interface AuthContextType {
     profile?: Profile,
+    status: "idle" | "pending" | "succeed" | "failed",
     logout: () => void
 }
 
@@ -22,7 +24,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [profile, setProfile] = useState<Profile | undefined>(undefined)
-
+    const [status, setStatus] = useState<"idle" | "pending" | "succeed" | "failed">("idle")
     const logout = useCallback(() => {
         authService.logout()
         setProfile(undefined)
@@ -31,16 +33,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const isRefeshTokenExpired = authService.refeshIsExpired()
         const profile_ = authService.getProfile()
-
         if (isRefeshTokenExpired) {
             setProfile(undefined)
+            setStatus("failed")
         } else {
             setProfile(profile_)
+            setStatus("succeed")
         }
     }, [])
 
+    if (status === "idle" || status === "pending") {
+        return <>
+            <div className="w-screen h-screen flex justify-center items-center">
+                <Loading />
+            </div>
+        </>
+    }
+
     return (
-        <AuthContext.Provider value={{ profile: profile, logout: logout }}>
+        <AuthContext.Provider value={{ profile, logout, status }}>
             {children}
         </AuthContext.Provider>
     )

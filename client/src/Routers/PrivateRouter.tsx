@@ -7,7 +7,7 @@ export default function PrivateRouter() {
     return (
         <>
             {/* Admin route */}
-            <Route path="/manager/" element={<ProtectedRoute allowedRoles={['admin']}><Manager /></ProtectedRoute>}>
+            <Route path="/manager/" element={<ProtectedRoute allowedRoles={['administrator']}><Manager /></ProtectedRoute>}>
                 <Route index element={<Dashboard />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="products" element={<ProductManager />} />

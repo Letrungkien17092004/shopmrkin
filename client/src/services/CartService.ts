@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ENV } from "../config/ENV.ts";
 import AuthService from "./AuthService.ts";
-import { Cart, CartItem, Variant } from "../entities/index.ts"
+import { ICart, ICartItem, Variant } from "../entities/index.ts"
 const auth = new AuthService();
 interface GetCartResponse {
     cart: {
@@ -26,14 +26,17 @@ interface GetCartResponse {
 export default class CartService {
     baseUrl = `${ENV.BACK_END_HOST}/api`;
 
-    async getCart(cartId: string) {
+    async getCart(cartId: string): Promise<ICart> {
+        if (auth.accessIsExpired()) {
+            await auth.refeshAccess()
+        }
         const token = auth.getAccessToken();
-        const response = await axios.get<GetCartResponse>(`${this.baseUrl}/cart/${cartId}?include[user]=true&include[cartItem]=true`, {
+        const response = await axios.get<GetCartResponse>(`${this.baseUrl}/carts/${cartId}?include[user]=true&include[cartItem]=true`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         const cartResponse = response.data.cart
-        const cartItems: CartItem[] = cartResponse.cartItems.map((ci) => {
-            const variant = new Variant({
+        const cartItems: ICartItem[] = cartResponse.cartItems.map((ci) => {
+            const variant = {
                 id: ci.variantId,
                 name: ci.variant_name,
                 sku: ci.variant_sku,
@@ -41,22 +44,22 @@ export default class CartService {
                 userId: "",
                 price: ci.variant_price,
                 stock: ci.variant_stock,
-            })
+            }
 
-            return new CartItem({
+            return {
                 id: ci.id,
                 cartId: cartResponse.id,
                 variantId: ci.variantId,
                 quantity: ci.quantity,
                 variant: variant,
                 productName: ci.product_name
-            })
+            }
         })
-        return new Cart({
+        return {
             id: cartResponse.id,
             userId: cartResponse.userId,
             items: cartItems
-        });
+        };
     }
 
     async addItem(cartId: string, variantId: string, quantity: number) {

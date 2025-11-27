@@ -182,9 +182,8 @@ export default class AuthService {
             type APIResponse = {
                 accessToken: string
             }
-            const response = await axios.post<APIResponse>(
+            const response = await axios.get<APIResponse>(
                 `${ENV.BACK_END_HOST}/api/auth/refesh-access-token`,
-                {},
                 {
                     headers: {
                         Authorization: `Bearer ${this.getRefeshToken()}`
