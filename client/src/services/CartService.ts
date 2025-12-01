@@ -24,14 +24,19 @@ interface GetCartResponse {
     }
 }
 export default class CartService {
-    baseUrl = `${ENV.BACK_END_HOST}/api`;
+    baseUrl = `${ENV.BACK_END_HOST}/api/carts`;
 
+    /**
+     * Retrieves a cart from server by cartId
+     * @param cartId 
+     * @returns 
+     */
     async getCart(cartId: string): Promise<ICart> {
         if (auth.accessIsExpired()) {
             await auth.refeshAccess()
         }
         const token = auth.getAccessToken();
-        const response = await axios.get<GetCartResponse>(`${this.baseUrl}/carts/${cartId}?include[user]=true&include[cartItem]=true`, {
+        const response = await axios.get<GetCartResponse>(`${this.baseUrl}/${cartId}?include[user]=true&include[cartItem]=true`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         const cartResponse = response.data.cart
@@ -62,15 +67,87 @@ export default class CartService {
         };
     }
 
+    /**
+     * Add a item into cart by cart's id
+     * @param cartId 
+     * @param variantId 
+     * @param quantity 
+     */
     async addItem(cartId: string, variantId: string, quantity: number) {
-        throw new Error("NO CODE")
+        try {
+            if (auth.accessIsExpired()) {
+                await auth.refeshAccess()
+            }
+            const token = auth.getAccessToken()
+            const response = await axios.post<{ message: string }>(
+                `${this.baseUrl}/${cartId}/items`,
+                {
+                    variantId: variantId,
+                    quantity: quantity
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+            console.log("CartService.addItem response\n", response)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
+    /**
+     * Update a item in a cart by cart's id and cartItemId
+     * @param cartId 
+     * @param cartItemId 
+     * @param quantity 
+     */
     async updateItem(cartId: string, cartItemId: string, quantity: number) {
-        throw new Error("NO CODE")
+        try {
+            if (auth.accessIsExpired()) {
+                await auth.refeshAccess()
+            }
+            const token = auth.getAccessToken()
+            const response = await axios.put<{ message: string }>(
+                `${this.baseUrl}/${cartId}/items/${cartItemId}`,
+                {
+                    quantity: quantity
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+            console.log("CartService.updateItem response\n", response)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
+    /**
+     * Delete an item in a cart by cart's id and cartItemId
+     * @param cartId
+     * @param variantId
+     */
     async removeItem(cartId: string, cartItemId: string) {
-        throw new Error("NO CODE")
+        try {
+            if (auth.accessIsExpired()) {
+                await auth.refeshAccess()
+            }
+            const token = auth.getAccessToken()
+            const response = await axios.delete<{ message: string }>(
+                `${this.baseUrl}/${cartId}/items/${cartItemId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+            console.log("CartService.removeItem response\n", response)
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
