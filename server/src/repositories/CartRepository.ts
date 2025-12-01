@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client"
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js"
-import { Cart, CartItem, Product, User, Variant } from "../core/entities/index.js"
+import { Cart, CartItem, Product, User, Variant, Media } from "../core/entities/index.js"
 import ICartRepository, { IncludeOption } from "../core/applications/interfaces/repositories/ICartRepository.js"
 
 const prisma = new PrismaClient()
@@ -30,7 +30,11 @@ export default class CartRepository implements ICartRepository {
                                 include: {
                                     variant: {
                                         include: {
-                                            product: true
+                                            product: {
+                                                include: {
+                                                    media: true
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -51,7 +55,13 @@ export default class CartRepository implements ICartRepository {
                             stock: ci.variant.stock,
                             productId: ci.variant.productId,
                             userId: ci.variant.userId,
-                            product: new Product(ci.variant.product)
+                            product: new Product({
+                                ...ci.variant.product,
+                                media: ci.variant.product.media.map(med => new Media({
+                                    ...med,
+                                    productId: med.productId || undefined
+                                }))
+                            })
                         })
                     }))
                     return new Cart({
