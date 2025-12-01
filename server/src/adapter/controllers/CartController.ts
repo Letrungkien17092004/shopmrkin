@@ -93,7 +93,7 @@ export default class CartController {
 
     /**
     * Adds an item to the cart  
-    * POST: /cart/:cartId/item
+    * POST: /cart/:cartId/items
     * @param req 
     * @param res 
     * @returns 
@@ -160,9 +160,6 @@ export default class CartController {
                     case USECASE_ERROR_CODE.FK_CONSTRAINT:
                         res.status(404).json({ message: "Cart or Variant not found" })
                         return
-                    case USECASE_ERROR_CODE.CONFLIX:
-                        res.status(409).json({ message: "Item existed" })
-                        return
                 }
             }
             res.status(500).json({ message: "Server Internal Error!" })
@@ -171,7 +168,7 @@ export default class CartController {
 
     /**
     * Updates item quantity in the cart
-    * PUT: /cart/:cartId/cartItem/:cartItemId
+    * PUT: /carts/:cartId/items/:cartItemId
     * @param req 
     * @param res 
     * @returns 
@@ -251,7 +248,7 @@ export default class CartController {
 
     /**
      * Delete item
-     * DELETE: /cart/:cartId/items/:cartItemId
+     * DELETE: /carts/:cartId/items/:cartItemId
      * @param req 
      * @param res 
      * @returns 
@@ -311,7 +308,7 @@ export default class CartController {
 
     /**
      * Clear all cartItem with cartId
-     * DELETE: /cart/:cartId/items
+     * DELETE: /carts/:cartId/items
      * @param req 
      * @param res 
      */

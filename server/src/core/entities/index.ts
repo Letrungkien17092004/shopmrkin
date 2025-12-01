@@ -11,6 +11,7 @@ import CartItem from "./CartItem.js";
 import Order from "./Order.js";
 import OrderItem from "./OrderItem.js";
 import Payment from "./Payment.js";
+import ProductEmbedded from "./ProductEmbedded.js";
 export {
     User,
     Role,
@@ -24,5 +25,6 @@ export {
     CartItem,
     Order,
     OrderItem,
-    Payment
+    Payment,
+    ProductEmbedded
 }
