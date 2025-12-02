@@ -2,7 +2,7 @@ import React from "react";
 
 interface CartItemProps  {
     key: string
-    image?: string
+    imgUrl?: string
     productName: string
     variantName: string
     quantity: number
@@ -16,12 +16,12 @@ function formatPrice(value: number) {
     return value;
 }
 
-export default function CartItem({ key, image = defaultCartImage, productName, variantName, quantity, price }: CartItemProps) {
+export default function CartItem({ key, imgUrl = defaultCartImage, productName, variantName, quantity, price }: CartItemProps) {
     return (
         <li key={key} className="p-2 hover:bg-gray-100 cursor-pointer">
             <div className="w-full flex">
                 <div className="size-20">
-                    <img className="w-full h-full object-contain aspect-square" src={image} alt={image} />
+                    <img className="w-full h-full object-contain aspect-square" src={imgUrl} alt={imgUrl} />
                 </div>
                 <div className="pl-2 w-[60%]">
                     <p title="product name" className="text-sm font-semibold line-clamp-2 text-start">

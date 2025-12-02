@@ -3,7 +3,8 @@ import { ENV } from "../config/ENV.ts";
 import AuthService from "./AuthService.ts";
 import { ICart, ICartItem, Variant } from "../entities/index.ts"
 const auth = new AuthService();
-interface GetCartResponse {
+
+interface IGetCartResponse {
     cart: {
         id: string,
         userId: string,
@@ -18,6 +19,7 @@ interface GetCartResponse {
             product_id: string,
             product_name: string,
             product_description: string,
+            media: { filePath: string, hostname: string, type: string }
         }[],
         createdAt: Date,
         updatedAt: Date
@@ -36,7 +38,7 @@ export default class CartService {
             await auth.refeshAccess()
         }
         const token = auth.getAccessToken();
-        const response = await axios.get<GetCartResponse>(`${this.baseUrl}/${cartId}?include[user]=true&include[cartItem]=true`, {
+        const response = await axios.get<IGetCartResponse>(`${this.baseUrl}/${cartId}?include[user]=true&include[cartItem]=true`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         const cartResponse = response.data.cart
@@ -46,7 +48,6 @@ export default class CartService {
                 name: ci.variant_name,
                 sku: ci.variant_sku,
                 productId: ci.product_id,
-                userId: "",
                 price: ci.variant_price,
                 stock: ci.variant_stock,
             }
@@ -57,7 +58,12 @@ export default class CartService {
                 variantId: ci.variantId,
                 quantity: ci.quantity,
                 variant: variant,
-                productName: ci.product_name
+                productName: ci.product_name,
+                media: {
+                    filePath: ci.media.filePath || "",
+                    hostname: ci.media.hostname || '',
+                    type: ci.media.type || ""
+                }
             }
         })
         return {

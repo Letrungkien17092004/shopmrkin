@@ -36,6 +36,7 @@ export default function CartItemContainer({ cart, status, error }: CartItemConta
                         cart!.items.map(item => (
                             <CartItem
                                 key={item.id}
+                                imgUrl={`${item.media.hostname}${item.media.filePath}`}
                                 productName={item.productName}
                                 variantName={item.variant.name}
                                 quantity={item.quantity}

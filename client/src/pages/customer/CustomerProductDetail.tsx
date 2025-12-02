@@ -5,6 +5,11 @@ import { ProductImageSlider } from "../../components/products/index.tsx"
 import Loading from "../../components/Loading.tsx";
 import ProductService from "../../services/ProductService.ts";
 import { Product, Variant } from "../../entities/index.ts";
+import { addCartItem } from "../../store/cartSlice.ts"
+import { RootState, AppDispatch } from "../../store/index.ts";
+import { useDispatch, useSelector } from "react-redux";
+import { useAuthContext } from "../../contexts/AuthContext.tsx";
+import { ICart, ICartItem } from "../../entities/index.ts";
 
 const productService = new ProductService()
 
@@ -40,12 +45,30 @@ function VariantList({ variants, selectedVariant, createSelectedEvent }: Variant
     </>
 }
 
+
+function getCartItemByVariantId(cart: ICart, variantId: string): ICartItem | null {
+    const items = cart.items
+
+    for (let i = 0; i < items.length; i++) {
+        let item = items[i]!
+        if (item.variantId === variantId) {
+            return { ...item }
+        }
+    }
+    return null
+}
+
 export default function CustomerProductDetail() {
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [product, setProduct] = useState<Product | undefined>(undefined)
     const [defaultPrice, setDefaultPrice] = useState<string | undefined>(undefined)
     const [selectedVariant, setSelectedVariant] = useState<Variant | undefined>(undefined)
     const { productId } = useParams()
+    const [isAdding, setIsAdding] = useState<boolean>(false)
+    const [canAdd, setCanAdd] = useState<boolean>(false)
+    const dispatch: AppDispatch = useDispatch()
+    const { cart } = useSelector((state: RootState) => state.cart)
+    const { profile } = useAuthContext()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,6 +82,20 @@ export default function CustomerProductDetail() {
         fetchData()
     }, [])
 
+    useEffect(() => {
+        if (isAdding) {
+            setCanAdd(false)
+            return
+        }
+
+        // if selectedVariant isn't null
+        if (selectedVariant) {
+            setCanAdd(true)
+        } else if (!selectedVariant) {
+            setCanAdd(false)
+        }
+    }, [selectedVariant, isAdding])
+
     const createSelectedEvent = useCallback((id: string) => {
         if (!product) { return }
         if (product.variants.length <= 0) { return }
@@ -71,6 +108,49 @@ export default function CustomerProductDetail() {
             setSelectedVariant(product.variants.find(v => v.id === id))
         }
     }, [product, selectedVariant])
+
+    // event hander for adding item to the shopping cart
+    const addItemEvent = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation()
+        e.preventDefault()
+        if (!profile) {
+            window.alert("Bạn cần đăng nhập!")
+            return
+        }
+        if (!cart) {
+            window.alert("Vui lòng thử lại sau!")
+            return
+        }
+
+        if (!selectedVariant || isAdding) { return }
+
+        const callApi = async () => {
+            let quantity = 1
+            let item = getCartItemByVariantId(cart, selectedVariant.id)
+            if (item) {
+                quantity = item.quantity + 1
+            }
+            await dispatch(addCartItem({
+                cartId: cart.id,
+                variantId: selectedVariant.id,
+                quantity: quantity
+            }))
+        }
+        setIsAdding(true)
+
+        callApi()
+            .then(() => {
+                setIsAdding(false)
+                window.alert("Thêm sản phẩm thành công")
+            })
+            .catch((err) => {
+                setIsAdding(false)
+                window.alert("Thêm vào giỏ hàng thất bại")
+                console.log("[Error] in CustomerProductDetail->AddItemEvent: \n", err)
+            })
+
+    }, [selectedVariant, isAdding, cart])
+
     if (isLoading) {
         return <>
             <Navivation />
@@ -126,9 +206,16 @@ export default function CustomerProductDetail() {
 
                             {/* actions */}
                             <div className="w-full mt-4">
-                                <div className="inline-block rounded p-2 text-base font-normal bg-orange-500 text-white cursor-pointer hover:scale-105 transition">
-                                    Thêm vào giỏ hàng
-                                </div>
+                                {
+                                    canAdd
+                                        ? <button onClick={addItemEvent} className="inline-block rounded p-2 text-base font-normal bg-orange-500 text-white cursor-pointer hover:scale-105 transition">
+                                            Thêm vào giỏ hàng
+                                        </button>
+                                        : <button title="vui lòng chọn mặt hàng" className="inline-block rounded p-2 text-base font-normal bg-gray-400 text-white">
+                                            Thêm vào giỏ hàng
+                                        </button>
+                                }
+
                             </div>
                         </div>
                     </div>
