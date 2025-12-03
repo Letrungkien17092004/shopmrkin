@@ -32,8 +32,8 @@ export default function CartItemContainer({ cart, status, error }: CartItemConta
         }
 
         return <>
-            <div className="z-1 absolute right-0 top-[120%] w-lg max-h-82 shadow-[0_4px_12px_rgba(0,0,0,0.3)] rounded-sm bg-white">
-                <ul className="w-full p-2">
+            <div className="z-1 absolute right-0 top-[120%] w-lg shadow-[0_4px_12px_rgba(0,0,0,0.3)] rounded-sm bg-white">
+                <ul className="w-full max-h-80 overflow-y-scroll p-2">
                     {
                         cart.items.map(item => (
                             <CartItem

@@ -33,7 +33,7 @@ function VariantList({ variants, selectedVariant, createSelectedEvent }: Variant
                             </div>
                         </>
                         : <>
-                            <div onClick={createSelectedEvent(v.id)} key={v.sku} className="cursor-pointer select-none hover:ring hover:ring-green-500 rounded shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                            <div onClick={createSelectedEvent(v.id)} key={`${v.sku}_2`} className="cursor-pointer select-none hover:ring hover:ring-green-500 rounded shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
                                 <div className="w-full p-1 px-2 text-sm text-black text-center  text-nowrap">
                                     {v.name}
                                 </div>

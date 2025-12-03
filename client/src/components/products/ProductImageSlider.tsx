@@ -45,7 +45,7 @@ export default function ProductImageSlider({ images }: ProductImageSliderProps) 
                     </div>
                 </div>
                 <div className="col-span-10">
-                    <img className=" max-w-[90%] mx-auto object-contain" src={images[currentIdx].url} alt={images[currentIdx].url} />
+                    <img className="w-[250px] h-[300px] mx-auto object-contain" src={images[currentIdx].url} alt={images[currentIdx].url} />
                 </div>
                 <div className="col-span-1">
                     <div className="w-full h-full ml-2 flex justify-center items-center select-none">
