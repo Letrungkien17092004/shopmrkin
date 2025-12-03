@@ -1,6 +1,6 @@
 import { Variant } from "./index.ts"
 
-export interface ICartItem {
+export interface CartItem {
     id: string
     cartId: string
     variantId: string

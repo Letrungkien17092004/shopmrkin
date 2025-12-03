@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import ProductService from "../../services/ProductService.ts"
-import { Product } from "../../entities/index.ts"
+import { Product } from "../../types/index.ts"
 import ProductCard from "./ProductCard.tsx"
 import ProductSortingOptions from "./ProductSortingOptions.tsx"
 import ProductFilteringInfo from "./ProductFilteringInfo.tsx"

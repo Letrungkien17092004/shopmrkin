@@ -4,12 +4,12 @@ import { Navivation } from "../../components/nav/index.tsx";
 import { ProductImageSlider } from "../../components/products/index.tsx"
 import Loading from "../../components/Loading.tsx";
 import ProductService from "../../services/ProductService.ts";
-import { Product, Variant } from "../../entities/index.ts";
+import { Product, Variant } from "../../types/index.ts";
 import { addCartItem } from "../../store/cartSlice.ts"
 import { RootState, AppDispatch } from "../../store/index.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuthContext } from "../../contexts/AuthContext.tsx";
-import { ICart, ICartItem } from "../../entities/index.ts";
+import { getCartItemByVariantId } from "../../utils/index.ts"
 
 const productService = new ProductService()
 
@@ -43,19 +43,6 @@ function VariantList({ variants, selectedVariant, createSelectedEvent }: Variant
             </>
         })}
     </>
-}
-
-
-function getCartItemByVariantId(cart: ICart, variantId: string): ICartItem | null {
-    const items = cart.items
-
-    for (let i = 0; i < items.length; i++) {
-        let item = items[i]!
-        if (item.variantId === variantId) {
-            return { ...item }
-        }
-    }
-    return null
 }
 
 export default function CustomerProductDetail() {

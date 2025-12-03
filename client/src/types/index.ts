@@ -1,10 +1,10 @@
 import { Variant } from "./Variant.ts";
 import { Product } from "./Product.ts";
-import type { ICartItem } from "./ICartItem.ts";
-import type { ICart } from "./ICart.ts";
+import type { CartItem } from "./CartItem.ts";
+import type { Cart } from "./Cart.ts";
 export {
     Product,
     Variant,
-    ICart,
-    ICartItem
+    Cart,
+    CartItem
 }

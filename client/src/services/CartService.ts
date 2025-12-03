@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ENV } from "../config/ENV.ts";
 import AuthService from "./AuthService.ts";
-import { ICart, ICartItem, Variant } from "../entities/index.ts"
+import { Cart, CartItem, Variant } from "../types/index.ts"
 const auth = new AuthService();
 
 interface IGetCartResponse {
@@ -33,7 +33,7 @@ export default class CartService {
      * @param cartId 
      * @returns 
      */
-    async getCart(cartId: string): Promise<ICart> {
+    async getCart(cartId: string): Promise<Cart> {
         if (auth.accessIsExpired()) {
             await auth.refeshAccess()
         }
@@ -42,7 +42,7 @@ export default class CartService {
             headers: { Authorization: `Bearer ${token}` },
         });
         const cartResponse = response.data.cart
-        const cartItems: ICartItem[] = cartResponse.cartItems.map((ci) => {
+        const cartItems: CartItem[] = cartResponse.cartItems.map((ci) => {
             const variant = {
                 id: ci.variantId,
                 name: ci.variant_name,

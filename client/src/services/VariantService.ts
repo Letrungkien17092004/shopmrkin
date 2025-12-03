@@ -1,7 +1,7 @@
 import axios from "axios"
 import { ENV } from "../config/ENV.ts"
 import AuthService from "./AuthService.ts"
-import { Variant } from "../entities/index.ts"
+import { Variant } from "../types/index.ts"
 
 const authService = new AuthService()
 

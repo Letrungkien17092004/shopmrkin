@@ -1,11 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import CartService from "../services/CartService.ts";
-import { ICart } from "../entities/index.ts"
+import { Cart } from "../types/index.ts"
 import axios from "axios";
 const cartService = new CartService()
 
 type CartState = {
-    cart: ICart | null;
+    cart: Cart | null;
     status: "idle" | "loading" | "succeeded" | "failed";
     error: string | null;
 }
@@ -17,7 +17,7 @@ const initialState: CartState = {
 };
 
 export const fetchCart = createAsyncThunk<
-    ICart,
+    Cart,
     string,
     { rejectValue: string }
 >("cart/fetchCart", async (cartId: string, thunkAPI) => {
@@ -97,7 +97,7 @@ const cartSlice = createSlice({
                 state.status = "loading";
                 state.error = null;
             })
-            .addCase(fetchCart.fulfilled, (state, action: PayloadAction<ICart>) => {
+            .addCase(fetchCart.fulfilled, (state, action: PayloadAction<Cart>) => {
                 state.status = "succeeded";
                 state.cart = action.payload;
             })
