@@ -1,7 +1,8 @@
 import axios from "axios";
 import { ENV } from "../config/ENV.ts";
 import AuthService from "./AuthService.ts";
-import { Cart, CartItem, Variant } from "../types/index.ts"
+import { Cart, CartItem } from "../types/cart/index.ts"
+import { Variant } from "../types/product/index.ts"
 
 interface IGetCartResponse {
     cart: {
@@ -47,7 +48,7 @@ export default class CartService {
         });
         const cartResponse = response.data.cart
         const cartItems: CartItem[] = cartResponse.cartItems.map((ci) => {
-            const variant = {
+            const variant: Omit<Variant, "user" | "userId"> = {
                 id: ci.variantId,
                 name: ci.variant_name,
                 sku: ci.variant_sku,
@@ -64,6 +65,7 @@ export default class CartService {
                 variant: variant,
                 productName: ci.product_name,
                 media: {
+                    fileName: ci.media.filePath,
                     filePath: ci.media.filePath || "",
                     hostname: ci.media.hostname || '',
                     type: ci.media.type || ""

@@ -3,15 +3,16 @@ import { useParams } from "react-router-dom";
 import { Navivation } from "../../components/nav/index.tsx";
 import { ProductImageSlider } from "../../components/products/index.tsx"
 import Loading from "../../components/Loading.tsx";
-import ProductService from "../../services/ProductService.ts";
-import { Product, Variant } from "../../types/index.ts";
+import { ProductService, AuthService } from "../../services/index.ts";
+import { Product, Variant } from "../../types/product/index.ts";
 import { addCartItem } from "../../store/cartSlice.ts"
 import { RootState, AppDispatch } from "../../store/index.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuthContext } from "../../contexts/AuthContext.tsx";
 import { getCartItemByVariantId } from "../../utils/index.ts"
 
-const productService = new ProductService()
+const authService = new AuthService()
+const productService = new ProductService(authService)
 
 interface VariantListProps {
     variants: Variant[],

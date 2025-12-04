@@ -1,15 +1,8 @@
 import axios from "axios"
+import { Profile } from "../types/user/index.ts"
+
 import { ENV } from "../config/ENV.ts"
 
-type UserProfile = {
-    id: string,
-    email: string,
-    account: string,
-    username: string,
-    picture: string,
-    cartId: string,
-    role: string
-}
 enum AuthLocalStoreFieldNames {
     profile = "profile",
     refeshToken = "refesh_token",
@@ -17,13 +10,29 @@ enum AuthLocalStoreFieldNames {
     accessToken = "access_token",
     accessTokenCreatedAt = "access_token_createdAt",
 }
+
+
+type LoginWithGooogleResponse = {
+    profile: {
+        id: string,
+        account: string,
+        username: string,
+        email: string,
+        picture: string,
+        role: string,
+        cartId: string
+    },
+    refeshToken: string,
+    accessToken: string,
+}
+
 export default class AuthService {
 
     /**
      * Store the user's profile in localStorage
      * @param profile 
      */
-    storeProfile(profile: UserProfile): void {
+    storeProfile(profile: Profile): void {
         localStorage.setItem("profile", JSON.stringify(profile))
     }
 
@@ -31,8 +40,8 @@ export default class AuthService {
      * Retrieve User's profile
      * @returns 
      */
-    getProfile(): UserProfile | undefined {
-        const profile: UserProfile | null = JSON.parse(localStorage.getItem(AuthLocalStoreFieldNames.profile) || "null")
+    getProfile(): Profile | undefined {
+        const profile: Profile | null = JSON.parse(localStorage.getItem(AuthLocalStoreFieldNames.profile) || "null")
         return profile ?? undefined
     }
 
@@ -83,7 +92,7 @@ export default class AuthService {
         // if createdAtString is invalid, tokenCreatedAtTime will be null
         if (!tokenCreatedAtTime) { throw new Error("access_token is null") }
         const minutesPassed = (currentTime.getTime() - tokenCreatedAtTime.getTime()) / 1000 / 60
-        return minutesPassed > 60 
+        return minutesPassed > 60
     }
 
     /**
@@ -128,12 +137,7 @@ export default class AuthService {
      */
     async LoginWithGooogle(state: string, access_token: string): Promise<boolean> {
         try {
-            type ResponseData = {
-                profile: UserProfile,
-                refeshToken: string,
-                accessToken: string,
-            }
-            const response = await axios.get<ResponseData>(ENV.GOOGLE_CALLBACK_BE_URL, {
+            const response = await axios.get<LoginWithGooogleResponse>(ENV.GOOGLE_CALLBACK_BE_URL, {
                 params: {
                     state: state,
                     access_token: access_token,

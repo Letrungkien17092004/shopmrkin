@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react"
 import { ProductService, AuthService } from "../../services/index.ts"
-import { Product } from "../../types/index.ts"
+import { Product } from "../../types/product/index.ts"
+import {
+    getTotalStock,
+    getMinPrice,
+    getMaxPrice,
+    makeThumbnailURL
+} from "../../utils/index.ts"
+
 import ProductCard from "./ProductCard.tsx"
 import ProductSortingOptions from "./ProductSortingOptions.tsx"
 import ProductFilteringInfo from "./ProductFilteringInfo.tsx"
@@ -43,11 +50,11 @@ export default function ProductCardList() {
                         <div key={p.id} className="col-span-6 sm:col-span-4 lg:col-span-3">
                             <Link className="text-base no-underline" to={`/product-detail/${p.id}`}>
                                 <ProductCard
-                                    imgURL={`${p.thumbnailURL}`}
+                                    imgURL={`${makeThumbnailURL(p.media)}`}
                                     discount={0}
                                     starPoint={5}
                                     name={p.name}
-                                    price={p.maxPrice || 0}
+                                    price={getMaxPrice(p.variants)}
                                 />
                             </Link>
                         </div>

@@ -1,7 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductService, AuthService } from "../../../services/index.ts";
-import { Product } from "../../../types/Product.ts";
+import { Product } from "../../../types/product/index.ts";
+import {
+    getTotalStock,
+    getMinPrice,
+    getMaxPrice,
+    makeThumbnailURL
+} from "../../../utils/index.ts"
+
 import { NormalButton } from "../../../components/buttons/Button.tsx";
 import Loading from "../../../components/Loading.tsx";
 import Notification from "../../../components/notifications/Notification.tsx";
@@ -91,10 +98,10 @@ export default function ProductManager() {
                             <ProductTable
                                 listProduct={products.map(p => ({
                                     ...p,
-                                    imageURL: `${p.media[0]?.hostname}${p.media[0]?.filePath}`,
-                                    minPrice: p.minPrice,
-                                    maxPrice: p.maxPrice,
-                                    stock: p.stock
+                                    imageURL: `${makeThumbnailURL(p.media)}`,
+                                    minPrice: getMinPrice(p.variants),
+                                    maxPrice: getMaxPrice(p.variants),
+                                    stock: getTotalStock(p.variants)
                                 }))}
                                 createDeleteEventHandler={createDeleteEventHandler}
                             />
