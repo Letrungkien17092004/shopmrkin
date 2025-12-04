@@ -9,7 +9,7 @@ import TableDataImage from "./TableDataImage.tsx";
 import TableDataPrice from "./TableDataPrice.tsx";
 import TableDataStock from "./TableDataStock.tsx";
 import TableDataActions from "./TableDataActions.tsx";
-import { NormalButton, DangerButton } from "../buttons/Button.tsx";
+import { NormalButton, DangerButton } from "../button/Button.tsx";
 import { Link } from "react-router-dom";
 
 type Props = {

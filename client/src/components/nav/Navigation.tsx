@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { useAuthContext } from "../../contexts/AuthContext.tsx"
-import { Cart } from "../Cart/index.ts"
+import { Cart } from "../cart/index.ts"
 import UserProfile from "./UserProfile.tsx"
 
 export default function Navivation() {

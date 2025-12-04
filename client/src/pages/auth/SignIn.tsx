@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import LoginWithGoogle from "../../components/LoginWithGoogle.tsx";
+import LoginWithGoogle from "../../components/auth/LoginWithGoogle.tsx";
 
 export default function Register() {
     return (

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
-import TextAreaInput from "../../../components/inputs/TextAreaInput.tsx";
-import { useCreateProduct } from "../../../contexts/CreateProductContext.tsx";
+import TextAreaInput from "../inputs/TextAreaInput.tsx";
+import { useCreateProduct } from "../../contexts/CreateProductContext.tsx";
 
 
 

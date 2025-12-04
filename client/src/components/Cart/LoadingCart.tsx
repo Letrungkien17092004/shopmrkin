@@ -1,5 +1,5 @@
 import React from "react";
-import Loading from "../Loading.tsx";
+import Loading from "../waiter/Loading.tsx";
 
 export default function LoadingCart() {
     return <>

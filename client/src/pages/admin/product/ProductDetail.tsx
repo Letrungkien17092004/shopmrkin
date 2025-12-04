@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
-import { NormalButton, DangerButton } from "../../../components/buttons/Button.tsx";
+import { NormalButton, DangerButton } from "../../../components/button/Button.tsx";
 import { ProductService, VariantService, AuthService } from "../../../services/index.ts";
-import { Product, Variant } from "../../../types/index.ts";
+import { Product, Variant } from "../../../types/product/index.ts";
+import {getMinPrice, getMaxPrice} from "../../../utils/index.ts"
 import ProductImageSlider from "../../../components/products/ProductImageSlider.tsx";
 
 const authService = new AuthService()
@@ -51,12 +52,12 @@ export default function ProductDetail() {
     useEffect(() => {
         const fetdata = async () => {
             if (id) {
-                const searchProduct = await productService.findById(id)
-                if (searchProduct) {
-                    setVariants(searchProduct.variants)
-                    setDefaultPrice(`${searchProduct.minPrice} - ${searchProduct.maxPrice}`)
+                const searchedProduct = await productService.findById(id)
+                if (searchedProduct) {
+                    setVariants(searchedProduct.variants)
+                    setDefaultPrice(`${getMinPrice(searchedProduct.variants)} - ${getMaxPrice(searchedProduct.variants)}`)
                 }
-                setProduct(searchProduct)
+                setProduct(searchedProduct)
             } else {
                 throw new Error("id param is not found")
             }

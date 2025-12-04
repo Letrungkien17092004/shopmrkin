@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from "react";
-import { useCreateProduct } from "../../../contexts/CreateProductContext.tsx";
-import { NormalButton, DangerButton } from "../../../components/buttons/Button.tsx";
-import { Input } from "../../../components/inputs/index.tsx"
-import { Table, TableHead, TableBody, TableRow, TableHeading, TableData, TableDataPrice, TableDataActions } from "../../../components/table/index.ts"
+import { useCreateProduct } from "../../contexts/CreateProductContext.tsx";
+import { NormalButton, DangerButton } from "../button/Button.tsx";
+import { Input } from "../inputs/index.tsx"
+import { Table, TableHead, TableBody, TableRow, TableHeading, TableData, TableDataPrice, TableDataActions } from "../table/index.ts"
 
 interface VariantType {
     name: string,

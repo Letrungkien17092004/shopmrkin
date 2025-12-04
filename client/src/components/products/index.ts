@@ -4,7 +4,8 @@ import ProductFilter from "./ProductFilter.tsx";
 import ProductFilteringInfo from "./ProductFilteringInfo.tsx";
 import ProductImageSlider from "./ProductImageSlider.tsx";
 import ProductSortingOptions from "./ProductSortingOptions.tsx";
-
+import CreateProductForm from "./CreateProductForm.tsx";
+import CreateVariantForm from "./CreateVariantForm.tsx";
 
 export {
     ProductCard,
@@ -13,4 +14,6 @@ export {
     ProductFilteringInfo,
     ProductImageSlider,
     ProductSortingOptions,
+    CreateProductForm,
+    CreateVariantForm
 }

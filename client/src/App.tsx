@@ -1,5 +1,5 @@
 import React from "react";
-import Router from "./Routers/Router.tsx";
+import Router from "./routers/Router.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 
 export default function MyApp() {

@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
-import Loading from "../components/Loading.tsx";
+import Loading from "../components/waiter/Loading.tsx";
 import AuthService from "../services/AuthService.ts";
 const authService = new AuthService()
 

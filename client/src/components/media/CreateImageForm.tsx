@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, ChangeEvent } from "react";
-import { useCreateProduct } from "../../../contexts/CreateProductContext.tsx";
+import { useCreateProduct } from "../../contexts/CreateProductContext.tsx";
 type ImageItem = {
     id: string;
     file: File;

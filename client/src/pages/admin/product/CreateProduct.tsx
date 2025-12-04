@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import CreateProductForm from "./CreateProductForm.tsx";
-import CreateVariantForm from "./CreateVariantForm.tsx";
-import CreateImageForm from "./CreateImageForm.tsx";
-import Loading from "../../../components/Loading.tsx";
-import { NormalButton } from "../../../components/buttons/Button.tsx";
+import { CreateProductForm, CreateVariantForm } from "../../../components/products/index.ts";
+import { CreateImageForm } from "../../../components/media/index.ts";
+import Loading from "../../../components/waiter/Loading.tsx";
+import { NormalButton } from "../../../components/button/Button.tsx";
 import { CreateProductProvider, useCreateProduct } from "../../../contexts/CreateProductContext.tsx";
 import { MediaService, ProductService, VariantService, AuthService } from "../../../services/index.ts"
 

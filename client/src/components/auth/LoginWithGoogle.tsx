@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import AuthService from "../services/AuthService.ts";
+import AuthService from "../../services/AuthService.ts";
 
 const authService = new AuthService()
 

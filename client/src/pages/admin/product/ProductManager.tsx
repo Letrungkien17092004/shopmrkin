@@ -9,8 +9,8 @@ import {
     makeThumbnailURL
 } from "../../../utils/index.ts"
 
-import { NormalButton } from "../../../components/buttons/Button.tsx";
-import Loading from "../../../components/Loading.tsx";
+import { NormalButton } from "../../../components/button/Button.tsx";
+import Loading from "../../../components/waiter/Loading.tsx";
 import Notification from "../../../components/notifications/Notification.tsx";
 import { ProductTable } from "../../../components/table/index.ts"
 import useNotificationController from "../../../hooks/useNotificationController.ts";
