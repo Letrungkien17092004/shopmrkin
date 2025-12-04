@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import axios from "axios"
+import GoogleService from "../../services/googleService/GoogleApi.js";
 import IUserUsecase from "../../core/applications/interfaces/usecases/IUserUsecase.js";
 import IAdminSystemUsecase from "../../core/applications/interfaces/usecases/IAdminSystemUsecase.js";
 import ICartUsecase from "../../core/applications/interfaces/usecases/ICartUsecase.js";
@@ -8,15 +8,6 @@ import jwt from "jsonwebtoken";
 import { ENV } from "../../config/env.js";
 import { z } from "zod"
 
-interface GoogleUserProfile {
-    email: string,
-    family_name: string,
-    given_name: string,
-    id: string,
-    name: string,
-    picture: string,
-    verified_email: boolean,
-}
 
 interface JWTPayload {
     id: string,
@@ -42,13 +33,15 @@ interface InternalProfile {
 export default class AuthorController {
 
     private userUsecase: IUserUsecase
+    private googleApiService: GoogleService
     private adminSystemUsecase: IAdminSystemUsecase
     private cartUsecase: ICartUsecase
 
-    constructor(userUsecase: IUserUsecase, adminSystemUsecase: IAdminSystemUsecase, cartUsecase: ICartUsecase) {
+    constructor(userUsecase: IUserUsecase, adminSystemUsecase: IAdminSystemUsecase, cartUsecase: ICartUsecase, googleApiService: GoogleService) {
         this.userUsecase = userUsecase
         this.adminSystemUsecase = adminSystemUsecase
         this.cartUsecase = cartUsecase
+        this.googleApiService = googleApiService
     }
 
     /**
@@ -334,10 +327,7 @@ export default class AuthorController {
 
             try {
                 // get profile from google
-                const googleUser = await axios.get<GoogleUserProfile>(
-                    `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`
-                )
-                const googleProfile = googleUser.data
+                const googleProfile = await this.googleApiService.getProfileByAccessToken(access_token)
                 const foundUser = await this.userUsecase.findByEmail({
                     where: {
                         email: googleProfile.email
@@ -346,7 +336,7 @@ export default class AuthorController {
 
                 var payload: JWTPayload | null = null
                 var profile: InternalProfile | null = null
-                // if user wasn't found
+                // if user wasn't found then create new
                 if (!foundUser) {
                     const createdUser = await this.userUsecase.create({
                         data: {
