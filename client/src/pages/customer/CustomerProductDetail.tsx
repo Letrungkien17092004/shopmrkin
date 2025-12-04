@@ -9,7 +9,7 @@ import { addCartItem } from "../../store/cartSlice.ts"
 import { RootState, AppDispatch } from "../../store/index.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuthContext } from "../../contexts/AuthContext.tsx";
-import { getCartItemByVariantId } from "../../utils/index.ts"
+import { getCartItemByVariantId, getMinPrice } from "../../utils/index.ts"
 
 const authService = new AuthService()
 const productService = new ProductService(authService)
@@ -65,7 +65,7 @@ export default function CustomerProductDetail() {
             const productData = await productService.findById(productId!)
             if (productData) {
                 setProduct(productData)
-                setDefaultPrice(`${productData.minPrice} - ${productData.maxPrice}`)
+                setDefaultPrice(`${getMinPrice(productData.variants)} - ${getMinPrice(productData.variants)}`)
             }
             setIsLoading(false)
         }

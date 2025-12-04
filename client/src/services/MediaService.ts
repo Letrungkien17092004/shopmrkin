@@ -1,17 +1,17 @@
 import axios from "axios";
+import { Media } from "../types/media/index.ts"
 import AuthService from "./AuthService.ts";
 import { ENV } from "../config/ENV.ts";
 
-interface Media {
-    id: string,
-    fileName: string,
-    filePath: string,
-    hostname: string,
-    media_type: "IMAGE" | "VIDEO",
-    username?: string
-}
 interface UploadResponse {
-    media: Media[]
+    media: {
+        id: string,
+        fileName: string,
+        filePath: string,
+        hostname: string,
+        media_type: "IMAGE" | "VIDEO",
+        username?: string
+    }[]
 }
 export default class MediaService {
     private readonly authService: AuthService
@@ -45,7 +45,13 @@ export default class MediaService {
                     }
                 }
             )
-            return response.data.media
+            return response.data.media.map(med => ({
+                id: med.id,
+                fileName: med.fileName,
+                filePath: med.filePath,
+                hostname: med.hostname,
+                type: med.media_type
+            }))
         } catch (error) {
             throw error
         }

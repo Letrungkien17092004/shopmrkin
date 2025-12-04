@@ -5,10 +5,10 @@ interface ProductCardProps {
     discount: number,
     starPoint: number,
     name: string,
-    price: number
+    price?: number | null
 }
 
-export default function ProductCard({ imgURL, discount, starPoint, name, price }: ProductCardProps) {
+export default function ProductCard({ imgURL, discount, starPoint, name, price = 1 }: ProductCardProps) {
     return (
         <div className="relative w-full shadow-2xl hover:scale-103 hover:ring-1 hover:ring-green-400 transition overflow-hidden rounded">
             <div style={{ backgroundImage: `url(${imgURL})` }} className="pt-[100%] bg-center bg-cover">
@@ -39,7 +39,7 @@ export default function ProductCard({ imgURL, discount, starPoint, name, price }
                         discount > 0
                             ? <>
                                 <span className="text-base font-semibold text-orange-600">
-                                    {price * ((100 - discount) / 100)}
+                                    {(price || 0) * ((100 - discount) / 100)}
                                 </span>
                                 <span className="text-base ml-4 font-semibold text-gray-600 line-through">
                                     {price}

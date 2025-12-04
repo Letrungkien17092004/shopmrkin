@@ -8,7 +8,7 @@ export default interface Variant {
     userId: string
     price: number
     stock: number
-    user: Auth
+    user?: Auth
     createdAt?: Date
     updatedAt?: Date
 }

@@ -9,7 +9,9 @@ import RolePerRepository from "../../repositories/RolePerRepository.js";
 import AdminSystemUsecase from "../../core/applications/usecases/AdminSystemUsecase.js";
 import UserUsecase from "../../core/applications/usecases/UserUsecase.js";
 import CartUsecase from "../../core/applications/usecases/CartUsecase.js";
+import GoogleService from "../../services/googleService/GoogleApi.js";
 
+const googleService = new GoogleService()
 const userRepo = new UserRepository()
 const roleRepo = new RolesRepository()
 const perRepo = new PermissionsRepository()
@@ -19,7 +21,7 @@ const cartRepo = new CartRepository()
 const userUsecase = new UserUsecase(userRepo)
 const adminUsecase = new AdminSystemUsecase(roleRepo, perRepo, rolePerRepo)
 const cartUsecase = new CartUsecase(cartRepo)
-const authorController = new AuthorController(userUsecase, adminUsecase, cartUsecase)
+const authorController = new AuthorController(userUsecase, adminUsecase, cartUsecase, googleService)
 
 const authorRouter = Router()
 

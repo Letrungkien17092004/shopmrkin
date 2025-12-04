@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import CartService from "../services/CartService.ts";
-import { Cart } from "../types/index.ts"
+import { CartService, AuthService } from "../services/index.ts";
+import { Cart } from "../types/cart/index.ts"
 import axios from "axios";
-const cartService = new CartService()
+
+const authService = new AuthService()
+const cartService = new CartService(authService)
 
 type CartState = {
     cart: Cart | null;

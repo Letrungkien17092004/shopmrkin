@@ -19,7 +19,7 @@ interface IGetCartResponse {
             product_id: string,
             product_name: string,
             product_description: string,
-            media: { filePath: string, hostname: string, type: string }
+            media: { id: string, filePath: string, hostname: string, type: string }
         }[],
         createdAt: Date,
         updatedAt: Date
@@ -65,6 +65,7 @@ export default class CartService {
                 variant: variant,
                 productName: ci.product_name,
                 media: {
+                    id: ci.media.id,
                     fileName: ci.media.filePath,
                     filePath: ci.media.filePath || "",
                     hostname: ci.media.hostname || '',

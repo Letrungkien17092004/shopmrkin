@@ -1,7 +1,7 @@
 import axios from "axios"
 import { ENV } from "../config/ENV.ts"
 import AuthService from "./AuthService.ts"
-import { Variant } from "../types/index.ts"
+import { Variant } from "../types/product/index.ts"
 
 export function validVariant(variant: Variant): boolean {
     if (variant.name.length < 5) return false
@@ -20,11 +20,6 @@ type VariantResponse = {
     userId: string
     price: number
     stock: number
-
-    user?: {
-        username: string
-        role?: string
-    }
 
     createdAt?: string
     updatedAt?: string
@@ -64,7 +59,7 @@ export default class VariantService {
             )
             console.log("variant response: ", response.data)
             const variant = response.data.variant
-            return new Variant({
+            return {
                 id: variant.id,
                 name: variant.name,
                 sku: variant.sku,
@@ -74,7 +69,7 @@ export default class VariantService {
                 userId: variant.userId,
                 createdAt: new Date(variant.createdAt || ""),
                 updatedAt: new Date(variant.updatedAt || "")
-            })
+            }
         } catch (error) {
             console.log(error)
             throw error
@@ -91,7 +86,7 @@ export default class VariantService {
         try {
             const response = await axios.get<{ variants: VariantResponse[] }>(`${ENV.BACK_END_HOST}/api/variant?productId=${productId}`)
             const variants = response.data.variants
-            return variants.map(v => new Variant({
+            return variants.map(v => ({
                 id: v.id,
                 name: v.name,
                 sku: v.sku,
@@ -131,7 +126,7 @@ export default class VariantService {
                 }
             )
             const variantData = response.data.variant
-            return new Variant({
+            return {
                 id: variantData.id,
                 name: variantData.name,
                 sku: variantData.sku,
@@ -139,7 +134,7 @@ export default class VariantService {
                 stock: variantData.stock,
                 productId: variantData.productId,
                 userId: variantData.userId
-            })
+            }
         } catch (error) {
             throw error
         }

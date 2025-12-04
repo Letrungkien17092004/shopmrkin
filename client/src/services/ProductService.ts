@@ -1,9 +1,10 @@
 import axios, { AxiosError } from "axios"
-import VariantService from "./VariantService.ts"
-import { Variant, Product } from "../types/index.ts"
+
+import { Variant, Product } from "../types/product/index.ts"
+import { Media } from "../types/media/index.ts"
+
 import AuthService from "./AuthService.ts"
 import { ENV } from "../config/ENV.ts"
-// const variantService = new VariantService()
 
 type ProductResponse = {
     id: string,
@@ -15,7 +16,7 @@ type ProductResponse = {
         role?: string
     },
     category: string,
-    media: { fileName: string, filePath: string, hostname: string }[],
+    media: { id: string, fileName: string, filePath: string, hostname: string }[],
     variants: {
         id: string,
         name: string,
@@ -38,13 +39,13 @@ type GetAllProductResponse = {
 
 
 const DEFAULT_MEDIA = {
+    id: "",
     fileName: "vn-11134207-7ra0g-m6gngdko0gip8d.webp",
     filePath: "/file/vn-11134207-7ra0g-m6gngdko0gip8d.webp",
-    hostname: "https://down-vn.img.susercontent.com"
+    hostname: "https://down-vn.img.susercontent.com",
+    type: 'image'
 }
-function wait(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+
 export default class ProductService {
     private readonly authService: AuthService
 
@@ -80,7 +81,7 @@ export default class ProductService {
                 }
             )
             const product = response.data.product
-            return new Product({
+            return ({
                 id: product.id,
                 name: product.name,
                 product_code: product.product_code,
@@ -120,23 +121,31 @@ export default class ProductService {
                 }
             )
             const product = response.data.product
-            return new Product({
+            const media: Media[] = product.media.map(med => ({
+                id: med.id,
+                fileName: med.fileName,
+                filePath: med.filePath,
+                hostname: med.hostname,
+                type: 'image'
+            }))
+            const variants: Variant[] = product.variants.map(v => ({
+                id: v.id,
+                name: v.name,
+                sku: v.sku,
+                productId: v.productId,
+                userId: "",
+                price: v.price,
+                stock: v.stock
+
+            }))
+            return ({
                 id: product.id,
                 name: product.name,
                 product_code: product.product_code,
                 description: product.description,
                 category: product.category,
-                media: product.media,
-                variants: product.variants.map(v => new Variant({
-                    id: "",
-                    name: v.name,
-                    sku: v.sku,
-                    price: v.price,
-                    stock: v.stock,
-                    productId: product.id,
-                    userId: ""
-                })),
-                user: product.user,
+                media: media,
+                variants: variants,
                 createdAt: new Date(product.createdAt),
                 updatedAt: new Date(product.updatedAt)
             })
@@ -149,7 +158,7 @@ export default class ProductService {
      * Find many product
      * @returns 
      */
-    async getAll(options:{
+    async getAll(options: {
         include?: {
             user?: boolean,
             variants?: boolean,
@@ -172,24 +181,34 @@ export default class ProductService {
             }
             const response = await axios.get<GetAllProductResponse>(`${ENV.BACK_END_HOST}/api/products?${includeQuery}`)
             const products = response.data.products
+
             return products.map(p => {
-                const media = p.media.length !== 0 ? p.media : [DEFAULT_MEDIA]
-                return new Product({
+
+                const media: Media[] = p.media.map(med => ({
+                    id: med.id,
+                    fileName: med.fileName,
+                    filePath: med.filePath,
+                    hostname: med.hostname,
+                    type: 'image'
+                }))
+                const variants: Variant[] = p.variants.map(v => ({
+                    id: v.id,
+                    name: v.name,
+                    sku: v.sku,
+                    productId: v.productId,
+                    userId: "",
+                    price: v.price,
+                    stock: v.stock
+
+                }))
+                return ({
                     id: p.id,
                     name: p.name,
                     product_code: p.product_code,
                     description: p.description,
-                    category: "TODO",
+                    category: p.category,
                     media: media,
-                    variants: p.variants.map(v => new Variant({
-                        id: "",
-                        name: v.name,
-                        sku: v.sku,
-                        price: v.price,
-                        stock: v.stock,
-                        productId: p.id,
-                        userId: ""
-                    })),
+                    variants: variants,
                     createdAt: new Date(p.createdAt),
                     updatedAt: new Date(p.updatedAt)
                 })
@@ -236,26 +255,35 @@ export default class ProductService {
     async findById(id: string): Promise<Product | null> {
         try {
             const response = await axios.get<{ product: ProductResponse }>(`${ENV.BACK_END_HOST}/api/product/${id}?include[user]=true&include[variants]=true&include[media]=true`)
-            const productData = response.data.product
-            return new Product({
-                id: productData.id,
-                name: productData.name,
-                product_code: productData.product_code,
-                description: productData.description,
-                category: productData.category,
-                media: productData.media.length!==0?productData.media:[DEFAULT_MEDIA],
-                variants: productData.variants.map(v => new Variant({
-                    id: v.id,
-                    name: v.name,
-                    sku: v.sku,
-                    price: v.price,
-                    stock: v.stock,
-                    productId: productData.id,
-                    userId: ""
-                })),
-                createdAt: new Date(productData.createdAt),
-                updatedAt: new Date(productData.updatedAt)
-            })
+            const product = response.data.product
+            const media: Media[] = product.media.map(med => ({
+                id: med.id,
+                fileName: med.fileName,
+                filePath: med.filePath,
+                hostname: med.hostname,
+                type: 'image'
+            }))
+            const variants: Variant[] = product.variants.map(v => ({
+                id: v.id,
+                name: v.name,
+                sku: v.sku,
+                productId: v.productId,
+                userId: "",
+                price: v.price,
+                stock: v.stock
+
+            }))
+            return {
+                id: product.id,
+                name: product.name,
+                product_code: product.product_code,
+                description: product.description,
+                category: product.category,
+                media: media,
+                variants: variants,
+                createdAt: new Date(product.createdAt),
+                updatedAt: new Date(product.updatedAt)
+            }
         } catch (error) {
             if (error instanceof AxiosError) {
                 if (error.status === 404) {

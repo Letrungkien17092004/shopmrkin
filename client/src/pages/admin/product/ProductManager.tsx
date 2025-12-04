@@ -26,7 +26,13 @@ export default function ProductManager() {
     // initial data
     useEffect(() => {
         const fetch = async () => {
-            setProducts(await productService.getAll({}))
+            setProducts(await productService.getAll({
+                include: {
+                    user: true,
+                    variants: true,
+                    media: true
+                }
+            }))
         }
 
         fetch()
@@ -101,7 +107,7 @@ export default function ProductManager() {
                                     imageURL: `${makeThumbnailURL(p.media)}`,
                                     minPrice: getMinPrice(p.variants),
                                     maxPrice: getMaxPrice(p.variants),
-                                    stock: getTotalStock(p.variants)
+                                    stock: getTotalStock(p.variants) || 0
                                 }))}
                                 createDeleteEventHandler={createDeleteEventHandler}
                             />

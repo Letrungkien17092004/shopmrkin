@@ -4,7 +4,10 @@ import { Media } from "../types/media/index.ts"
 /**
  * get total number of stocks in list of variants
  */
-export function getTotalStock(variants: Variant[]): number {
+export function getTotalStock(variants?: Variant[]): number | null {
+    if (!variants || variants.length <= 0) {
+        return null
+    }
     let totalStock = 0
     variants.forEach(variant => totalStock += variant.stock)
     return totalStock
@@ -13,7 +16,10 @@ export function getTotalStock(variants: Variant[]): number {
 /**
  * get minium number of stocks in list of variants
  */
-export function getMinPrice(variants: Variant[]): number {
+export function getMinPrice(variants?: Variant[]): number | null {
+    if (!variants || variants.length <= 0) {
+        return null
+    }
     let min_ = variants[0].price
     variants.forEach((variant) => {
         if (variant.price < min_) {
@@ -27,8 +33,11 @@ export function getMinPrice(variants: Variant[]): number {
 /**
  * get maxium number of stocks in list of variants
  */
-export function getMaxPrice(variants: Variant[]): number {
-    let max_ = variants[0]!.price
+export function getMaxPrice(variants?: Variant[]): number | null {
+    if (!variants || variants.length <= 0) {
+        return null
+    }
+    let max_ = variants[0].price
 
     variants.forEach((variant) => {
         if (variant.price > max_) {
@@ -45,7 +54,10 @@ export function getMaxPrice(variants: Variant[]): number {
  * @param media 
  * @returns 
  */
-export function makeThumbnailURL(media: Media[]): string {
+export function makeThumbnailURL(media?: Media[]): string {
+    if (!media || media.length <= 0) {
+        return "https://i.pinimg.com/1200x/fd/3d/8e/fd3d8e2a1dd4f09b4170d31e26913bab.jpg"
+    }
     const thumbnail = media[0]
     return `${thumbnail.hostname}${thumbnail.filePath}`
 }
