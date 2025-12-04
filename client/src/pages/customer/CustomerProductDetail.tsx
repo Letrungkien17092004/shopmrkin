@@ -20,30 +20,32 @@ interface VariantListProps {
 }
 
 function VariantList({ variants, selectedVariant, createSelectedEvent }: VariantListProps) {
-    return <>
-        {variants.map(v => {
-            return <>
-                {
-                    selectedVariant && selectedVariant.id === v.id
-                        ? <>
-                            <div onClick={createSelectedEvent(v.id)} key={v.sku} className="cursor-pointer select-none bg-green-400 rounded shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                                <div className="w-full p-1 px-2 text-sm text-white text-center text-nowrap">
-                                    {v.name}
-                                </div>
-                            </div>
-                        </>
-                        : <>
-                            <div onClick={createSelectedEvent(v.id)} key={`${v.sku}_2`} className="cursor-pointer select-none hover:ring hover:ring-green-500 rounded shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
-                                <div className="w-full p-1 px-2 text-sm text-black text-center  text-nowrap">
-                                    {v.name}
-                                </div>
-                            </div>
-                        </>
-                }
-            </>
-        })}
-    </>
+    return (
+        <>
+            {variants.map(v => {
+                const selected = selectedVariant?.id === v.id;
+
+                return (
+                    <div
+                        key={v.sku}
+                        onClick={createSelectedEvent(v.id)}
+                        className={
+                            "cursor-pointer select-none rounded shadow-[0_4px_12px_rgba(0,0,0,0.3)] " +
+                            (selected
+                                ? "bg-green-400"
+                                : "hover:ring hover:ring-green-500")
+                        }
+                    >
+                        <div className={`w-full p-1 px-2 text-sm text-center text-nowrap ${selected ? "text-white" : "text-black"}`}>
+                            {v.name}
+                        </div>
+                    </div>
+                );
+            })}
+        </>
+    );
 }
+
 
 export default function CustomerProductDetail() {
     const [isLoading, setIsLoading] = useState<boolean>(true)

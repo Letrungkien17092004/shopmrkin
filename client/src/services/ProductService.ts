@@ -4,7 +4,6 @@ import { Variant, Product } from "../types/index.ts"
 import AuthService from "./AuthService.ts"
 import { ENV } from "../config/ENV.ts"
 // const variantService = new VariantService()
-const authService = new AuthService()
 
 type ProductResponse = {
     id: string,
@@ -47,6 +46,11 @@ function wait(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 export default class ProductService {
+    private readonly authService: AuthService
+
+    constructor(authService: AuthService) {
+        this.authService = authService
+    }
 
     /**
      * Create a Product
@@ -59,8 +63,8 @@ export default class ProductService {
         categoryId: number
     }): Promise<Product> {
         try {
-            if (authService.accessIsExpired()) {
-                await authService.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
             const response = await axios.post<CreateProductResponse>(
                 `${ENV.BACK_END_HOST}/api/product/`,
@@ -71,7 +75,7 @@ export default class ProductService {
                 },
                 {
                     headers: {
-                        Authorization: `Bearer ${authService.getAccessToken()}`
+                        Authorization: `Bearer ${this.authService.getAccessToken()}`
                     }
                 }
             )
@@ -100,8 +104,8 @@ export default class ProductService {
      */
     async updateById(id: string, options: Partial<Omit<Product, "id" | "variants">>): Promise<Product> {
         try {
-            if (authService.accessIsExpired()) {
-                await authService.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
             const response = await axios.put<{ product: ProductResponse }>(`${ENV.BACK_END_HOST}/api/product/${id}`,
                 {
@@ -111,7 +115,7 @@ export default class ProductService {
                 {
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${authService.getAccessToken()}`
+                        Authorization: `Bearer ${this.authService.getAccessToken()}`
                     }
                 }
             )
@@ -202,13 +206,13 @@ export default class ProductService {
      */
     async deleteById(id: string): Promise<void> {
         try {
-            if (authService.accessIsExpired()) {
-                await authService.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
             const response = await axios.delete(`${ENV.BACK_END_HOST}/api/product/${id}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${authService.getAccessToken()}`
+                        Authorization: `Bearer ${this.authService.getAccessToken()}`
                     }
                 }
             )

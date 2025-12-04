@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { DangerButton, NormalButton } from "../../../components/buttons/Button.tsx";
-import ProductService, { Product } from "../../../services/ProductService.ts";
+import { ProductService, AuthService } from "../../../services/index.ts";
 import TextAreaInput from "../../../components/inputs/TextAreaInput.tsx";
 import VariantModifyForm from "./VariantModifyForm.tsx";
+import { Product } from "../../../types/index.ts";
 
-
-const productService = new ProductService()
+const authService = new AuthService()
+const productService = new ProductService(authService)
 // Product modify form
 export default function ProductModifyForm({ id }: { id: string }) {
     const [loaded, setLoaded] = useState<boolean>(false)

@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { NormalButton, DangerButton } from "../../../components/buttons/Button.tsx";
-import VariantService, { Variant, validVariant } from "../../../services/VariantService.ts";
+import { VariantService, AuthService } from "../../../services/index.ts";
+import { Variant } from "../../../types/index.ts"
 
-const variantService = new VariantService()
+const authService = new AuthService()
+const variantService = new VariantService(authService)
 
 type ExtendedVariant = Variant & {
     state: "original" | "modified" | "delete" | "new"
@@ -179,7 +181,6 @@ export default function VariantModifyForm({ id, savingState, setSavingState }: P
                             price: item.price,
                             stock: item.stock,
                             productId: item.productId,
-                            userId: item.userId
                         })
                         console.log("Create variant successfully")
                         count++
@@ -239,16 +240,16 @@ export default function VariantModifyForm({ id, savingState, setSavingState }: P
             userId: ""
         }
 
-        const isValid = validVariant(newVariant)
-        if (isValid) {
-            variantsDispatch({
-                type: "add",
-                variant: {
-                    ...newVariant,
-                    state: "new"
-                }
-            })
-        }
+        // const isValid = validVariant(newVariant)
+        // if (isValid) {
+        variantsDispatch({
+            type: "add",
+            variant: {
+                ...newVariant,
+                state: "new"
+            }
+        })
+        // }
     }, [createField])
 
 
@@ -303,11 +304,11 @@ export default function VariantModifyForm({ id, savingState, setSavingState }: P
             userId: ""
         }
 
-        if (!validVariant(variant)) {
-            console.log(variant)
-            window.alert("Dữ liệu không hợp lệ!")
-            return
-        }
+        // if (!validVariant(variant)) {
+        //     console.log(variant)
+        //     window.alert("Dữ liệu không hợp lệ!")
+        //     return
+        // }
 
         if (!markedSku) { throw new Error("sku is null when update") }
         variantsDispatch({

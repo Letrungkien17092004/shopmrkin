@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react"
-import ProductService from "../../services/ProductService.ts"
+import { ProductService, AuthService } from "../../services/index.ts"
 import { Product } from "../../types/index.ts"
 import ProductCard from "./ProductCard.tsx"
 import ProductSortingOptions from "./ProductSortingOptions.tsx"
 import ProductFilteringInfo from "./ProductFilteringInfo.tsx"
 import { Link } from "react-router-dom"
-const productService = new ProductService()
+
+const authService = new AuthService()
+const productService = new ProductService(authService)
 
 export default function ProductCardList() {
     const [products, setProducts] = useState<Product[]>([])

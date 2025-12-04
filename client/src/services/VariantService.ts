@@ -3,8 +3,6 @@ import { ENV } from "../config/ENV.ts"
 import AuthService from "./AuthService.ts"
 import { Variant } from "../types/index.ts"
 
-const authService = new AuthService()
-
 export function validVariant(variant: Variant): boolean {
     if (variant.name.length < 5) return false
     if (variant.sku.length < 5) return false
@@ -33,6 +31,11 @@ type VariantResponse = {
 }
 
 export default class VariantService {
+    private readonly authService: AuthService
+
+    constructor(authService: AuthService) {
+        this.authService = authService
+    }
 
     /**
      * Create a Variant
@@ -40,8 +43,8 @@ export default class VariantService {
      */
     async create(options: Omit<Variant, "id" | "userId">): Promise<Variant> {
         try {
-            if (authService.accessIsExpired()) {
-                await authService.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
             const response = await axios.post<{ variant: VariantResponse }>(`${ENV.BACK_END_HOST}/api/variant`,
                 {
@@ -55,7 +58,7 @@ export default class VariantService {
                 {
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${authService.getAccessToken()}`
+                        Authorization: `Bearer ${this.authService.getAccessToken()}`
                     }
                 }
             )
@@ -110,8 +113,8 @@ export default class VariantService {
      */
     async updateById(id: string, options: Partial<Omit<Variant, "id" | "productId">>): Promise<Variant> {
         try {
-            if (authService.accessIsExpired()) {
-                await authService.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
             const response = await axios.put<{ variant: VariantResponse }>(`${ENV.BACK_END_HOST}/api/variant/${id}`,
                 {
@@ -123,7 +126,7 @@ export default class VariantService {
                 {
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${authService.getAccessToken()}`
+                        Authorization: `Bearer ${this.authService.getAccessToken()}`
                     }
                 }
             )
@@ -147,7 +150,7 @@ export default class VariantService {
             const response = await axios.delete(`${ENV.BACK_END_HOST}/api/variant/${id}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${authService.getAccessToken()}`
+                        Authorization: `Bearer ${this.authService.getAccessToken()}`
                     }
                 }
             )

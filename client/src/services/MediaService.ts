@@ -2,8 +2,6 @@ import axios from "axios";
 import AuthService from "./AuthService.ts";
 import { ENV } from "../config/ENV.ts";
 
-const authService = new AuthService()
-
 interface Media {
     id: string,
     fileName: string,
@@ -16,6 +14,11 @@ interface UploadResponse {
     media: Media[]
 }
 export default class MediaService {
+    private readonly authService: AuthService
+
+    constructor(authService: AuthService) {
+        this.authService = authService
+    }
 
     /**
      * Upload many media
@@ -24,8 +27,8 @@ export default class MediaService {
      */
     upload = async (media: File[]): Promise<Media[]> => {
         try {
-            if (authService.accessIsExpired()) {
-                await authService.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
             const formData: FormData = new FormData()
             media.forEach(i => {
@@ -38,7 +41,7 @@ export default class MediaService {
                 {
                     headers: {
                         "Content-Type": "multipart/form-data",
-                        Authorization: `Bearer ${authService.getAccessToken()}`
+                        Authorization: `Bearer ${this.authService.getAccessToken()}`
                     }
                 }
             )
@@ -55,8 +58,8 @@ export default class MediaService {
             status?: "ORPHANED" | "ASSIGNED"
         }): Promise<void> => {
         try {
-            if (authService.accessIsExpired()) {
-                await authService.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
             await axios.put<void>(
                 `${ENV.BACK_END_HOST}/api/media/${mediaId}`,
@@ -64,7 +67,7 @@ export default class MediaService {
                 {
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${authService.getAccessToken()}`
+                        Authorization: `Bearer ${this.authService.getAccessToken()}`
                     }
                 }
             )

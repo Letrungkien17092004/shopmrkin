@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 import { NormalButton, DangerButton } from "../../../components/buttons/Button.tsx";
-import ProductService from "../../../services/ProductService.ts";
-import VariantService from "../../../services/VariantService.ts";
+import { ProductService, VariantService, AuthService } from "../../../services/index.ts";
 import { Product, Variant } from "../../../types/index.ts";
 import ProductImageSlider from "../../../components/products/ProductImageSlider.tsx";
-const productService = new ProductService()
-const variantService = new VariantService()
+
+const authService = new AuthService()
+const productService = new ProductService(authService)
+const variantService = new VariantService(authService)
 
 interface VariantListProps {
     variants: Variant[],

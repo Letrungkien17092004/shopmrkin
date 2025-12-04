@@ -5,11 +5,12 @@ import CreateImageForm from "./CreateImageForm.tsx";
 import Loading from "../../../components/Loading.tsx";
 import { NormalButton } from "../../../components/buttons/Button.tsx";
 import { CreateProductProvider, useCreateProduct } from "../../../contexts/CreateProductContext.tsx";
-import { MediaService, ProductService, VariantService } from "../../../services/index.ts"
+import { MediaService, ProductService, VariantService, AuthService } from "../../../services/index.ts"
 
-const mediaService = new MediaService()
-const productService = new ProductService()
-const variantService = new VariantService()
+const authService = new AuthService()
+const mediaService = new MediaService(authService)
+const productService = new ProductService(authService)
+const variantService = new VariantService(authService)
 
 function CreateProductWrapper() {
     const { product, variants, media } = useCreateProduct()

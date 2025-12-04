@@ -2,7 +2,6 @@ import axios from "axios";
 import { ENV } from "../config/ENV.ts";
 import AuthService from "./AuthService.ts";
 import { Cart, CartItem, Variant } from "../types/index.ts"
-const auth = new AuthService();
 
 interface IGetCartResponse {
     cart: {
@@ -26,7 +25,12 @@ interface IGetCartResponse {
     }
 }
 export default class CartService {
-    baseUrl = `${ENV.BACK_END_HOST}/api/carts`;
+    private readonly authService: AuthService
+    private readonly baseUrl: string = `${ENV.BACK_END_HOST}/api/carts`;
+
+    constructor(authService: AuthService) {
+        this.authService = authService
+    }
 
     /**
      * Retrieves a cart from server by cartId
@@ -34,10 +38,10 @@ export default class CartService {
      * @returns 
      */
     async getCart(cartId: string): Promise<Cart> {
-        if (auth.accessIsExpired()) {
-            await auth.refeshAccess()
+        if (this.authService.accessIsExpired()) {
+            await this.authService.refeshAccess()
         }
-        const token = auth.getAccessToken();
+        const token = this.authService.getAccessToken();
         const response = await axios.get<IGetCartResponse>(`${this.baseUrl}/${cartId}?include[user]=true&include[cartItem]=true`, {
             headers: { Authorization: `Bearer ${token}` },
         });
@@ -81,10 +85,10 @@ export default class CartService {
      */
     async addItem(cartId: string, variantId: string, quantity: number) {
         try {
-            if (auth.accessIsExpired()) {
-                await auth.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
-            const token = auth.getAccessToken()
+            const token = this.authService.getAccessToken()
             const response = await axios.post<{ message: string }>(
                 `${this.baseUrl}/${cartId}/items`,
                 {
@@ -111,10 +115,10 @@ export default class CartService {
      */
     async updateItem(cartId: string, cartItemId: string, quantity: number) {
         try {
-            if (auth.accessIsExpired()) {
-                await auth.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
-            const token = auth.getAccessToken()
+            const token = this.authService.getAccessToken()
             const response = await axios.put<{ message: string }>(
                 `${this.baseUrl}/${cartId}/items/${cartItemId}`,
                 {
@@ -139,10 +143,10 @@ export default class CartService {
      */
     async removeItem(cartId: string, cartItemId: string) {
         try {
-            if (auth.accessIsExpired()) {
-                await auth.refeshAccess()
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
             }
-            const token = auth.getAccessToken()
+            const token = this.authService.getAccessToken()
             const response = await axios.delete<{ message: string }>(
                 `${this.baseUrl}/${cartId}/items/${cartItemId}`,
                 {

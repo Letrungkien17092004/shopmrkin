@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import ProductService from "../../../services/ProductService.ts";
+import { ProductService, AuthService } from "../../../services/index.ts";
 import { Product } from "../../../types/Product.ts";
 import { NormalButton } from "../../../components/buttons/Button.tsx";
 import Loading from "../../../components/Loading.tsx";
@@ -8,7 +8,9 @@ import Notification from "../../../components/notifications/Notification.tsx";
 import { ProductTable } from "../../../components/table/index.ts"
 import useNotificationController from "../../../hooks/useNotificationController.ts";
 
-const productService = new ProductService()
+const authService = new AuthService()
+const productService = new ProductService(authService)
+
 export default function ProductManager() {
     const [products, setProducts] = useState<Product[]>([])
     const [toDelete, setToDelete] = useState<string | null>(null)
