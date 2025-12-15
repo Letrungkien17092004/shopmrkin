@@ -1,17 +1,17 @@
-import User from "../../core/entities/User.js";
-import Role from "../../core/entities/Role.js";
-import Permission from "../../core/entities/Permission.js";
-import RolePermission from "../../core/entities/RolePermission.js";
-import Category from "../../core/entities/Category.js";
-import Product from "../../core/entities/Product.js";
-import Variant from "../../core/entities/Variant.js";
+import User from "./User.js";
+import Role from "./Role.js";
+import Permission from "./Permission.js";
+import RolePermission from "./RolePermission.js";
+import Category from "./Category.js";
+import Product from "./Product.js";
+import Variant from "./Variant.js";
 import Media from "./Media.js";
 import Cart from "./Cart.js";
 import CartItem from "./CartItem.js";
 import Order from "./Order.js";
 import OrderItem from "./OrderItem.js";
 import Payment from "./Payment.js";
-import ProductEmbedded from "./ProductEmbedded.js";
+import ProductEmbedding from "./ProductEmbedding.js";
 export {
     User,
     Role,
@@ -26,5 +26,5 @@ export {
     Order,
     OrderItem,
     Payment,
-    ProductEmbedded
+    ProductEmbedding
 }

@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["relationJoins"]
 }
 
@@ -15,20 +15,20 @@ datasource db {
 }
 
 model Roles {
-  id Int @id @default(autoincrement())
-  roleName String @unique @db.VarChar(30)
+  id          Int     @id @default(autoincrement())
+  roleName    String  @unique @db.VarChar(30)
   description String? @db.VarChar(255)
 
   // Relationship
   permissions Roles_Permissions[]
-  users Users[]
+  users       Users[]
 
   @@map("roles")
 }
 
 model Permissions {
-  id Int @id @default(autoincrement())
-  perName String @unique @db.VarChar(30)
+  id          Int     @id @default(autoincrement())
+  perName     String  @unique @db.VarChar(30)
   description String? @db.VarChar(255)
 
   // Relationship
@@ -38,11 +38,11 @@ model Permissions {
 }
 
 model Roles_Permissions {
-  roleId Int 
+  roleId   Int
   permisId Int
 
   // Relationship
-  role Roles @relation(fields: [roleId], references: [id])
+  role       Roles       @relation(fields: [roleId], references: [id])
   permission Permissions @relation(fields: [permisId], references: [id])
 
   @@id([roleId, permisId])
@@ -50,80 +50,80 @@ model Roles_Permissions {
 }
 
 model Users {
-  id String @id @default(uuid(7))
-  username String  @db.VarChar(50)
-  account String  @db.VarChar(50) @unique
-  password_hash String  @db.VarChar(255)
-  email String @db.VarChar(255) @unique
+  id            String @id @default(uuid(7))
+  username      String @db.VarChar(50)
+  account       String @unique @db.VarChar(50)
+  password_hash String @db.VarChar(255)
+  email         String @unique @db.VarChar(255)
 
   // Foreign key
-  roleId Int 
+  roleId Int
 
   // Relationship
-  role Roles @relation(fields: [roleId], references: [id])
-  products Products[]
-  variants Variants[]
-  media Media[]
-  orders Orders[]
-  payments Payments[]
-  cart Carts? 
+  role      Roles      @relation(fields: [roleId], references: [id])
+  products  Products[]
+  variants  Variants[]
+  media     Media[]
+  orders    Orders[]
+  payments  Payments[]
+  cart      Carts?
   // Time
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
   @@map("users")
 }
 
 model Categories {
-  id Int @id @default(autoincrement())
-  name String
-  slug String @unique
+  id       Int        @id @default(autoincrement())
+  name     String
+  slug     String     @unique
   products Products[]
 }
 
 model Products {
-  id String @id @default(uuid(7))
-  product_code Int @unique @default(autoincrement())
-  name String
-  description String
+  id           String @id @default(uuid(7))
+  product_code Int    @unique @default(autoincrement())
+  name         String
+  description  String
 
   // Foreign key
-  userId String
-  categoryId Int? 
+  userId     String
+  categoryId Int?
 
   // Relationship
-  category Categories? @relation(fields: [categoryId], references: [id], onDelete: SetNull) 
-  variants Variants[]
-  media Media[]
-  user Users @relation(fields: [userId], references: [id])
+  category          Categories?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  variants          Variants[]
+  media             Media[]
+  user              Users             @relation(fields: [userId], references: [id])
+  productEmbeddings ProductEmbedding?
 
   // time
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
 }
 
 model Variants {
-  id String @id @default(uuid(7))
-  name String
-  sku String @unique
-  stock Int
-  price Decimal
+  id     String  @id @default(uuid(7))
+  name   String
+  sku    String  @unique
+  stock  Int
+  price  Decimal
   userId String
 
   // Foreign Key
   productId String
 
   // Relationship
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
-  product Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user       Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product    Products     @relation(fields: [productId], references: [id], onDelete: Cascade)
   orderItems OrderItems[]
-  cartItems CartItems[]
+  cartItems  CartItems[]
 
   // Time
-  createdAt DateTime @default(now())  
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
 
 enum MediaType {
   IMAGE
@@ -136,49 +136,48 @@ enum MediaStatus {
 }
 
 model Media {
-  id String @id @default(uuid(7))
-  fileName String
-  filePath String
-  hostname String
+  id         String    @id @default(uuid(7))
+  fileName   String
+  filePath   String
+  hostname   String
   media_type MediaType
-  size Int
-  userId String 
-  productId String?
+  size       Int
+  userId     String
+  productId  String?
 
   // Relationship
-  product Products? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status MediaStatus @default(ORPHANED)
+  product Products?   @relation(fields: [productId], references: [id], onDelete: SetNull)
+  user    Users       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status  MediaStatus @default(ORPHANED)
 
   // Time
-  createdAt DateTime @default(now())  
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-} 
-
-
+}
 
 model Carts {
-  id String @id @default(uuid(7))
+  id     String @id @default(uuid(7))
   userId String @unique
 
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      Users       @relation(fields: [userId], references: [id], onDelete: Cascade)
   cartItems CartItems[]
+
   @@map("carts")
 }
 
 model CartItems {
-  id String @id @default(uuid())
-  cartId String
+  id        String @id @default(uuid())
+  cartId    String
   variantId String
 
   quantity Int
 
-  cart Carts @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  cart    Carts    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   variant Variants @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
   @@unique([cartId, variantId])
   @@map("cart_items")
 }
-
 
 // Order Enum
 enum OrderStatus {
@@ -190,32 +189,32 @@ enum OrderStatus {
 }
 
 model Orders {
-  id String @id @default(uuid(7))
-  userId String
+  id          String      @id @default(uuid(7))
+  userId      String
   totalAmount Decimal
-  status OrderStatus @default(PENDING)
+  status      OrderStatus @default(PENDING)
 
   // relation ship
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       Users        @relation(fields: [userId], references: [id], onDelete: Cascade)
   orderItems OrderItems[]
-  payments Payments[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  payments   Payments[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 
   @@map("orders")
 }
 
 model OrderItems {
-  id String @id @default(uuid(7))
-  orderId String
+  id        String  @id @default(uuid(7))
+  orderId   String
   variantId String
-  quantity Int
+  quantity  Int
   unitPrice Decimal
 
-  order Orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  variant Variants @relation(fields: [variantId], references: [id], onDelete: Cascade) 
+  order   Orders   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant Variants @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
   @@unique([orderId, variantId])
-  
   @@map("order_items")
 }
 
@@ -229,14 +228,26 @@ enum PaymentStatus {
 }
 
 model Payments {
-  id String @id @default(uuid(7))
-  transactionId String @unique
-  amount Decimal
-  orderId String
-  userId String
-  status PaymentStatus @default(PENDING)
-  createdAt DateTime @default(now())
+  id            String        @id @default(uuid(7))
+  transactionId String        @unique
+  amount        Decimal
+  orderId       String
+  userId        String
+  status        PaymentStatus @default(PENDING)
+  createdAt     DateTime      @default(now())
 
-  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  Users  @relation(fields: [userId], references: [id], onDelete: Cascade)
   order Orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
+
+model ProductEmbedding {
+  id        String   @id @default(uuid())
+  productId String   @unique
+  origin_text  String
+  embedding Unsupported("vector(1024)")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  product Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
