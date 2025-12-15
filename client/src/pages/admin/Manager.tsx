@@ -1,60 +1,95 @@
 import React, { useCallback, useState } from "react"
-import { Outlet, Link } from "react-router-dom"
+import { Outlet, Link, useLocation } from "react-router-dom"
 import AuthService from "../../services/AuthService.ts"
 
 const authService = new AuthService()
 
 export default function Manager() {
-    type TabNames = "" | "Dashboard" | "Products" | "Orders" | "Delivery" | "Customer"
-    const listNameTab: TabNames[] = ["Dashboard", "Products", "Orders", "Delivery", "Customer"]
-    const [selectedTab, setSelectedTab] = useState<TabNames>("")
+    type TabNames = "Dashboard" | "Products" | "Orders" | "Delivery" | "Customer"
 
-    const changeTab = useCallback((tabNames: TabNames) => {
-        return (e: React.MouseEvent) => {
-            e.stopPropagation()
-            setSelectedTab(tabNames)
-        }
-    }, [])
+    const listNameTab: TabNames[] = [
+        "Dashboard",
+        "Products",
+        "Orders",
+        "Delivery",
+        "Customer",
+    ]
 
-    const tabs = listNameTab.map(tabName => (
-        <li key={tabName} className={selectedTab == tabName ? "cursor-pointer w-full p-1 text-green-400" : "cursor-pointer w-full p-1"}>
-            <Link onClick={changeTab(tabName)} to={tabName.toLowerCase()} className="block size-full text-base font-semibold">
-                {tabName}
-            </Link>
-        </li>
-    ))
-    return (<>
-        <main className="w-full grid grid-cols-12 p-6">
-            <div className="col-span-2">
-                <div className="w-full h-[90vh] rounded shadow-2xl p-2">
-                    {/* User info */}
-                    <div className="w-full">
-                        <div className="size-10 mx-auto rounded-full overflow-hidden shadow-2xl">
-                            <img className="size-full " src={`${authService.getProfile()?.picture}`} />
+    const location = useLocation()
+
+    const getActiveTab = (): TabNames | "" => {
+        const path = location.pathname.split("/").pop()
+        if (!path) return ""
+
+        return listNameTab.find(
+            tab => tab.toLowerCase() === path.toLowerCase()
+        ) ?? ""
+    }
+    return (
+        <>
+            <main className="w-full min-h-screen grid grid-cols-12 bg-slate-100">
+                {/* Sidebar */}
+                <aside className="col-span-2">
+                    <div className="flex h-screen flex-col bg-white border-r border-slate-200">
+
+                        {/* User info */}
+                        <div className="flex flex-col items-center gap-3 py-6 border-b border-slate-200">
+                            <div className="size-12 rounded-full overflow-hidden ring-2 ring-emerald-500">
+                                <img
+                                    className="size-full object-cover"
+                                    src={`${authService.getProfile()?.picture}`}
+                                    alt="avatar"
+                                />
+                            </div>
+                            <p className="text-sm font-semibold text-slate-700">
+                                {authService.getProfile()?.username}
+                            </p>
                         </div>
-                        <p className="text-base font-semibold mt-2 text-center">
-                            {
-                                authService.getProfile()?.username
-                            }
-                        </p>
-                    </div>
-                    <div className="border border-orange-400"></div>
 
-                    {/* Tabs */}
-                    <ul className="w-full">
-                        {tabs}
-                    </ul>
-                    {/* logout */}
-                    <div className="w-full">
-                        <button className="underline pl-1 pr-2 cursor-pointer py-1 text-xs font-normal text-red-500">
-                            Đăng xuất
-                        </button>
+                        {/* Tabs */}
+                        <nav className="flex-1 py-4">
+                            <ul className="flex flex-col gap-1">
+                                {listNameTab.map(tabName => {
+                                    const active = getActiveTab() === tabName
+                                    return (
+                                        <li key={tabName}>
+                                            <Link
+                                                to={tabName.toLowerCase()}
+                                                className={`
+                                                relative flex items-center px-6 py-2.5 text-sm font-medium transition
+                                                ${active
+                                                        ? "bg-emerald-50 text-emerald-600"
+                                                        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}
+                                            `}
+                                            >
+                                                {/* Active indicator */}
+                                                {active && (
+                                                    <span className="absolute left-0 top-0 h-full w-1 bg-emerald-500" />
+                                                )}
+
+                                                {tabName}
+                                            </Link>
+                                        </li>
+                                    )
+                                })}
+                            </ul>
+                        </nav>
+
+                        {/* Logout */}
+                        <div className="border-t border-slate-200 p-4">
+                            <button className="w-full rounded-md px-4 py-2 text-left text-sm text-red-500 hover:bg-red-50 transition">
+                                Đăng xuất
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div className="col-span-10">
-                <Outlet />
-            </div>
-        </main>
-    </>)
+                </aside>
+
+                {/* Main content */}
+                <section className="col-span-10 bg-slate-50 p-6">
+                    <Outlet />
+                </section>
+            </main>
+        </>
+    )
+
 }

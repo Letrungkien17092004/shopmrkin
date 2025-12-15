@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Navivation } from "../../components/nav/index.tsx";
-import { ProductImageSlider } from "../../components/products/index.tsx"
+import { ProductImageSlider } from "../../components/products/index.ts"
 import Loading from "../../components/waiter/Loading.tsx";
 import { ProductService, AuthService } from "../../services/index.ts";
 import { Product, Variant } from "../../types/product/index.ts";

@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import IProductUsecase from "../../core/applications/interfaces/usecases/IProductUsecase.js";
+import IProductEmbeddingUsecase from "../../core/applications/interfaces/usecases/IProductEmbeddingUsecase.js";
+import EmbeddingService from "../../services/embeddingService/EmbeddingService.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/interfaces/usecases/errors.js";
 import { includes, object, z } from "zod"
 import { ProductDTO } from "../../adapter/DTO/index.js"
@@ -13,9 +15,17 @@ const MIN_DESCRIPTION_LENGTH = 1
 
 export default class ProductController {
     private productUsecase: IProductUsecase
+    private productEmbeddingUsecase: IProductEmbeddingUsecase
+    private emdeddingService: EmbeddingService
 
-    constructor(productUsecase: IProductUsecase) {
+    constructor(
+        productUsecase: IProductUsecase, 
+        productEmbeddingUsecase: IProductEmbeddingUsecase,
+        emdeddingService: EmbeddingService
+    ) {
         this.productUsecase = productUsecase
+        this.productEmbeddingUsecase = productEmbeddingUsecase
+        this.emdeddingService = emdeddingService
     }
 
     /**
@@ -83,9 +93,26 @@ export default class ProductController {
                     userId: req.user.id
                 }
             })
+            // create productEmbedding
+            var createEmbeddingOk: boolean = false
+            try {
+                const embeddingVectors = await this.emdeddingService.embeddings([createdProduct.description])
+                const createdEmbedding = await this.productEmbeddingUsecase.create({
+                    data: {
+                        productId: createdProduct.id,
+                        origin_text: createdProduct.description,
+                        embedding: embeddingVectors[0]
+                    }
+                })
+                createEmbeddingOk = true
+            } catch (error) {
+                console.log("error in ProductController.create - embedding:\n", error)
+                createEmbeddingOk = false
+            }
 
             res.status(201).json({
-                product: ProductDTO.toOutputSingle(createdProduct)
+                product: ProductDTO.toOutputSingle(createdProduct),
+                warning: createEmbeddingOk?undefined:"create product ok but no embedding"
             })
             return
         } catch (error) {

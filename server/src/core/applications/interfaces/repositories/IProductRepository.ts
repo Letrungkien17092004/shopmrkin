@@ -6,7 +6,8 @@ export type IncludeOption = {
     variants?: boolean,
     media?: boolean,
     category?: boolean,
-    user?: boolean
+    user?: boolean,
+    productEmbeddings?: boolean
 };
 
 export type OrderByOption = Partial<Record<keyof Omit<Product, "user" | "category" | "media" | "variants">, SortOrder>>;

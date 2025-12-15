@@ -1,4 +1,4 @@
-import { User, Category, Variant, Media } from "../../core/entities/index.js"
+import { User, Category, Variant, Media, ProductEmbedding } from "../../core/entities/index.js"
 
 type ProductConstructorParam = {
     id: string,
@@ -12,6 +12,7 @@ type ProductConstructorParam = {
     category?: Category | null,
     media?: Media[]
     variants?: Variant[]
+    productEmbedding?: ProductEmbedding
 
     // time
     createdAt?: Date,
@@ -30,6 +31,7 @@ export default class Product {
     category?: Category | null
     media?: Media[]
     variants?: Variant[]
+    productEmbedding?: ProductEmbedding
 
     createdAt?: Date
     updatedAt?: Date
@@ -46,6 +48,7 @@ export default class Product {
         this.category = options.category
         this.media = options.media
         this.variants = options.variants
+        this.productEmbedding = options.productEmbedding
         
         this.createdAt = options.createdAt
         this.updatedAt = options.updatedAt

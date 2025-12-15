@@ -9,6 +9,7 @@ export default interface IProductEmbeddingRepository {
      */
     create(options: {
         data: {
+            productId: string
             origin_text: string,
             embedding: number[]
         }
@@ -21,6 +22,7 @@ export default interface IProductEmbeddingRepository {
     createMany(options: {
         data: {
             items: {
+                productId: string
                 origin_text: string,
                 embedding: number[]
             }[]

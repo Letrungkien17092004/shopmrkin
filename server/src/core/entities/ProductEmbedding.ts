@@ -5,7 +5,7 @@ interface ProductEmbeddingContructorParam {
     productId: string
     origin_text: string
     embedding: number[]
-    product: Product
+    product?: Product
     createdAt: Date
     updatedAt: Date
 }
@@ -15,7 +15,7 @@ export default class ProductEmbedding {
     productId: string
     origin_text: string
     embedding: number[]
-    product: Product
+    product?: Product
     createdAt: Date
     updatedAt: Date
 

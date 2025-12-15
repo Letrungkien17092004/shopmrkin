@@ -12,7 +12,7 @@ export default class ProductEmbeddingUsecase implements IProductEmbeddingUsecase
     }
 
     /**
-     * Create new ProductEmbedded
+     * Create a new ProductEmbedding
      * @param options 
      */
     async create(options: {
@@ -45,7 +45,7 @@ export default class ProductEmbeddingUsecase implements IProductEmbeddingUsecase
         }
     }): Promise<ProductEmbedding[]> {
         try {
-            return this.productEmbeddingRepo.createMany(options)
+            return await this.productEmbeddingRepo.createMany(options)
         } catch (error) {
             // TODO:
             throw new USECASE_ERROR({
@@ -56,17 +56,17 @@ export default class ProductEmbeddingUsecase implements IProductEmbeddingUsecase
     }
 
     /**
-     * Find many ProductEmbedded by name
+     * Find many ProductEmbedding by name
      * @param options 
      */
-    async searchEmbedding(options: {
+    async embeddingSearch(options: {
         where: {
-            embedding: string
+            embedding: number[]
         },
         limit?: number
     }): Promise<ProductEmbedding[]> {
         try {
-            return this.productEmbeddingRepo.embeddingSearch(options)
+            return await this.productEmbeddingRepo.embeddingSearch(options)
         } catch (error) {
             // TODO
             throw new USECASE_ERROR({
@@ -77,7 +77,7 @@ export default class ProductEmbeddingUsecase implements IProductEmbeddingUsecase
     }
 
     /**
-     * Find many ProductEmbedded by describe
+     * Find many ProductEmbedding by describe
      * @param options 
      */
     async searchById(options: {

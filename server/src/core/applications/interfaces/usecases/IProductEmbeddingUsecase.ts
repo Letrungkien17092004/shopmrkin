@@ -4,11 +4,12 @@ import { ProductEmbedding } from "../../../entities/index.js"
 export default interface IProductEmbeddingUsecase {
 
     /**
-     * Create new ProductEmbedded
+     * Create a new ProductEmbedding
      * @param options 
      */
     create(options: {
         data: {
+            productId: string
             origin_text: string,
             embedding: number[]
         }
@@ -21,6 +22,7 @@ export default interface IProductEmbeddingUsecase {
     createMany(options: {
         data: {
             items: {
+                productId: string
                 origin_text: string,
                 embedding: number[]
             }[]
@@ -28,18 +30,18 @@ export default interface IProductEmbeddingUsecase {
     }): Promise<ProductEmbedding[]>
 
     /**
-     * Find many ProductEmbedded by name
+     * Find many ProductEmbedding by name
      * @param options 
      */
-    searchEmbedding(options: {
+    embeddingSearch(options: {
         where: {
-            embedding: string
+            embedding: number[]
         },
         limit?: number
     }): Promise<ProductEmbedding[]>
 
     /**
-     * Find many ProductEmbedded by describe
+     * Find many ProductEmbedding by describe
      * @param options 
      */
     searchById(options: {

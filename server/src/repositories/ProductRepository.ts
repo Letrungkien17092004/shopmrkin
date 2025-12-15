@@ -1,4 +1,4 @@
-import { Category, Product, User, Variant, Media } from "../core/entities/index.js";
+import { Category, Product, User, Variant, Media, ProductEmbedding } from "../core/entities/index.js";
 import IProductRepository, { IncludeOption, OrderByOption } from "../core/applications/interfaces/repositories/IProductRepository.js";
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
 import { PrismaClient } from "@prisma/client";
@@ -82,10 +82,18 @@ export default class ProductRepository implements IProductRepository {
                         }))
                         : []
 
+                    const productEmbedding: ProductEmbedding | undefined = p.productEmbeddings
+                        ? new ProductEmbedding({
+                            ...p.productEmbeddings,
+                            embedding: []
+                        })
+                        : undefined
+
                     return new Product({
                         ...p,
                         media: media,
-                        variants: variants
+                        variants: variants,
+                        productEmbedding: productEmbedding
                     })
                 })
             } // else
@@ -125,15 +133,24 @@ export default class ProductRepository implements IProductRepository {
                     ...pm,
                     productId: pm.productId || undefined
                 }))
+
                 const variants: Variant[] = product.variants.map(pv => new Variant({
                     ...pv,
                     price: Number(pv.price)
                 }))
 
+                const productEmbedding: ProductEmbedding | undefined = product.productEmbeddings
+                    ? new ProductEmbedding({
+                        ...product.productEmbeddings,
+                        embedding: []
+                    })
+                    : undefined
+
                 return new Product({
                     ...product,
                     media: media,
-                    variants: variants
+                    variants: variants,
+                    productEmbedding: productEmbedding
                 })
             } // else
             const searchedProduct = await prisma.products.findUnique({
@@ -166,7 +183,6 @@ export default class ProductRepository implements IProductRepository {
                     include: options.include,
                 })
                 if (!product) return null
-
                 const media: Media[] = product.media
                     ? product.media.map(pm => new Media({
                         ...pm,
@@ -180,10 +196,18 @@ export default class ProductRepository implements IProductRepository {
                         price: Number(pv.price)
                     }))
                     : []
+
+                const productEmbedding: ProductEmbedding | undefined = product.productEmbeddings
+                    ? new ProductEmbedding({
+                        ...product.productEmbeddings,
+                        embedding: []
+                    })
+                    : undefined
                 return new Product({
                     ...product,
                     media: media,
-                    variants: variants
+                    variants: variants,
+                    productEmbedding: productEmbedding
                 })
             } // else
             const searchedProduct = await prisma.products.findUnique({

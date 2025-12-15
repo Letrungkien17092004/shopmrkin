@@ -33,7 +33,7 @@ export default class UserUsecase implements IUserUsecase {
                     username: options.data.username,
                     account: options.data.account,
                     password_hashed: password_hashed,
-                    email: password_hashed,
+                    email: options.data.email,
                 }
             })
             return newUser
