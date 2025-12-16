@@ -25,6 +25,9 @@ const envSchema = z.object({
 
     // Upload folder
     UPLOAD_FOLDER: z.string(),
+
+    // API KEY
+    LLM_KEY: z.string()
 })
 
 export const ENV = envSchema.parse({
