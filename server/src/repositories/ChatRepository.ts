@@ -2,7 +2,6 @@ import { Chat, Message } from "../core/entities/index.js"
 import IChatRepository, { IncludeOption, OrderByOptions } from "../core/applications/interfaces/repositories/IChatRepository.js"
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js"
 import { PrismaClient } from "@prisma/client/index.js"
-import { z } from "zod"
 
 interface ExtractType {
     username?: string
@@ -11,12 +10,6 @@ interface ExtractType {
     category?: string
 }
 
-const ExtractSchema = z.object({
-    username: z.string().optional(),
-    phone: z.string().optional(),
-    interest: z.string().optional(),
-    category: z.string().optional()
-})
 
 const prisma = new PrismaClient()
 
@@ -170,24 +163,23 @@ export default class ChatRepository implements IChatRepository {
     async updateById(options: {
         where: { id: string },
         data: {
-            isExtracted?: boolean,
+            isExtracted: boolean,
             extractedData?: ExtractType,
-            isSpam?: boolean
+            isSpam: boolean
         }
     }): Promise<void> {
         try {
             const data = options.data
-            const parsedExtractData = ExtractSchema.parse(options.data)
             await prisma.chats.update({
                 where: options.where,
                 data: {
                     isExtracted: data.isExtracted,
-                    extractedData: {
-                        username: parsedExtractData?.username,
-                        phone: parsedExtractData?.phone,
-                        interest: parsedExtractData?.interest,
-                        category: parsedExtractData?.category
-                    },
+                    extractedData: data.extractedData ? {
+                        username: data.extractedData.username,
+                        phone: data.extractedData.phone,
+                        interest: data.extractedData.interest,
+                        category: data.extractedData.category
+                    } : undefined,
                     isSpam: data.isSpam
                 }
             })
