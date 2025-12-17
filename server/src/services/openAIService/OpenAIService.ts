@@ -122,7 +122,15 @@ export default class OpenAIService {
         this.productEmbeddingUsecase = productEmbeddingUsecase
     }
 
-    chat = async (newMessage: string) => {
-
+    chat = async (currentMessage: string, historyMessage: { content: string, role: string }): Promise<{
+        message: string,
+        recommend_products: {
+            productId: string
+        }[]
+    }> => {
+        return {
+            message: "ok",
+            recommend_products: []
+        }
     }
 }

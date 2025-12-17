@@ -12,6 +12,8 @@ import Order from "./Order.js";
 import OrderItem from "./OrderItem.js";
 import Payment from "./Payment.js";
 import ProductEmbedding from "./ProductEmbedding.js";
+import Message from "./Messages.js";
+import Chat from "./Chat.js";
 export {
     User,
     Role,
@@ -26,5 +28,7 @@ export {
     Order,
     OrderItem,
     Payment,
-    ProductEmbedding
+    ProductEmbedding,
+    Message,
+    Chat
 }

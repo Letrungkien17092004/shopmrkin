@@ -241,13 +241,38 @@ model Payments {
 }
 
 model ProductEmbedding {
-  id        String   @id @default(uuid())
-  productId String   @unique
-  origin_text  String
-  embedding Unsupported("vector(1024)")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  id          String                      @id @default(uuid())
+  productId   String                      @unique
+  origin_text String
+  embedding   Unsupported("vector(1024)")
+  createdAt   DateTime                    @default(now())
+  updatedAt   DateTime                    @default(now())
 
   product Products @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
+model Chats {
+  id            String     @id @default(uuid())
+  isExtracted   Boolean    @default(false)
+  extractedData Json       @default("{}")
+  isSpam        Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @default(now())
+  messages      Messages[]
+}
+
+enum Role {
+  USER
+  SYSTEM
+}
+
+model Messages {
+  id        String   @id @default(uuid())
+  chatId    String
+  role      Role
+  message   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  chat Chats @relation(fields: [chatId], references: [id], onDelete: Cascade)
+}
