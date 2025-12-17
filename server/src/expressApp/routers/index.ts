@@ -6,6 +6,8 @@ import demoRouter from "./DemoRouter.js";
 import cartRouter from "./CartRouter.js";
 import orderRouter from "./OrderRouter.js";
 import paymentRouter from "./PaymentRouter.js";
+import assistantRouter from "./AssistantRouter.js";
+
 export {
     authorRouter,
     productRouter,
@@ -14,5 +16,6 @@ export {
     demoRouter,
     cartRouter,
     orderRouter,
-    paymentRouter
+    paymentRouter,
+    assistantRouter
 }

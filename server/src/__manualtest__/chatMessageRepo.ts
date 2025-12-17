@@ -87,12 +87,12 @@ async function main() {
     // add message to chat2
     await addMessageToChat({
         chatId: chatId2,
-        role: "SYSTEM",
+        role: "USER",
         content: "this is a content"
     })
     await addMessageToChat({
         chatId: chatId2,
-        role: "USER",
+        role: "SYSTEM",
         content: "this is a content"
     })
 

@@ -1,22 +1,7 @@
-import { Chat } from "../../../entities/index.js";
+import { Chat } from "../../../entities/index.js"
+import { OrderByOptions, IncludeOption, ExtractedSchema } from "../repositories/IChatRepository.js"
 
-export type SortOrder = "asc" | "desc"
-export type IncludeOption = {
-    messages?: boolean
-}
-
-export type OrderByOptions = Partial<
-    Record<keyof Omit<Chat, "id" | "extractedData" | "messages">, SortOrder>
->
-
-export interface ExtractedSchema {
-    username?: string
-    phone?: string
-    interest?: string
-    category?: string
-}
-
-export default interface IChatRepository {
+export default interface IChatUsecase {
 
     /**
      * Create new Chat

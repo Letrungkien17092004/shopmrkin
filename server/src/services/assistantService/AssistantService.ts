@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { ENV } from "../../config/env.js";
 import IProductEmbeddingUsecase from "../../core/applications/interfaces/usecases/IProductEmbeddingUsecase.js";
-
+import EmbeddingService from "../embeddingService/EmbeddingService.js";
 const client = new OpenAI({
     apiKey: ENV.LLM_KEY
 });
@@ -93,11 +93,12 @@ type FinalOutput = {
 }
 
 export default class AssistantService {
-    // private productEmbeddingUsecase: IProductEmbeddingUsecase
-
-    // constructor(productEmbeddingUsecase: IProductEmbeddingUsecase) {
-    //     this.productEmbeddingUsecase = productEmbeddingUsecase
-    // }
+    private productEmbeddingUsecase: IProductEmbeddingUsecase
+    private embeddingService: EmbeddingService
+    constructor(productEmbeddingUsecase: IProductEmbeddingUsecase, embeddingService: EmbeddingService) {
+        this.productEmbeddingUsecase = productEmbeddingUsecase
+        this.embeddingService = embeddingService
+    }
 
     /**
      * RAG function
@@ -108,17 +109,28 @@ export default class AssistantService {
         productId: string,
         info: string
     }[]> => {
-        console.log("text: ", text)
-        return [
-            {
-                productId: "03296453-1a25-44cf-94ce-a1b69403d6b3",
-                info: "Điện thoại Iphone 14 promax"
-            },
-            {
-                productId: "2eb02d1e-2906-44ca-a396-45860a00a349",
-                info: "OPPO Find X9 12GB 256GB, Điện thoại Oppo cao cấp giá chỉ từ 22tr việt nam đồng"
-            },
-        ]
+        try {
+            console.log("text: ", text)
+            const embedVector = await this.embeddingService.embeddings([text])
+            const searchResult = await this.productEmbeddingUsecase.embeddingSearch({
+                where: {
+                    embedding: embedVector[0]
+                }
+            })
+
+            const convertResult: {
+                productId: string,
+                info: string
+            }[] = searchResult.map(item => ({
+                productId: item.productId,
+                info: item.origin_text
+            }))
+            return convertResult
+
+        } catch (error) {
+            console.log("error in Assistant.retrieveProduct\n", error)
+            return []
+        }
     }
 
     chat = async (currentMessage: string, historyMessage: HistoryMessage[]): Promise<FinalOutput> => {
