@@ -25,7 +25,7 @@ export default function UserProfile({ profile }: { profile: Profile }) {
     }, [])
 
     return <>
-        <div onClick={toggleMenuEvent} className="relative z-9999">
+        <div onClick={toggleMenuEvent} className="relative z-10">
             <img className="size-7 cursor-pointer rounded-full shadow-2xl" src={`${profile?.picture}`} alt="cart-image" />
             {
                 isShowMenu ? <>

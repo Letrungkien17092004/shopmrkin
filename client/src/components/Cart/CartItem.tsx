@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { updateCartItem, removeCartItem } from "../../store/cartSlice.ts"
 import { AppDispatch } from "../../store/index.ts";
-import { CartItem as CartItemType } from "../../types/index.ts";
+import { CartItem as CartItemType } from "../../types/cart/index.ts";
 import { formatPrice } from "../../utils/index.ts"
 
 interface CartItemProps {

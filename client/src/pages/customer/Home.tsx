@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Navivation } from "../../components/nav/index.tsx";
 import ProductCardList from "../../components/products/ProductCardList.tsx";
 import ProductFilter from "../../components/products/ProductFilter.tsx";
-
+import { ChatContainer } from "../../components/chat/index.tsx";
 
 export default function Home() {
     return (<>
@@ -17,6 +17,7 @@ export default function Home() {
                 </div>
             </div>
         </section>
+        <ChatContainer />
     </>
     )
 }
