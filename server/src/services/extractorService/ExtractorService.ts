@@ -99,10 +99,66 @@ export default class ExtractorService {
                 }
             }
         });
-        
+
         // console.log("response.output_text")
         // console.log(response.output_text)
         const finalOut: ExtractorServiceOutput = JSON.parse(response.output_text)
         return finalOut
     }
 }
+
+// async function main() {
+
+//     const extractor = new ExtractorService()
+
+//     const demoChat1: { role: "user" | "assistant", content: string }[] = [
+//         {
+//             role: "user",
+//             content: "xin chào tôi cần mua một chiếc điện thoại iphone giá dưới 20tr"
+//         },
+//         {
+//             role: "assistant",
+//             content: "Chào bạn hiện tại shop chúng tôi có sản phẩm Iphone 15 promax 128Gb giá 16tr"
+//         },
+//         {
+//             role: "user",
+//             content: "tên tôi là Mr Kin sdt: 0123123123, hãy gọi điện tư vấn cho tôi"
+//         },
+//     ]
+
+//     const demoChat2: { role: "user" | "assistant", content: string }[] = [
+//         {
+//             role: "user",
+//             content: "xin chào tôi cần mua một chiếc điện thoại iphone giá dưới 20tr"
+//         },
+//         {
+//             role: "assistant",
+//             content: "Chào bạn hiện tại shop chúng tôi có sản phẩm Iphone 15 promax 128Gb giá 16tr"
+//         },
+//     ]
+
+//     const demoChat3: { role: "user" | "assistant", content: string }[] = [
+//         {
+//             role: "user",
+//             content: "xin chào"
+//         },
+//         {
+//             role: "assistant",
+//             content: "Chào bạn, tôi là chatbot chăm sóc khách hàng, tôi có thể giúp gì cho bạn?"
+//         },
+//     ]
+
+//     const result1 = await extractor.extract(demoChat1)
+//     const result2 = await extractor.extract(demoChat2)
+//     const result3 = await extractor.extract(demoChat3)
+//     console.log("ket qua 1")
+//     console.log(result1)
+//     console.log("ket qua 2")
+//     console.log(result2)
+//     console.log("ket qua 2")
+//     console.log(result3)
+// }
+
+// main()
+
+
