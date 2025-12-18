@@ -41,6 +41,9 @@ export default class AssistantService {
             }
         )
 
-        return response.data
+        return {
+            ...response.data,
+            role: "user"
+        }
     }
 }

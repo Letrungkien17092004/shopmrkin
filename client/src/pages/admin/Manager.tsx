@@ -5,13 +5,13 @@ import AuthService from "../../services/AuthService.ts"
 const authService = new AuthService()
 
 export default function Manager() {
-    type TabNames = "Dashboard" | "Products" | "Orders" | "Delivery" | "Customer"
+    type TabNames = "Dashboard" | "Products" | "Orders" | "Delivery" | "Customer" | "Chats"
 
     const listNameTab: TabNames[] = [
         "Dashboard",
         "Products",
         "Orders",
-        "Delivery",
+        "Chats",
         "Customer",
     ]
 

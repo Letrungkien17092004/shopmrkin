@@ -80,9 +80,7 @@ export default class ChatController {
     extract = async (req: Request, res: Response): Promise<void> => {
         try {
             const chats = await this.chatUsecase.findMany({
-                where: {
-                    isExtracted: false
-                },
+                where: {},
                 include: {
                     messages: true
                 }
@@ -90,6 +88,7 @@ export default class ChatController {
 
             for (let i = 0; i < chats.length; i++) {
                 const chat = chats[i]
+                if (chat.isExtracted) { continue }
                 const parsedMess: { role: "user" | "assistant", content: string }[] = chat.messages.map(mess => ({
                     role: mess.role === "USER" ? "user" : "assistant",
                     content: mess.message
