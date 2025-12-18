@@ -10,6 +10,7 @@ import { RootState, AppDispatch } from "../../store/index.ts";
 import { useDispatch, useSelector } from "react-redux";
 import { useAuthContext } from "../../contexts/AuthContext.tsx";
 import { getCartItemByVariantId, getMinPrice } from "../../utils/index.ts"
+import { ChatContainer } from "../../components/chat/index.tsx";
 
 const authService = new AuthService()
 const productService = new ProductService(authService)
@@ -159,7 +160,8 @@ export default function CustomerProductDetail() {
         </>
     }
     if (product) {
-        return (
+        return (<>
+
 
             <div className="max-w-[1000px] mx-auto">
                 <Navivation />
@@ -216,6 +218,7 @@ export default function CustomerProductDetail() {
                     <p className="text-base font-light">{product.description}</p>
                 </div>
             </div>
-        )
+            <ChatContainer />
+        </>)
     }
 }
