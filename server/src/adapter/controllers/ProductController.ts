@@ -94,25 +94,25 @@ export default class ProductController {
                 }
             })
             // create productEmbedding
-            var createEmbeddingOk: boolean = false
-            try {
-                const embeddingVectors = await this.emdeddingService.embeddings([createdProduct.description])
-                const createdEmbedding = await this.productEmbeddingUsecase.create({
-                    data: {
-                        productId: createdProduct.id,
-                        origin_text: createdProduct.description,
-                        embedding: embeddingVectors[0]
-                    }
-                })
-                createEmbeddingOk = true
-            } catch (error) {
-                console.log("error in ProductController.create - embedding:\n", error)
-                createEmbeddingOk = false
-            }
+            // var createEmbeddingOk: boolean = false
+            // try {
+            //     const embeddingVectors = await this.emdeddingService.embeddings([createdProduct.description])
+            //     const createdEmbedding = await this.productEmbeddingUsecase.create({
+            //         data: {
+            //             productId: createdProduct.id,
+            //             origin_text: createdProduct.description,
+            //             embedding: embeddingVectors[0]
+            //         }
+            //     })
+            //     createEmbeddingOk = true
+            // } catch (error) {
+            //     console.log("error in ProductController.create - embedding:\n", error)
+            //     createEmbeddingOk = false
+            // }
 
             res.status(201).json({
                 product: ProductDTO.toOutputSingle(createdProduct),
-                warning: createEmbeddingOk?undefined:"create product ok but no embedding"
+                // warning: createEmbeddingOk?undefined:"create product ok but no embedding"
             })
             return
         } catch (error) {
