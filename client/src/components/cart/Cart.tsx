@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchCart } from "../../store/cartSlice.ts";
 import { RootState, AppDispatch } from "../../store/index.ts";
 import { useAuthContext } from "../../contexts/AuthContext.tsx";
-import { CartItemContainer } from "./index.ts"
+import { CartItemContainer } from "./index.tsx"
 
 
 export default function Cart() {

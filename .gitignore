@@ -6,7 +6,11 @@ client/node_modules/
 tasks.md
 
 server/dist/
-server/public/
+
+# Upload folder
+server/public/upload/*
+# keep upload folder
+!server/public/upload/.gitkeep
 
 client/dist/
 

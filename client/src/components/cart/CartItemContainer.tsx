@@ -1,6 +1,6 @@
 import React from "react";
-import { Cart } from "../../types/index.ts";
-import { EmptyCart, ErrorCart, LoadingCart, CartItem } from "./index.ts"
+import { Cart } from "../../types/cart/index.ts";
+import { EmptyCart, ErrorCart, LoadingCart, CartItem } from "./index.tsx"
 
 interface CartItemContainerProps {
     cart: Cart | null,
