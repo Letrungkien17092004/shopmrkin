@@ -1,0 +1,81 @@
+services:
+  client:
+    build: ./client
+    container_name: shopmrkin_client
+    environment:
+      VITE_GENERATE_OAUTH_URL: http://localhost:8000/api/auth/google-redirect-url?redirect_uri=http://localhost:9000/auth/google/callback
+      VITE_GOOGLE_CALLBACK_BE_URL: http://localhost:8000/api/auth/login-google
+      VITE_BACK_END_HOST: http://localhost:8000
+    ports:
+      - "9000:9000"
+    develop:
+      watch:
+        # sync new source code
+        - action: sync
+          path: ./client/src
+          target: /app/src
+
+        # rebuild when install new package
+        - action: rebuild
+          path: ./client/package.json
+        - action: rebuild
+          path: ./client/package-lock.json
+
+        # restart when config change
+        - action: sync+restart
+          path: ./client
+          target: /app
+          ignore:
+            - ./client/src
+            - ./client/node_modules/
+            - ./client/package.json
+            - ./client/package-lock.json
+
+  server:
+    build: ./server
+    container_name: shopmrkin_server
+    environment:
+      SERVER_NAME: http://localhost:8001
+      PORT: 8001
+    ports:
+      - "8000:8001"
+    develop:
+      watch:
+        # sync new source code
+        - action: sync
+          path: ./server/src
+          target: /app/src
+
+        # rebuild when install new package
+        - action: rebuild
+          path: ./server/package.json
+        - action: rebuild
+          path: ./server/package-lock.json
+
+        # restart when config change
+        - action: sync+restart
+          path: ./server
+          target: /app
+          ignore:
+            - ./server/src
+            - ./server/public
+            - ./server/node_modules/
+            - ./server/package.json
+            - ./server/package-lock.json
+    volumes:
+      - ./server/public:/app/public
+
+  postgres:
+    image: ankane/pgvector:v0.5.0
+    container_name: pgvector
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_db:/var/lib/postgresql/data
+
+volumes:
+  postgres_db:

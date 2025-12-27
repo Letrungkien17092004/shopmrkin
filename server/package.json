@@ -15,7 +15,7 @@
     "test:verbose": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --verbose",
     "test:clear": "jest --clearCache",
     "prisma-generate": "npx prisma generate --schema=./src/services/postgresSQL/prisma/schema.prisma",
-    "prisma-migrate": "npx prisma migrate dev --schema=./src/services/postgresSQL/prisma/schema.prisma",
+    "prisma-migrate": "npx prisma migrate --skip-seed dev --schema=./src/services/postgresSQL/prisma/schema.prisma",
     "prisma-migrate-co": "npx prisma migrate dev --create-only --schema=./src/services/postgresSQL/prisma/schema.prisma",
     "prisma-studio": "npx prisma studio --schema=./src/services/postgresSQL/prisma/schema.prisma",
     "prisma-reset": "npx prisma migrate reset --skip-seed --schema=./src/services/postgresSQL/prisma/schema.prisma",
