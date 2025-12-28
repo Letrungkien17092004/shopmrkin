@@ -19,14 +19,33 @@ export default interface IMediaRepository {
         data: {
             fileName: string,
             filePath: string,
-            hostname: string,
             media_type: "IMAGE" | "VIDEO",
+            storage: "internal" | "external",
+            status?: "ORPHANED" | "ASSIGNED",
             size: number,
             productId?: string,
             userId: string
         },
         include?: IncludeOption
     }): Promise<Media>
+
+    /**
+     * create multiple media at once
+     * @param options 
+     */
+    createMany(options: {
+        data: {
+            fileName: string,
+            filePath: string,
+            media_type: "IMAGE" | "VIDEO",
+            storage?: "internal" | "external",
+            status?: "ORPHANED" | "ASSIGNED",
+            size: number,
+            productId?: string,
+            userId: string
+        }[],
+        include?: IncludeOption
+    }): Promise<Media[]>
 
     /**
      * Find many media by attribute name
@@ -36,8 +55,8 @@ export default interface IMediaRepository {
         where: {
             fileName?: string,
             filePath?: string,
-            hostname?: string,
             media_type?: "IMAGE" | "VIDEO",
+            storage?: "internal" | "external",
             status?: "ORPHANED" | "ASSIGNED",
             productId?: string,
             userId?: string,

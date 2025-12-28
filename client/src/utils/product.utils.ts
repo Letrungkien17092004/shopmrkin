@@ -59,5 +59,5 @@ export function makeThumbnailURL(media?: Media[]): string {
         return "https://i.pinimg.com/1200x/fd/3d/8e/fd3d8e2a1dd4f09b4170d31e26913bab.jpg"
     }
     const thumbnail = media[0]
-    return `${thumbnail.hostname}${thumbnail.filePath}`
+    return `${thumbnail.filePath}`
 }

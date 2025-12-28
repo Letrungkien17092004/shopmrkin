@@ -1,6 +1,6 @@
 import IMediaRepository, { IncludeOption, OrderByOption } from "../core/applications/interfaces/repositories/IMediaRepository.js";
 import { PrismaClient } from "@prisma/client";
-import { Media, Product } from "../core/entities/index.js"
+import { Media, Product, User } from "../core/entities/index.js"
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
 
 const prisma = new PrismaClient()
@@ -15,8 +15,9 @@ export default class MediaRepository implements IMediaRepository {
         data: {
             fileName: string,
             filePath: string,
-            hostname: string,
             media_type: "IMAGE" | "VIDEO",
+            storage: "internal" | "external",
+            status?: "ORPHANED" | "ASSIGNED",
             size: number,
             productId?: string,
             userId: string
@@ -51,8 +52,8 @@ export default class MediaRepository implements IMediaRepository {
                 id: createdMedia.id,
                 fileName: createdMedia.fileName,
                 filePath: createdMedia.filePath,
-                hostname: createdMedia.hostname,
                 media_type: createdMedia.media_type,
+                storage: createdMedia.storage,
                 size: createdMedia.size,
                 status: createdMedia.status,
                 userId: createdMedia.userId,
@@ -65,6 +66,68 @@ export default class MediaRepository implements IMediaRepository {
     }
 
     /**
+     * create multiple media at once
+     * @param options 
+     */
+    async createMany(options: {
+        data: {
+            fileName: string,
+            filePath: string,
+            media_type: "IMAGE" | "VIDEO",
+            storage: "internal" | "external",
+            status?: "ORPHANED" | "ASSIGNED",
+            size: number,
+            productId?: string,
+            userId: string
+        }[],
+        include?: IncludeOption
+    }): Promise<Media[]> {
+        try {
+            if (options.include) {
+                const createdMediaList = await prisma.media.createManyAndReturn({
+                    data: options.data,
+                    include: options.include
+                })
+
+                const mediaList = createdMediaList.map(med => {
+                    const product: Product | undefined = med.product
+                        ? new Product({
+                            ...med.product,
+                        })
+                        : undefined
+                    const user: User | undefined = med.user
+                        ? new User({
+                            ...med.user
+                        })
+                        : undefined
+                    return new Media({
+                        ...med,
+                        productId: med.productId || undefined,
+                        product: product,
+                        user: user
+                    })
+                })
+
+                return mediaList
+            }
+
+
+            const createdMediaList = await prisma.media.createManyAndReturn({
+                data: options.data
+            })
+            const mediaList: Media[] = createdMediaList.map(med => {
+                    return new Media({
+                        ...med,
+                        productId: med.productId || undefined,
+                    })
+                })
+            return mediaList
+        } catch (error) {
+            throw baseExceptionHandler(error)
+        }
+    }
+
+    /**
      * Find many media by attribute name
      * @param options 
      */
@@ -72,8 +135,8 @@ export default class MediaRepository implements IMediaRepository {
         where: {
             fileName?: string,
             filePath?: string,
-            hostname?: string,
             media_type?: "IMAGE" | "VIDEO",
+            storage?: "internal" | "external",
             status?: "ORPHANED" | "ASSIGNED",
             productId?: string,
             userId?: string,
@@ -164,7 +227,7 @@ export default class MediaRepository implements IMediaRepository {
                 where: options.where,
                 data: {
                     // If productId is updated, status will be updated to ASSIGNED.
-                    status: options.data.productId?"ASSIGNED":options.data.status,
+                    status: options.data.productId ? "ASSIGNED" : options.data.status,
                     productId: options.data.productId
                 }
             })

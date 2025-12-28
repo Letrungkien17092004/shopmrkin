@@ -19,10 +19,10 @@ const FilesMulter = z.array(
 )
 
 export default class MediaController {
-    private usecase: IMediaUsecase
+    private mediaUsecase: IMediaUsecase
 
-    constructor(usecase: IMediaUsecase) {
-        this.usecase = usecase
+    constructor(mediaUsecase: IMediaUsecase) {
+        this.mediaUsecase = mediaUsecase
     }
 
     /**
@@ -74,16 +74,17 @@ export default class MediaController {
                     : undefined
             })
 
-            const createdMedia = await this.usecase.create({
+            const createdMedia = await this.mediaUsecase.create({
                 ...createOptionParsed,
                 data: {
                     ...createOptionParsed.data,
+                    storage: "internal",
                     userId: req.user.id
                 }
             })
 
             res.status(201).json({
-                media: MediaDTO.toOutputOne(createdMedia)
+                media: MediaDTO.toOutputOne(createdMedia, req)
             })
             return
         } catch (error) {
@@ -139,33 +140,36 @@ export default class MediaController {
                 return
             }
 
-            // const QuerySchema = z.object({
-            //     include: z.object({
-            //         user: z.string().optional(),
-            //         product: z.string().optional()
-            //     }).optional()
-            // }).optional()
+            const QuerySchema = z.object({
+                include: z.object({
+                    user: z.string().optional(),
+                    product: z.string().optional()
+                }).optional()
+            }).optional()
+            const user = req.user
+            const queryParsed = QuerySchema.parse(req.query)
 
             const files = FilesMulter.parse(req.files)
-            const media: MediaDTO.OutputType[] = []
-
-            for (let file of files) {
-                const createdMedia = await this.usecase.create({
-                    data: {
-                        fileName: file.filename,
-                        filePath: `${ENV.UPLOAD_FOLDER}/${file.filename}`,
-                        hostname: ENV.SERVER_NAME,
-                        media_type: file.mimetype.split("/")[0] === "video" ? "VIDEO" : "IMAGE",
-                        size: file.size,
-                        userId: req.user!.id
+            const createdMediaList = await this.mediaUsecase.createMany({
+                data: files.map(file => ({
+                    fileName: file.filename,
+                    filePath: `${ENV.UPLOAD_FOLDER}/${file.filename}`,
+                    media_type: file.mimetype.split("/")[0] === "video" ? "VIDEO" : "IMAGE",
+                    storage: "internal",
+                    size: file.size,
+                    userId: user.id
+                })),
+                include: queryParsed && queryParsed.include
+                    ? {
+                        user: queryParsed.include.user === "true",
+                        product: queryParsed.include.product === "true"
                     }
-                })
+                    : undefined
+            })
 
-                media.push(MediaDTO.toOutputOne(createdMedia))
-            }
-
+            const mediaListDto = MediaDTO.toOutputMany(createdMediaList, req)
             res.status(201).json({
-                media
+                media: mediaListDto
             })
             return
         } catch (error) {
@@ -218,7 +222,7 @@ export default class MediaController {
 
             const { include, ...whereOptions } = queryParsed || {}
 
-            const media = await this.usecase.findMany({
+            const media = await this.mediaUsecase.findMany({
                 where: whereOptions || {},
                 include: include
                     ? {
@@ -229,7 +233,7 @@ export default class MediaController {
             })
 
             res.status(200).json({
-                media: media.map(m => MediaDTO.toOutputOne(m))
+                media: MediaDTO.toOutputMany(media, req)
             })
             return
         } catch (error) {
@@ -270,7 +274,7 @@ export default class MediaController {
 
             const queryParsed = QuerySchema.parse(req.query)
 
-            const media = await this.usecase.findOneById({
+            const media = await this.mediaUsecase.findOneById({
                 where: { id: req.params.id },
                 include: queryParsed?.include
                     ? {
@@ -288,7 +292,7 @@ export default class MediaController {
             }
 
             res.status(200).json({
-                media: MediaDTO.toOutputOne(media)
+                media: MediaDTO.toOutputOne(media, req)
             })
             return
         } catch (error) {
@@ -343,7 +347,7 @@ export default class MediaController {
 
             const updateDataParsed = UpdateSchema.parse(req.body)
 
-            await this.usecase.updateById({
+            await this.mediaUsecase.updateById({
                 where: {
                     id: req.params.id
                 },
@@ -391,7 +395,7 @@ export default class MediaController {
                 return
             }
 
-            await this.usecase.deleteById({
+            await this.mediaUsecase.deleteById({
                 where: {
                     id: req.params.id,
                     userId: req.user.id

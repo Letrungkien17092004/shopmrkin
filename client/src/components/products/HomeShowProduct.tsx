@@ -9,14 +9,14 @@ import {
 } from "../../utils/index.ts"
 
 import ProductCard from "./ProductCard.tsx"
-import ProductSortingOptions from "./ProductSortingOptions.tsx"
-import ProductFilteringInfo from "./ProductFilteringInfo.tsx"
+import ProductSortingOptions from "./HomeProductSortingOptions.tsx"
+import ProductFilteringInfo from "./HomeProductFilteringInfo.tsx"
 import { Link } from "react-router-dom"
 
 const authService = new AuthService()
 const productService = new ProductService(authService)
 
-export default function ProductCardList() {
+export default function HomeShowProduct() {
     const [products, setProducts] = useState<Product[]>([])
 
     // fetching products

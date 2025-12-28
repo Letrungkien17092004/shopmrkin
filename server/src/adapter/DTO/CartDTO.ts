@@ -1,6 +1,6 @@
 import { Cart, CartItem, Product } from "../../core/entities/index.js"
-import { ENV } from "../../config/env.js"
-
+import { MediaDTO } from "./index.js"
+import { Request } from "express"
 type InputParams = {
     userId: string
 }
@@ -15,7 +15,7 @@ type Item = {
     product_id?: string,
     product_name?: string,
     product_description?: string,
-    media?: { filePath: string, hostname: string, type: string }
+    media?: MediaDTO.OutputType
 }
 type ToOutput = {
     id: string,
@@ -33,7 +33,7 @@ export default class CartDTO {
         })
     }
 
-    static toOutputSingle(cart: Cart): ToOutput {
+    static toOutputSingle(cart: Cart, req: Request): ToOutput {
         var items: Item[] = []
         if (cart.cartItems) {
             items = cart.cartItems.map(ci => {
@@ -51,11 +51,7 @@ export default class CartDTO {
                         product_id: product.id,
                         product_name: product.name,
                         product_description: product.description,
-                        media: {
-                            filePath: product.media[0].filePath,
-                            hostname: ENV.SERVER_NAME,
-                            type: product.media[0].media_type
-                        }
+                        media: MediaDTO.toOutputOne(product.media[0], req)
                     }
                 }
                 return {
@@ -74,7 +70,7 @@ export default class CartDTO {
         }
     }
 
-    static toOutputMany(carts: Cart[]): ToOutput[] {
-        return carts.map(c => CartDTO.toOutputSingle(c))
+    static toOutputMany(carts: Cart[], req: Request): ToOutput[] {
+        return carts.map(c => CartDTO.toOutputSingle(c, req))
     }
 }

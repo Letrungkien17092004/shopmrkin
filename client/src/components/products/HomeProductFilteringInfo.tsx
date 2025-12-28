@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function ProductFilteringInfo() {
+export default function HomeProductFilteringInfo() {
     return (
         <section className="mt-2 w-full">
             <div className="flex flex-wrap items-center justify-start gap-1">

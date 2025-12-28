@@ -63,7 +63,7 @@ export default class CartController {
                     return
                 }
                 res.status(200).json({
-                    cart: CartDTO.toOutputSingle(cart)
+                    cart: CartDTO.toOutputSingle(cart, req)
                 })
                 return
             }
@@ -83,7 +83,9 @@ export default class CartController {
                 })
                 return
             }
-            res.status(200).json({ cart: CartDTO.toOutputSingle(cart) })
+            res.status(200).json({
+                cart: CartDTO.toOutputSingle(cart, req)
+            })
         } catch (error) {
             if (error instanceof z.ZodError) return void res.status(400).json({ message: "Invalid input" })
             if (error instanceof USECASE_ERROR && error.code === USECASE_ERROR_CODE.INITIAL) return void res.status(500).json({ message: "Server Internal Error!" })

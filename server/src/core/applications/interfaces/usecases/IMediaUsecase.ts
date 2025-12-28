@@ -11,14 +11,33 @@ export default interface IMediaUsecase {
         data: {
             fileName: string,
             filePath: string,
-            hostname: string,
             media_type: "IMAGE" | "VIDEO",
+            storage: "internal" | "external",
+            status?: "ORPHANED" | "ASSIGNED",
             size: number,
             productId?: string,
             userId: string
         },
         include?: IncludeOption
     }): Promise<Media>
+
+    /**
+     * create multiple media at once
+     * @param options 
+     */
+    createMany(options: {
+        data: {
+            fileName: string,
+            filePath: string,
+            media_type: "IMAGE" | "VIDEO",
+            storage?: "internal" | "external",
+            status?: "ORPHANED" | "ASSIGNED",
+            size: number,
+            productId?: string,
+            userId: string
+        }[],
+        include?: IncludeOption
+    }): Promise<Media[]>
 
     /**
      * Find many media by attribute name
@@ -28,8 +47,8 @@ export default interface IMediaUsecase {
         where: {
             fileName?: string,
             filePath?: string,
-            hostname?: string,
             media_type?: "IMAGE" | "VIDEO",
+            storage?: "internal" | "external",
             status?: "ORPHANED" | "ASSIGNED",
             productId?: string,
             userId?: string,
@@ -48,7 +67,7 @@ export default interface IMediaUsecase {
     }): Promise<Media | null>
 
     /**
-     * Update media by media's id (can only modify media's status)
+     * Update media by media's id (can only modify media's status and productId)
      */
     updateById(options: {
         where: { id: string },

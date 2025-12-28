@@ -63,7 +63,7 @@ export default function CartItem({ key, cartItem }: CartItemProps) {
                 <div className="size-20">
                     {
                         cartItem.media
-                            ? <img className="w-full h-full object-contain aspect-square" src={`${cartItem.media.hostname}${cartItem.media.filePath}`} alt={cartItem.variant.name} />
+                            ? <img className="w-full h-full object-contain aspect-square" src={`${cartItem.media.filePath}`} alt={cartItem.variant.name} />
                             : <img className="w-full h-full object-contain aspect-square" src={defaultCartImage} alt={cartItem.variant.name} />
                     }
 

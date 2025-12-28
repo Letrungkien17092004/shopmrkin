@@ -1,4 +1,5 @@
 import React from "react";
+import { formatPrice } from "../../utils/index.ts"
 
 interface ProductCardProps {
     imgURL: string
@@ -23,11 +24,11 @@ export default function ProductCard({ imgURL, discount, starPoint, name, price =
             }
             <div className="w-full">
                 <div className="flex justify-end items-center pr-1">
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star"/>
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star"/>
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star"/>
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star"/>
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star"/>
+                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
+                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
+                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
+                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
+                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
                     <span className="pl-2">{starPoint}</span>
                 </div>
                 <div className="w-full h-12 px-1">
@@ -39,15 +40,15 @@ export default function ProductCard({ imgURL, discount, starPoint, name, price =
                         discount > 0
                             ? <>
                                 <span className="text-base font-semibold text-orange-600">
-                                    {(price || 0) * ((100 - discount) / 100)}
+                                    {formatPrice((price || 0) * ((100 - discount) / 100))}
                                 </span>
                                 <span className="text-base ml-4 font-semibold text-gray-600 line-through">
-                                    {price}
+                                    {formatPrice(price || 0)}
                                 </span>
                             </>
                             : <>
                                 <span className="text-base font-semibold text-orange-600">
-                                    {price}
+                                    {formatPrice(price || 0)}
                                 </span>
                             </>
                     }

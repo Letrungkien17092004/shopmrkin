@@ -1,5 +1,6 @@
 import { Product } from "../../core/entities/index.js";
-
+import { MediaDTO } from "./index.js"
+import { Request } from "express";
 type InputParams = {
     product_code: number,
     name: string,
@@ -19,7 +20,7 @@ type ToOutput = {
         role: string
     },
     category?: string,
-    media?: { filePath: string, hostname: string,type: string }[],
+    media?: MediaDTO.OutputType[],
     variants?: {
         id: string,
         name: string,
@@ -53,7 +54,7 @@ export default class ProductDTO {
      * @param options
      * @param options.isSafe hide sensitive data (default true)
      */
-    static toOutputSingle(product: Product): ToOutput {
+    static toOutputSingle(product: Product, req: Request): ToOutput {
         var user: {
             username: string,
             role: string
@@ -69,7 +70,8 @@ export default class ProductDTO {
             updatedAt?: Date,
         }[] = []
 
-        var media: { filePath: string, hostname: string, type: string }[] = []
+        var media: MediaDTO.OutputType[] = []
+
         if (product.user) {
             user = {
                 username: product.user.username,
@@ -91,11 +93,7 @@ export default class ProductDTO {
         }
 
         if (product.media) {
-            media = product.media.map(med => ({
-                filePath: med.filePath,
-                hostname: med.hostname,
-                type: med.media_type
-            }))
+            media = MediaDTO.toOutputMany(product.media, req)
         }
         return {
             id: product.id,
@@ -119,7 +117,7 @@ export default class ProductDTO {
      * @param options
      * @param options.isSafe hide sensitive data (default true)
      */
-    static toOutputMany(products: Product[]): ToOutput[] {
-        return products.map(p => ProductDTO.toOutputSingle(p))
+    static toOutputMany(products: Product[], req: Request): ToOutput[] {
+        return products.map(p => ProductDTO.toOutputSingle(p, req))
     }
 }

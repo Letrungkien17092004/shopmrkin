@@ -8,9 +8,7 @@ interface UploadResponse {
         id: string,
         fileName: string,
         filePath: string,
-        hostname: string,
         media_type: "IMAGE" | "VIDEO",
-        username?: string
     }[]
 }
 export default class MediaService {
@@ -49,7 +47,6 @@ export default class MediaService {
                 id: med.id,
                 fileName: med.fileName,
                 filePath: med.filePath,
-                hostname: med.hostname,
                 type: med.media_type
             }))
         } catch (error) {

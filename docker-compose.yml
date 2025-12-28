@@ -35,7 +35,7 @@ services:
     build: ./server
     container_name: shopmrkin_server
     environment:
-      SERVER_NAME: http://localhost:8001
+      SERVER_NAME: http://localhost
       PORT: 8001
     ports:
       - "8000:8001"

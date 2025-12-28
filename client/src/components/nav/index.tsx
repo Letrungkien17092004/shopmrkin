@@ -1,5 +1,5 @@
-import Navivation from "./Navigation.tsx";
+import MainNav from "./MainNav.tsx";
 
 export {
-    Navivation
+    MainNav
 }

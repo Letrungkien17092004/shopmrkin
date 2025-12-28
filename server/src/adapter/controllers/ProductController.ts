@@ -111,7 +111,7 @@ export default class ProductController {
             // }
 
             res.status(201).json({
-                product: ProductDTO.toOutputSingle(createdProduct),
+                product: ProductDTO.toOutputSingle(createdProduct, req),
                 // warning: createEmbeddingOk?undefined:"create product ok but no embedding"
             })
             return
@@ -219,7 +219,7 @@ export default class ProductController {
 
             const products = await this.productUsecase.findMany(optionParsed)
             res.status(200).json({
-                products: ProductDTO.toOutputMany(products)
+                products: ProductDTO.toOutputMany(products, req)
             })
         } catch (error) {
             console.log(error)
@@ -293,7 +293,7 @@ export default class ProductController {
             }
 
             res.status(200).json({
-                product: ProductDTO.toOutputSingle(searchedProduct)
+                product: ProductDTO.toOutputSingle(searchedProduct, req)
             })
             return
         } catch (error) {

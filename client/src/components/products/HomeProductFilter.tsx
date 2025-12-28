@@ -1,6 +1,6 @@
 import React from "react"
 
-export default function ProductFilter() {
+export default function HomeProductFilter() {
     return (<>
         <section className="w-full p-4 shadow md:shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
             <div className="text-lg font-bold text-center border-b border-gray-300">

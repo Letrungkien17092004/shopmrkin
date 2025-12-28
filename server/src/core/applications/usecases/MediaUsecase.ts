@@ -40,8 +40,9 @@ export default class MediaUsecase implements IMediaUsecase {
         data: {
             fileName: string,
             filePath: string,
-            hostname: string,
             media_type: "IMAGE" | "VIDEO",
+            storage: "internal" | "external",
+            status?: "ORPHANED" | "ASSIGNED",
             size: number,
             productId?: string,
             userId: string
@@ -50,6 +51,52 @@ export default class MediaUsecase implements IMediaUsecase {
     }): Promise<Media> {
         try {
             return await this.repo.create(options)
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: "Database error",
+                            code: USECASE_ERROR_CODE.INITIAL
+                        })
+                    case REPO_ERROR_CODE.UNIQUE_CONSTRAINT:
+                        throw new USECASE_ERROR({
+                            message: "Media already exist",
+                            code: USECASE_ERROR_CODE.CONFLIX
+                        })
+                    case REPO_ERROR_CODE.UNKNOW:
+                        throw new USECASE_ERROR({
+                            message: "something wrong with repo",
+                            code: USECASE_ERROR_CODE.UNKNOW
+                        })
+                }
+            }
+            throw new USECASE_ERROR({
+                message: "Unable to determine the cause",
+                code: USECASE_ERROR_CODE.UNKNOW
+            })
+        }
+    }
+
+    /**
+     * create multiple media at once
+     * @param options 
+     */
+    async createMany(options: {
+        data: {
+            fileName: string,
+            filePath: string,
+            media_type: "IMAGE" | "VIDEO",
+            storage?: "internal" | "external",
+            status?: "ORPHANED" | "ASSIGNED",
+            size: number,
+            productId?: string,
+            userId: string
+        }[],
+        include?: IncludeOption
+    }): Promise<Media[]> {
+        try {
+            return this.repo.createMany(options)
         } catch (error) {
             if (error instanceof REPO_ERROR) {
                 switch (error.code) {

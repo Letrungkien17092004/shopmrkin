@@ -1,6 +1,6 @@
 import React from "react"
 
-export default function ProductSortingOptions() {
+export default function HomeProductSortingOptions() {
     return (<>
         <div className="flex items-center gap-4">
             <span className="font-semibold text-gray-700">Sắp xếp theo:</span>

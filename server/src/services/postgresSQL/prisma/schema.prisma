@@ -135,11 +135,16 @@ enum MediaStatus {
   ASSIGNED
 }
 
+enum MediaStorage {
+  internal
+  external
+}
+
 model Media {
   id         String    @id @default(uuid(7))
   fileName   String
   filePath   String
-  hostname   String
+  storage MediaStorage @default(internal) 
   media_type MediaType
   size       Int
   userId     String

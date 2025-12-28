@@ -16,7 +16,12 @@ type ProductResponse = {
         role?: string
     },
     category: string,
-    media: { id: string, fileName: string, filePath: string, hostname: string }[],
+    media: {
+        id: string,
+        fileName: string,
+        filePath: string,
+        media_type: "IMAGE" | "VIDEO"
+    }[],
     variants: {
         id: string,
         name: string,
@@ -125,7 +130,6 @@ export default class ProductService {
                 id: med.id,
                 fileName: med.fileName,
                 filePath: med.filePath,
-                hostname: med.hostname,
                 type: 'image'
             }))
             const variants: Variant[] = product.variants.map(v => ({
@@ -188,7 +192,6 @@ export default class ProductService {
                     id: med.id,
                     fileName: med.fileName,
                     filePath: med.filePath,
-                    hostname: med.hostname,
                     type: 'image'
                 }))
                 const variants: Variant[] = p.variants.map(v => ({
@@ -260,7 +263,6 @@ export default class ProductService {
                 id: med.id,
                 fileName: med.fileName,
                 filePath: med.filePath,
-                hostname: med.hostname,
                 type: 'image'
             }))
             const variants: Variant[] = product.variants.map(v => ({

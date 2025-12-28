@@ -4,8 +4,8 @@ type MediaConstructorParam = {
     id: string
     fileName: string
     filePath: string
-    hostname: string
     media_type: "IMAGE" | "VIDEO"
+    storage: "internal" | "external"
     size: number
     status: "ORPHANED" | "ASSIGNED"
     productId?: string
@@ -21,8 +21,8 @@ export default class Media {
     id: string
     fileName: string
     filePath: string
-    hostname: string
     media_type: "IMAGE" | "VIDEO"
+    storage: "internal" | "external"
     size: number
     status: "ORPHANED" | "ASSIGNED"
     productId?: string
@@ -37,8 +37,8 @@ export default class Media {
         this.id = options.id
         this.fileName = options.fileName
         this.filePath = options.filePath
-        this.hostname = options.hostname
         this.media_type = options.media_type
+        this.storage = options.storage
         this.size = options.size
         this.status = options.status
         this.userId = options.userId
