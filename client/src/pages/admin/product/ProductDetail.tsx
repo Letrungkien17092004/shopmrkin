@@ -92,7 +92,7 @@ export default function ProductDetail() {
                 {/* Slider */}
                 <div className="w-[70%] mx-auto sm:w-1/3 sm:mr-36">
                     <ProductImageSlider
-                        images={product.media.map(med => ({ url: `${med.hostname}${med.filePath}` }))}
+                        images={product.media.map(med => ({ url: `${med.filePath}` }))}
                     />
                 </div>
                 {/* info (name, price, variant, ...) */}

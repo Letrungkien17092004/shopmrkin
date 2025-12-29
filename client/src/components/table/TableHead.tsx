@@ -5,7 +5,7 @@ type Props = {
 }
 export default function TableHead({children}: Props) {
     return (<>
-        <thead className="bg-gray-200">
+        <thead className="bg-gray-400">
             {children}
         </thead>
     </>)

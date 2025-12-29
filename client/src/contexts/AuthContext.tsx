@@ -37,6 +37,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setProfile(undefined)
             setStatus("failed")
         } else {
+            profile_
             setProfile(profile_)
             setStatus("succeed")
         }

@@ -3,7 +3,7 @@ import React from "react";
 export function DangerButton({ children, onClick }: { children: string | React.ReactElement, onClick?: React.MouseEventHandler}) {
 
     return (<>
-        <button onClick={onClick} className="cursor-pointer p-1 ring-2 ring-red-400 rounded text-red-400 hover:scale-105 transition">{children}</button>
+        <button onClick={onClick} className="cursor-pointer p-1 font-semibold bg-red-500 text-amber-50 min-w-14 rounded hover:scale-102 transition">{children}</button>
     </>)
 }
 
@@ -15,6 +15,6 @@ interface NormalButtonProps {
 }
 export function NormalButton({ children, className,onClick }: NormalButtonProps) {
     return (<>
-        <button onClick={onClick}  className={`cursor-pointer p-1 ring-2 ring-sky-400 rounded text-sky-400 hover:scale-105 transition`}>{children}</button>
+        <button onClick={onClick}  className={`cursor-pointer p-1 font-semibold bg-blue-500 text-white  min-w-14 rounded hover:scale-102 transition`}>{children}</button>
     </>)
 }

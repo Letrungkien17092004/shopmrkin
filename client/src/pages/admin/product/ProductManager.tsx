@@ -8,12 +8,11 @@ import {
     getMaxPrice,
     makeThumbnailURL
 } from "../../../utils/index.ts"
-
+import { useNoticeManager } from "../../../hooks/index.ts"
+import { NoticeManager } from "../../../components/notifications/index.tsx"
 import { NormalButton } from "../../../components/button/Button.tsx";
 import Loading from "../../../components/waiter/Loading.tsx";
-import Notification from "../../../components/notifications/Notification.tsx";
 import { ProductTable } from "../../../components/table/index.ts"
-import useNotificationController from "../../../hooks/useNotificationController.ts";
 
 const authService = new AuthService()
 const productService = new ProductService(authService)
@@ -22,7 +21,7 @@ export default function ProductManager() {
     const [products, setProducts] = useState<Product[]>([])
     const [toDelete, setToDelete] = useState<string | null>(null)
     const [isDeleting, setIsDeleting] = useState<boolean>(false)
-    const { notifications, pushNotification, removeNotification } = useNotificationController()
+    const { noticeList, pushMessage } = useNoticeManager()
     // initial data
     useEffect(() => {
         const fetch = async () => {
@@ -45,15 +44,14 @@ export default function ProductManager() {
             try {
                 await productService.deleteById(toDelete)
                 setProducts(await productService.getAll({}))
-                pushNotification({
+                pushMessage({
                     message: "Xóa thành công",
-                    type: "bottom-right"
+                    noticeType: "normal"
                 })
             } catch (error) {
-                console.log("Có lỗi xảy ra vui lòng thử lại sau")
-                pushNotification({
-                    message: "Xóa không thành công",
-                    type: "bottom-right"
+                pushMessage({
+                    message: `Xóa thất bại: ${error}`,
+                    noticeType: "error"
                 })
 
             } finally {
@@ -75,14 +73,7 @@ export default function ProductManager() {
         }
     }, [])
     return (<>
-        {notifications.map(notice => (
-            <Notification
-                key={notice.id}
-                message={notice.message}
-                type={notice.type}
-                onClose={removeNotification(notice.id)}
-            />
-        ))}
+        <NoticeManager noticeList={noticeList}/>
         <div className="w-full">
             <div className="p-2">
                 <span className="text-xl font-normal">

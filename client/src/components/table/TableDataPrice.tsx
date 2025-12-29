@@ -1,5 +1,5 @@
 import React from "react";
-
+import { formatPrice } from "../../utils/index.ts";
 
 type Props = {
     price: {
@@ -19,7 +19,7 @@ export default function TableDataPrice({ price, className }: Props) {
     if (!price.minPrice && price.maxPrice) {
         return (<>
             <td className={`text-center text-green-500 ${className}`}>
-                {price.maxPrice}
+                {formatPrice(price.maxPrice)}
             </td>
         </>)
     }
@@ -27,14 +27,14 @@ export default function TableDataPrice({ price, className }: Props) {
     if (price.minPrice && !price.maxPrice) {
         return (<>
             <td className={`text-center text-green-500 ${className}`}>
-                {price.minPrice}
+                {formatPrice(price.minPrice)}
             </td>
         </>)
     }
 
     return (<>
         <td className={`text-center text-green-500 ${className}`}>
-            {price.minPrice} - {price.maxPrice}
+            {formatPrice(price.minPrice || 0)} - {formatPrice(price.maxPrice || 0)}
         </td>
     </>)
 }

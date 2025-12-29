@@ -22,23 +22,23 @@ export default function CreateProductForm() {
 
 
     return (<>
-        <section className="w-full p-4">
+        <section className="w-full p-2">
             <div className="grid grid-cols-12 gap-x-2">
-                    <div className="col-span-6">
+                    <div className="col-span-12">
                         <TextAreaInput
                             labelName="Tên sản phẩm"
                             textareaName="name"
                             textareaId="product-name"
-                            placeholder="Tên sản phẩm không quá 50 kí tự"
+                            placeholder="Ví dụ: iPhone Air 256GB | Chính hãng"
                             onChange={onChangeName}
                         />
                     </div>
-                    <div className="col-span-6">
+                    <div className="col-span-12">
                         <TextAreaInput
                             labelName="Mô tả"
                             textareaName="description"
                             textareaId="product-description"
-                            placeholder="viết mô tả sản phẩm ở đây"
+                            placeholder="Ví dụ: iPhone Air 256GB được Apple ra mắt với thiết kế siêu mỏng 5,64mm..."
                             onChange={onChangeDescription}
                         />
                     </div>

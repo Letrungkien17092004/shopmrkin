@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { CreateProductForm, CreateVariantForm } from "../../../components/products/index.ts";
 import { CreateImageForm } from "../../../components/media/index.ts";
 import Loading from "../../../components/waiter/Loading.tsx";
+import { NoticeManager } from "../../../components/notifications/index.tsx"
+import { useNoticeManager } from "../../../hooks/index.ts"
 import { NormalButton } from "../../../components/button/Button.tsx";
 import { CreateProductProvider, useCreateProduct } from "../../../contexts/CreateProductContext.tsx";
 import { MediaService, ProductService, VariantService, AuthService } from "../../../services/index.ts"
@@ -14,6 +16,8 @@ const variantService = new VariantService(authService)
 function CreateProductWrapper() {
     const { product, variants, media } = useCreateProduct()
     const [isSaving, setIsSaving] = useState<boolean>(false)
+    const { noticeList, pushMessage } = useNoticeManager()
+
 
     // post data to server
     useEffect(() => {
@@ -64,7 +68,26 @@ function CreateProductWrapper() {
         // if saving then skip
         if (isSaving) { return }
         if (media.length == 0) {
-            window.alert("Cần ít nhất 1 ảnh")
+            pushMessage({
+                message: "Cần ít nhất một ảnh",
+                noticeType: "error"
+            })
+            return
+        }
+
+        if (product.name.length <= 5 || product.description.length <= 5) {
+            pushMessage({
+                message: "Tên và mô tả quá ngắn",
+                noticeType: "error"
+            })
+            return
+        }
+
+        if (variants.length <= 0) {
+            pushMessage({
+                message: "Cần ít nhất 1 biến thể ",
+                noticeType: "error"
+            })
             return
         }
         setIsSaving(true)
@@ -79,25 +102,15 @@ function CreateProductWrapper() {
         </>)
     }
     return (<>
+        <NoticeManager noticeList={noticeList} />
         <div className="p-3">
-            <h1 className="text-xl text-gray-500 py-2">Thêm sản phẩm</h1>
-
-            <div className="border border-green-400"></div>
-            <h3 className="text-xl text-gray-500 py-1">Thêm ảnh</h3>
-            <CreateImageForm />
-
-            <div className="border border-green-400"></div>
-            <h3 className="text-xl text-gray-500 py-1">Thông tin sản phẩm</h3>
-            <CreateProductForm />
-
-            <div className="border border-green-400"></div>
-            <h3 className="text-xl text-gray-500 py-1">Thêm biến thể</h3>
-            <CreateVariantForm />
-
-            <div className="border border-green-400"></div>
-            <div className="w-full flex flex-center justify-start">
+            <h1 className="text-xl text-black py-2 border-b">Thêm sản phẩm</h1>
+            <div className="w-full p-2 flex flex-center justify-end">
                 <NormalButton className="text-xl" onClick={onClickSave}>Lưu</NormalButton>
             </div>
+            <CreateImageForm />
+            <CreateProductForm />
+            <CreateVariantForm />
         </div>
     </>)
 }

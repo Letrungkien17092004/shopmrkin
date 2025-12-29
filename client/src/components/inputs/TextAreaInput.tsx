@@ -21,7 +21,7 @@ export default function TextAreaInput({
 }: TextAreaInputProps) {
   return (
     <div className="flex flex-col gap-1 w-full">
-      <label htmlFor={textareaId} className="text-sm font-medium text-gray-700">
+      <label htmlFor={textareaId} className="text-sm font-medium text-black">
         {labelName}
       </label>
 
@@ -38,10 +38,9 @@ export default function TextAreaInput({
           p-3
           rounded-lg
           border border-gray-300
-          text-base text-gray-800
+          text-base text-black
           focus:outline-none
-          focus:ring-2 focus:ring-blue-500
-          focus:border-blue-500
+          focus:border-gray-500
           placeholder:text-gray-400
           resize-none
         "
