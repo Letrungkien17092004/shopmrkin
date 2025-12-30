@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser"
 import { Request, Response, NextFunction } from "express";
-import cors from "cors"
+import cors, { CorsOptions } from "cors"
 import path from "path";
 // import router
 import {
@@ -28,7 +28,24 @@ const app = express()
 app.set("trust proxy", true)
 app.set('query parser', 'extended');
 
-app.use(cors())
+const whitelist = [
+    'http://localhost:9000',
+    'http://shopmrkin.store',
+];
+
+const corsOptions: CorsOptions = {
+    origin: function (origin, callback) {
+        if (!origin || whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true, 
+};
+
+app.use(cors(corsOptions));
+
 app.use(logRequest)
 app.use(cookieParser())
 app.use("/public", express.static(PUBLIC_DIR))
