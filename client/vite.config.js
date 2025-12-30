@@ -9,9 +9,13 @@ export default defineConfig({
         port: 9000,
         hmr: {
             protocol: "ws",
-            host: "localhost",
+            host: "shopmrkin.store",
             clientPort: 80,   // 👈 QUAN TRỌNG
         },
+        allowedHosts: [
+            "shopmrkin.store",
+            ".shopmrkin.store"
+        ]
     },
     // publicDir: "/public",
     plugins: [
