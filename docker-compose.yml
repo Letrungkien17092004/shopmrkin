@@ -3,11 +3,11 @@ services:
     build: ./client
     container_name: shopmrkin_client
     environment:
-      VITE_GENERATE_OAUTH_URL: http://localhost:8000/api/auth/google-redirect-url?redirect_uri=http://localhost:9000/auth/google/callback
-      VITE_GOOGLE_CALLBACK_BE_URL: http://localhost:8000/api/auth/login-google
-      VITE_BACK_END_HOST: http://localhost:8000
-    ports:
-      - "9000:9000"
+      VITE_GENERATE_OAUTH_URL: ${PROTOCOL}://${SERVER_NAME}/api/auth/google-redirect-url?redirect_uri=${PROTOCOL}://${CLIENT_NAME}/auth/google/callback
+      VITE_GOOGLE_CALLBACK_BE_URL: ${PROTOCOL}://${SERVER_NAME}/api/auth/login-google
+      VITE_BACK_END_HOST: ${PROTOCOL}://${SERVER_NAME}
+    expose:
+      - "9000"
     develop:
       watch:
         # sync new source code
@@ -35,10 +35,11 @@ services:
     build: ./server
     container_name: shopmrkin_server
     environment:
-      SERVER_NAME: http://localhost
-      PORT: 8001
-    ports:
-      - "8000:8001"
+      SERVER_NAME: ${SERVER_NAME}
+      PORT: 8000
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/shopmrkin_dev
+    expose:
+      - "8000"
     develop:
       watch:
         # sync new source code
@@ -73,9 +74,15 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - "5432:5432" # expose for testing
     volumes:
       - postgres_db:/var/lib/postgresql/data
 
+  nginx:
+    image: nginx:stable
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
 volumes:
   postgres_db:

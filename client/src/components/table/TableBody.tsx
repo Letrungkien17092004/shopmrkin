@@ -6,7 +6,7 @@ type Props = {
 }
 export default function TableBody({children, className}: Props) {
     return (<>
-        <tbody className="">
+        <tbody className="xl:text-lg">
             {children}
         </tbody>
     </>)

@@ -1,0 +1,27 @@
+SERVER_NAME=localhost
+PORT=8000
+
+JWT_SECRET=shopmrkinsupersecret
+ACCESS_EXPRISES_IN=1h
+REFESH_EXPRISES_IN=7 days
+
+# database seeding config
+DEFAULT_USERNAME=Shop mr kin
+DEFAULT_ACCOUNT=shopmrkin@gmail.com
+DEFAULT_ADMIN_PASSWORD=12345678
+DEFAULT_EMAIL=ammenki31@gmail.com
+
+
+# Oauth2 config
+GOOGLE_CLIENT_ID=519966687818-gngnvi6f0bbugtgnevrfc3ub4eueqc20.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
+GOOGLE_OAUTH_STATE_STRING=cacsjnx-aac-aajxnc
+# postgreSQL
+DATABASE_URL="postgres://postgres:postgres@localhost:5432/shopmrkin_dev"
+
+# Upload folder
+UPLOAD_FOLDER="/public/upload"
+
+# API KEY
+LLM_KEY=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
+# LLM_KEY=AIzaSyBoPBUpWLlKPHVkjZsRrniR91oyJYuvuj0

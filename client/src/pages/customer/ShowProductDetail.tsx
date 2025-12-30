@@ -167,7 +167,7 @@ export default function ShowProductDetail() {
     if (product) {
         return (<>
             <MainLayout>
-                <div className="max-w-5xl mx-auto">
+                <div className="max-w-5xl xl:max-w-7xl mx-auto">
                     {/* slider and variant options */}
                     <div className="w-full mt-3 sm:flex sm:justify-end">
                         {/* Slider */}

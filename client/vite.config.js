@@ -6,7 +6,12 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
     server: {
         host: "0.0.0.0",
-        port: 9000
+        port: 9000,
+        hmr: {
+            protocol: "ws",
+            host: "localhost",
+            clientPort: 80,   // 👈 QUAN TRỌNG
+        },
     },
     // publicDir: "/public",
     plugins: [

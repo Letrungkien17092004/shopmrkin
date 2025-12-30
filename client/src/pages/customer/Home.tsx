@@ -9,7 +9,7 @@ import {
 export default function Home() {
     return (
         <MainLayout>
-            <section className="sm:mt-6 w-full h-fit lg:w-[1000px] mx-auto">
+            <section className="sm:mt-6 w-full h-fit lg:w-[1000px] xl:w-[1200px] mx-auto">
                 <div className="grid grid-cols-12 gap-x-3">
                     <div className="col-span-12 md:col-span-3">
                         <HomeProductFilter />

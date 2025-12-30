@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom"
 import { AuthProvider, useAuthContext } from "../../contexts/AuthContext.tsx";
-import { NoticeManager } from "../notifications/index.tsx";
 
 interface Props {
     children: React.ReactNode
@@ -60,7 +59,7 @@ export default function ManagerLayout({ children }: Props) {
                                             <Link
                                                 to={tabName.toLowerCase()}
                                                 className={`
-                                                relative flex items-center px-6 py-2.5 text-sm font-medium transition
+                                                relative xl:text-xl flex items-center px-6 py-2.5 text-sm font-medium transition
                                                 ${active
                                                         ? "bg-emerald-50 text-emerald-600"
                                                         : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"}
@@ -95,7 +94,6 @@ export default function ManagerLayout({ children }: Props) {
                     }
                 </section>
             </main>
-            <NoticeManager />
         </AuthProvider>
     )
 }

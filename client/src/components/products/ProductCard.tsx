@@ -24,30 +24,30 @@ export default function ProductCard({ imgURL, discount, starPoint, name, price =
             }
             <div className="w-full">
                 <div className="flex justify-end items-center pr-1">
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
-                    <img className="size-4" src="/public/svg/star-solid-full.svg" alt="product-star" />
+                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
+                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
+                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
+                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
+                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
                     <span className="pl-2">{starPoint}</span>
                 </div>
                 <div className="w-full h-12 px-1">
-                    <span className="line-clamp-2 text-start">{name}</span>
+                    <span className="xl:text-lg line-clamp-2 text-start">{name}</span>
                 </div>
-                <div className="w-full flex justify-around items-center pb-2">
+                <div className="w-full xl:text-lg flex justify-around items-center pb-2">
                     {/* if discount <=0 then hiden origin price */}
                     {
                         discount > 0
                             ? <>
-                                <span className="text-base font-semibold text-orange-600">
+                                <span className="font-semibold text-orange-600">
                                     {formatPrice((price || 0) * ((100 - discount) / 100))}
                                 </span>
-                                <span className="text-base ml-4 font-semibold text-gray-600 line-through">
+                                <span className="ml-4 font-semibold text-gray-600 line-through">
                                     {formatPrice(price || 0)}
                                 </span>
                             </>
                             : <>
-                                <span className="text-base font-semibold text-orange-600">
+                                <span className="font-semibold text-orange-600">
                                     {formatPrice(price || 0)}
                                 </span>
                             </>
