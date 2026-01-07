@@ -1,6 +1,6 @@
 import axios from "axios"
 import { Profile } from "../types/user/index.ts"
-
+import { jwtDecode } from "jwt-decode"
 import { ENV } from "../config/ENV.ts"
 
 enum AuthLocalStoreFieldNames {
@@ -9,6 +9,15 @@ enum AuthLocalStoreFieldNames {
     refeshTokenCreatedAt = "refesh_token_createdAt",
     accessToken = "access_token",
     accessTokenCreatedAt = "access_token_createdAt",
+}
+
+interface JWTPayload {
+    id: string,
+    account: string,
+    username: string,
+    email: string,
+    role: string,
+    permissions: string[]
 }
 
 
