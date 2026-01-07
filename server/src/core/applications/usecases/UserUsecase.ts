@@ -2,8 +2,8 @@ import IUserUsecase from "../interfaces/usecases/IUserUsecase.js";
 import { USECASE_ERROR, USECASE_ERROR_CODE } from "../interfaces/usecases/errors.js";
 import { REPO_ERROR, REPO_ERROR_CODE } from "../interfaces/repositories/errors.js";
 import IUsersRepository from "../interfaces/repositories/IUsersRepository.js";
-import { User } from "../../../core/entities/index.js";
-import bcrypt from 'bcrypt';
+import { User, Role } from "../../../core/entities/index.js";
+
 
 export default class UserUsecase implements IUserUsecase {
     private repository: IUsersRepository
@@ -20,19 +20,16 @@ export default class UserUsecase implements IUserUsecase {
         data: {
             username: string,
             account: string,
-            password: string,
+            password_hashed: string,
             email: string
         }
-    }): Promise<User> {
+    }): Promise<User & { role: Role }> {
         try {
-            // hash password
-            const password_hashed = await bcrypt.hash(options.data.password, 10)
-
             const newUser = await this.repository.create({
                 data: {
                     username: options.data.username,
                     account: options.data.account,
-                    password_hashed: password_hashed,
+                    password_hashed: options.data.password_hashed,
                     email: options.data.email,
                 }
             })
@@ -100,7 +97,7 @@ export default class UserUsecase implements IUserUsecase {
         where: {
             email: string
         }
-    }): Promise<User | null> {
+    }): Promise<User & { role: Role } | null> {
         try {
             const searchedUser = await this.repository.findByEmail(options)
             return searchedUser
@@ -129,7 +126,18 @@ export default class UserUsecase implements IUserUsecase {
      * Update an user
      * @param options 
      */
-    async update(options: Partial<User> & Pick<User, "id">): Promise<User> {
+    async update(options: {
+        where: {
+            id: string
+        },
+        data: {
+            username?: string
+            account?: string
+            password_hash?: string
+            email?: string
+            roleId?: number
+        }
+    }): Promise<User> {
         try {
             const user = await this.repository.update(options)
             return user
@@ -192,16 +200,15 @@ export default class UserUsecase implements IUserUsecase {
      * check correct user with account and password
      * @param options 
      */
-    async login({ account, password }: { account: string; password: string; }): Promise<User | null> {
+    async findByAccount(options: {
+        where: {
+            account: string
+        }
+    }): Promise<User & { role: Role } | null> {
         try {
-            const searchedUser = await this.repository.findWithAccount({
-                where: {
-                    account: account
-                }
+            const searchedUser = await this.repository.findByAccount({
+                where: options.where
             })
-            if (!searchedUser) return null
-            let isMatch = await bcrypt.compare(password, searchedUser.password_hash)
-            if (!isMatch) return null
             return searchedUser
         } catch (error) {
             if (error instanceof REPO_ERROR) {

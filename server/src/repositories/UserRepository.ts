@@ -25,7 +25,7 @@ export default class UserRepository implements IUsersRepository {
             password_hashed: string,
             email: string
         }
-    }): Promise<User> {
+    }): Promise<User & { role: Role }> {
         try {
             const createdUser: UserWithRoleAndCart = await prisma.users.create({
                 data: {
@@ -44,11 +44,13 @@ export default class UserRepository implements IUsersRepository {
                 }
             })
 
-            return new User({
+            const user = new User({
                 ...createdUser,
                 role: new Role({ ...createdUser.role }),
                 cart: createdUser.cart ? new Cart({ ...createdUser.cart }) : undefined
             })
+
+            return user as User & { role: Role }
         } catch (error) {
             console.log("log in Repo")
             console.table(error)
@@ -117,7 +119,7 @@ export default class UserRepository implements IUsersRepository {
         where: {
             email: string
         }
-    }): Promise<User | null> {
+    }): Promise<User & { role: Role } | null> {
         try {
             const searchedUser: UserWithRoleAndCart | null = await prisma.users.findUnique({
                 where: options.where,
@@ -128,7 +130,8 @@ export default class UserRepository implements IUsersRepository {
                 }
             })
             if (!searchedUser) { return null }
-            return new User({
+
+            const user = new User({
                 ...searchedUser,
                 role: new Role({
                     id: searchedUser.role.id,
@@ -142,6 +145,58 @@ export default class UserRepository implements IUsersRepository {
                     })
                     : undefined
             })
+            return user as User & { role: Role }
+        } catch (error) {
+            throw baseExceptionHandler(error)
+        }
+    }
+
+    /**
+     * Finds a user by their account identifier and loads related role and permissions, cart.
+     *
+     * @param options
+     * @returns {Promise<User | null>} A promise that resolves to the found user with populated role and permissions,
+     * or `null` if no user is found.
+     * @throws REPO_ERROR
+     */
+    async findByAccount(options: {
+        where: {
+            account: string
+        }
+    }): Promise<User & { role: Role } | null> {
+        try {
+            const searchedUser = await prisma.users.findUnique({
+                where: options.where,
+                relationLoadStrategy: "join",
+                include: {
+                    role: true,
+                    cart: true
+                }
+            })
+
+            // not found
+            if (!searchedUser) {
+                return null
+            }
+
+            const cart: Cart | undefined = searchedUser.cart
+                ? new Cart({ id: searchedUser.cart.id, userId: searchedUser.id })
+                : undefined
+
+            const role = new Role({
+                id: searchedUser.role.id,
+                roleName: searchedUser.role.roleName,
+                description: searchedUser.role.description,
+                permissions: []
+            })
+
+            const user = new User({
+                ...searchedUser,
+                role: role,
+                cart: cart
+            })
+
+            return user as User & { role: Role }
         } catch (error) {
             throw baseExceptionHandler(error)
         }
@@ -153,20 +208,23 @@ export default class UserRepository implements IUsersRepository {
      * @returns The updated User.
      * @throws REPO_ERROR
      */
-    async update(attributes: Partial<User>): Promise<User> {
+    async update(options: {
+        where: {
+            id: string
+        },
+        data: {
+            username?: string
+            account?: string
+            password_hash?: string
+            email?: string
+            roleId?: number
+        }
+    }): Promise<User> {
         try {
             const updated = await prisma.users.update({
-                where: {
-                    id: attributes.id
-                },
+                where: options.where,
                 relationLoadStrategy: "join",
-                data: {
-                    username: attributes.username,
-                    account: attributes.account,
-                    email: attributes.email,
-                    password_hash: attributes.password_hash,
-                    roleId: attributes.roleId
-                },
+                data: options.data,
                 include: {
                     role: {
                         include: {
@@ -226,66 +284,6 @@ export default class UserRepository implements IUsersRepository {
     }
 
 
-    /**
-     * Finds a user by their account identifier and loads related role and permissions, cart.
-     *
-     * @param options
-     * @returns {Promise<User | null>} A promise that resolves to the found user with populated role and permissions,
-     * or `null` if no user is found.
-     * @throws REPO_ERROR
-     */
-    async findWithAccount(options: {
-        where: {
-            account: string
-        }
-    }): Promise<User | null> {
-        try {
-            const searchedUser = await prisma.users.findUnique({
-                where: options.where,
-                relationLoadStrategy: "join",
-                include: {
-                    role: {
-                        include: {
-                            permissions: {
-                                include: {
-                                    permission: true
-                                }
-                            }
-                        }
-                    },
-                    cart: true
-                }
-            })
-
-            // not found
-            if (!searchedUser) {
-                return null
-            }
-
-            const cart: Cart | undefined = searchedUser.cart
-                ? new Cart({ id: searchedUser.cart.id, userId: searchedUser.id })
-                : undefined
-            const permissions = searchedUser.role.permissions.map(per => new Permission({
-                id: per.permission.id,
-                perName: per.permission.perName,
-                description: per.permission.description
-            }))
-
-            const role = new Role({
-                id: searchedUser.role.id,
-                roleName: searchedUser.role.roleName,
-                description: searchedUser.role.description,
-                permissions: permissions
-            })
-
-            return new User({
-                ...searchedUser,
-                role: role,
-                cart: cart
-            })
-        } catch (error) {
-            throw baseExceptionHandler(error)
-        }
-    }
+    
 }
 

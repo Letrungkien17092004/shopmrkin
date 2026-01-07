@@ -7,7 +7,7 @@ import { USECASE_ERROR, USECASE_ERROR_CODE } from "../../core/applications/inter
 import jwt from "jsonwebtoken";
 import { ENV } from "../../config/env.js";
 import { z } from "zod"
-
+import bcrypt from 'bcrypt';
 
 interface JWTPayload {
     id: string,
@@ -61,11 +61,13 @@ export default class AuthorController {
             })
 
             const bodyParsed = BodySchema.parse(req.body)
+            const password_hashed = await bcrypt.hash(bodyParsed.password, 10)
+
             const createdUser = await this.userUsecase.create({
                 data: {
                     username: bodyParsed.username,
                     account: bodyParsed.account,
-                    password: bodyParsed.password,
+                    password_hashed: password_hashed,
                     email: bodyParsed.email
                 }
             })
@@ -118,21 +120,34 @@ export default class AuthorController {
 
             const bodyParsed = BodySchema.parse(req.body)
 
-            const foundUser = await this.userUsecase.login(bodyParsed)
+            const foundUser = await this.userUsecase.findByAccount({
+                where: {
+                    account: bodyParsed.account
+                }
+            })
 
             if (!foundUser) {
                 res.status(404).json({
-                    messsage: "wrong account or password"
+                    messsage: "wrong account"
                 })
                 return
             }
+
+            let isMatch = await bcrypt.compare(bodyParsed.password, foundUser.password_hash)
+            if (!isMatch) {
+                res.status(404).json({
+                    message: "wrong password"
+                })
+                return
+            }
+
             const payload: JWTPayload = {
                 id: foundUser.id,
                 account: foundUser.account,
                 username: foundUser.username,
                 email: foundUser.email,
-                role: foundUser.role!.roleName,
-                permissions: foundUser.role!.permissions!.map(per => per.perName)
+                role: foundUser.role.roleName,
+                permissions: foundUser.role.permissions!.map(per => per.perName) || []
             }
 
             const profile: InternalProfile = {
@@ -141,7 +156,7 @@ export default class AuthorController {
                 account: foundUser.account,
                 email: foundUser.email,
                 picture: "",
-                role: foundUser.role?.roleName || "undefined",
+                role: foundUser.role.roleName,
                 cartId: foundUser.cart!.id
             }
             const refeshToken = jwt.sign(
@@ -338,11 +353,12 @@ export default class AuthorController {
                 var profile: InternalProfile | null = null
                 // if user wasn't found then create new
                 if (!foundUser) {
+                    const randomPasswordHashed = await bcrypt.hash(new Date().toString(), 10)
                     const createdUser = await this.userUsecase.create({
                         data: {
                             username: googleProfile.name,
                             account: googleProfile.email,
-                            password: new Date().toString(),
+                            password_hashed: randomPasswordHashed,
                             email: googleProfile.email
                         }
                     })
@@ -352,7 +368,7 @@ export default class AuthorController {
                         username: createdUser.username,
                         account: createdUser.account,
                         email: createdUser.email,
-                        role: createdUser.role?.roleName || "undefined",
+                        role: createdUser.role.roleName,
                         permissions: []
                     }
 
