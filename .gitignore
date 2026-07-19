@@ -13,4 +13,5 @@ server/public/upload/*
 !server/public/upload/.gitkeep
 
 client/dist/
+client/.next/
 

@@ -1,9 +1,0 @@
-{
-  "/page": "app/page.js",
-  "/product-detail/[productId]/page": "app/product-detail/[productId]/page.js",
-  "/manager/products/page": "app/manager/products/page.js",
-  "/manager/chats/page": "app/manager/chats/page.js",
-  "/manager/products/new/page": "app/manager/products/new/page.js",
-  "/manager/products/[id]/page": "app/manager/products/[id]/page.js",
-  "/manager/dashboard/page": "app/manager/dashboard/page.js"
-}
