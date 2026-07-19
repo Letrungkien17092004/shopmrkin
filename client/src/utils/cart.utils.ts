@@ -1,4 +1,4 @@
-import { Cart, CartItem } from "../types/index.ts"
+import { Cart, CartItem } from "../types/cart/index.ts"
 
 export function getCartItemByVariantId(cart: Cart, variantId: string): CartItem | null {
     const items = cart.items

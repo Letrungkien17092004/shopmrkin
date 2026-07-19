@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 import { useAuthContext } from "../../contexts/AuthContext.tsx"
 import { Cart } from "../cart/index.tsx"
 import UserProfile from "../user/UserProfile.tsx"
@@ -13,7 +13,7 @@ export default function MainNav() {
                     {/* logo */}
                     <div className="col-span-6 md:col-span-3 lg:col-span-2">
                         <div className="inline-block p-2 text-2xl uppercase text-green-500">
-                            <Link className="no-underline" to="/">Shopmrkin</Link>
+                            <Link className="no-underline" href="/">Shopmrkin</Link>
                         </div>
                     </div>
                     {/* menu */}
@@ -52,8 +52,8 @@ export default function MainNav() {
                                     :
                                     <>
                                         <div className="flex items-center gap-x-1">
-                                            <Link className="text-black hover:text-green-500" to="/login">Đăng nhập</Link>
-                                            <Link className="text-black hover:text-green-500" to="/sign-in">Đăng ký</Link>
+                                            <Link className="text-black hover:text-green-500" href="/login">Đăng nhập</Link>
+                                            <Link className="text-black hover:text-green-500" href="/sign-in">Đăng ký</Link>
                                         </div>
                                     </>
                             }

@@ -11,7 +11,7 @@ import {
 import ProductCard from "./ProductCard.tsx"
 import ProductSortingOptions from "./HomeProductSortingOptions.tsx"
 import ProductFilteringInfo from "./HomeProductFilteringInfo.tsx"
-import { Link } from "react-router-dom"
+import Link from "next/link"
 
 const authService = new AuthService()
 const productService = new ProductService(authService)
@@ -48,7 +48,7 @@ export default function HomeShowProduct() {
                 <div className="grid grid-cols-12 gap-y-4 gap-x-3">
                     {products.map(p => (
                         <div key={p.id} className="col-span-6 sm:col-span-4 lg:col-span-3">
-                            <Link className="text-base no-underline" to={`/product-detail/${p.id}`}>
+                            <Link className="text-base no-underline" href={`/product-detail/${p.id}`}>
                                 <ProductCard
                                     imgURL={`${makeThumbnailURL(p.media)}`}
                                     discount={0}

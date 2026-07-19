@@ -47,7 +47,7 @@ export default class MediaService {
                 id: med.id,
                 fileName: med.fileName,
                 filePath: med.filePath,
-                type: med.media_type
+                media_type: med.media_type
             }))
         } catch (error) {
             throw error

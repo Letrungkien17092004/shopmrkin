@@ -48,7 +48,7 @@ const DEFAULT_MEDIA = {
     fileName: "vn-11134207-7ra0g-m6gngdko0gip8d.webp",
     filePath: "/file/vn-11134207-7ra0g-m6gngdko0gip8d.webp",
     hostname: "https://down-vn.img.susercontent.com",
-    type: 'image'
+    media_type: 'IMAGE' as const
 }
 
 export default class ProductService {
@@ -130,7 +130,7 @@ export default class ProductService {
                 id: med.id,
                 fileName: med.fileName,
                 filePath: med.filePath,
-                type: 'image'
+                media_type: med.media_type || 'IMAGE'
             }))
             const variants: Variant[] = product.variants.map(v => ({
                 id: v.id,
@@ -192,7 +192,7 @@ export default class ProductService {
                     id: med.id,
                     fileName: med.fileName,
                     filePath: med.filePath,
-                    type: 'image'
+                    media_type: med.media_type || 'IMAGE'
                 }))
                 const variants: Variant[] = p.variants.map(v => ({
                     id: v.id,
@@ -263,7 +263,7 @@ export default class ProductService {
                 id: med.id,
                 fileName: med.fileName,
                 filePath: med.filePath,
-                type: 'image'
+                media_type: med.media_type || 'IMAGE'
             }))
             const variants: Variant[] = product.variants.map(v => ({
                 id: v.id,

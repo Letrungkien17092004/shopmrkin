@@ -1,0 +1,104 @@
+'use client'
+
+import React, { useCallback, useEffect, useState } from "react"
+import Link from "next/link"
+import { ProductService, AuthService } from "@/services/index.ts"
+import { Product } from "@/types/product/index.ts"
+import {
+    getTotalStock,
+    getMinPrice,
+    getMaxPrice,
+    makeThumbnailURL
+} from "@/utils/index.ts"
+import { useNoticeManager } from "@/hooks/index.ts"
+import { NoticeManager } from "@/components/notifications/index.tsx"
+import { NormalButton } from "@/components/button/Button.tsx"
+import Loading from "@/components/waiter/Loading.tsx"
+import { ProductTable } from "@/components/table/index.ts"
+
+const authService = new AuthService()
+const productService = new ProductService(authService)
+
+export default function ProductsPage() {
+    const [products, setProducts] = useState<Product[]>([])
+    const [toDelete, setToDelete] = useState<string | null>(null)
+    const [isDeleting, setIsDeleting] = useState<boolean>(false)
+    const { noticeList, pushMessage } = useNoticeManager()
+
+    useEffect(() => {
+        const fetch = async () => {
+            setProducts(await productService.getAll({
+                include: {
+                    user: true,
+                    variants: true,
+                    media: true
+                }
+            }))
+        }
+        fetch()
+    }, [])
+
+    useEffect(() => {
+        if (!toDelete) { return }
+        const deleteData = async () => {
+            try {
+                await productService.deleteById(toDelete)
+                setProducts(await productService.getAll({}))
+                pushMessage({
+                    message: "Xóa thành công",
+                    noticeType: "normal"
+                })
+            } catch (error) {
+                pushMessage({
+                    message: `Xóa thất bại: ${error}`,
+                    noticeType: "error"
+                })
+            } finally {
+                setToDelete(null)
+                setIsDeleting(false)
+            }
+        }
+        deleteData()
+        setIsDeleting(true)
+    }, [toDelete])
+
+    const createDeleteEventHandler = useCallback((id: string) => {
+        return (e: React.MouseEvent) => {
+            e.stopPropagation()
+            setToDelete(id)
+        }
+    }, [])
+
+    return (
+        <>
+            <NoticeManager noticeList={noticeList} />
+            <div className="w-full">
+                <div className="p-2">
+                    <span className="text-xl font-normal">Danh sách sản phẩm</span>
+                </div>
+                <div className="flex justify-end mb-4">
+                    <NormalButton>
+                        <Link className="text-base" href="/manager/products/new">Thêm mới</Link>
+                    </NormalButton>
+                </div>
+                {isDeleting
+                    ? <Loading />
+                    : (
+                        <div className="w-full p-2">
+                            <ProductTable
+                                listProduct={products.map(p => ({
+                                    ...p,
+                                    imageURL: `${makeThumbnailURL(p.media)}`,
+                                    minPrice: getMinPrice(p.variants),
+                                    maxPrice: getMaxPrice(p.variants),
+                                    stock: getTotalStock(p.variants) || 0
+                                }))}
+                                createDeleteEventHandler={createDeleteEventHandler}
+                            />
+                        </div>
+                    )
+                }
+            </div>
+        </>
+    )
+}

@@ -35,6 +35,20 @@ type LoginWithGooogleResponse = {
     accessToken: string,
 }
 
+type LoginResponse = {
+    profile: {
+        id: string,
+        account: string,
+        username: string,
+        email: string,
+        picture: string,
+        role: string,
+        cartId: string
+    },
+    refeshToken: string,
+    accessToken: string,
+}
+
 export default class AuthService {
 
     /**
@@ -131,6 +145,32 @@ export default class AuthService {
         const url = new URL(ENV.GENERATE_OAUTH_URL)
         const response = await axios<{ url: string }>(url.toString())
         return response.data.url
+    }
+
+    /**
+     * Login with account and password
+     *
+     * Sends account and password to the server. On success, stores the
+     * profile, refesh_token, and access_token in localStorage.
+     *
+     * @param account - email account
+     * @param password - user password
+     * @returns {Promise<boolean>} true if login succeeded, false otherwise
+     */
+    async login(account: string, password: string): Promise<boolean> {
+        try {
+            const response = await axios.post<LoginResponse>(ENV.LOGIN_URL, {
+                account,
+                password,
+            })
+
+            this.storeRefeshToken(response.data.refeshToken)
+            this.storeAccessToken(response.data.accessToken)
+            this.storeProfile(response.data.profile)
+            return true
+        } catch (error) {
+            return false
+        }
     }
 
     /**

@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { AssistantMessage } from '../../types/chat/index.ts';
 import { ChatListCard } from "./index.tsx"
 interface Props {
@@ -41,7 +41,7 @@ interface Props {
 //                 ))}
 
 export default function ChatListRecommends({ message }: Props) {
-    const navigate = useNavigate();
+    const router = useRouter();
 
     return (
         <div className="mt-3 w-full">

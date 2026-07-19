@@ -10,7 +10,7 @@ import TableDataPrice from "./TableDataPrice.tsx";
 import TableDataStock from "./TableDataStock.tsx";
 import TableDataActions from "./TableDataActions.tsx";
 import { NormalButton, DangerButton } from "../button/Button.tsx";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 type Props = {
     listProduct: {
@@ -48,7 +48,7 @@ export default function ProductTable({ listProduct, createDeleteEventHandler }: 
                         <TableDataActions>
                             <NormalButton>
                                 <Link
-                                    to={p.id}
+                                    href={`/manager/products/${p.id}`}
                                 >
                                     Chi tiết
                                 </Link>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import ProductService from "../../services/ProductService.ts";
 import AuthService from "../../services/AuthService.ts";
 import { Product } from "../../types/product/index.ts"
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function ChatListCard({ productId }: Props) {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [product, setProduct] = useState<Product | undefined>(undefined)
 
     useEffect(() => {
@@ -27,7 +27,7 @@ export default function ChatListCard({ productId }: Props) {
     }, [])
     return (
         <div
-            onClick={() => navigate(`/product-detail/${productId}`)}
+            onClick={() => router.push(`/product-detail/${productId}`)}
             className="shrink-0 w-32 bg-white rounded-lg border border-gray-300 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow hover:border-blue-400"
         >
             {/* Product Image */}

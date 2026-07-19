@@ -1,5 +1,6 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom"
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AuthProvider, useAuthContext } from "../../contexts/AuthContext.tsx";
 
 interface Props {
@@ -17,10 +18,11 @@ export default function ManagerLayout({ children }: Props) {
         "Customer",
     ]
 
-    const location = useLocation()
+    const pathname = usePathname()
 
     const checkActiveTab = (tabName: string): boolean => {
-        const path = location.pathname.split("/")
+        if (!pathname) return false
+        const path = pathname.split("/")
         const find = path.find(p => p.toLocaleLowerCase() === tabName.toLowerCase())
         if (find) { return true }
         return false
@@ -57,7 +59,7 @@ export default function ManagerLayout({ children }: Props) {
                                     return (
                                         <li key={tabName}>
                                             <Link
-                                                to={tabName.toLowerCase()}
+                                                href={`/manager/${tabName.toLowerCase()}`}
                                                 className={`
                                                 relative xl:text-xl flex items-center px-6 py-2.5 text-sm font-medium transition
                                                 ${active

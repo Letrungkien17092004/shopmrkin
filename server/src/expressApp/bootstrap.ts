@@ -30,6 +30,7 @@ app.set('query parser', 'extended');
 
 const whitelist = [
     'http://localhost:9000',
+    'http://localhost:3000',
     'http://shopmrkin.store',
 ];
 
