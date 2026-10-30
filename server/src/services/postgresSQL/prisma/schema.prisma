@@ -96,7 +96,7 @@ model Products {
   variants          Variants[]
   media             Media[]
   user              Users             @relation(fields: [userId], references: [id])
-  productEmbeddings ProductEmbedding?
+  // productEmbeddings ProductEmbedding?
 
   // time
   createdAt DateTime @default(now())
@@ -245,16 +245,16 @@ model Payments {
   order Orders @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
-model ProductEmbedding {
-  id          String                      @id @default(uuid())
-  productId   String                      @unique
-  origin_text String
-  embedding   Unsupported("vector(1024)")
-  createdAt   DateTime                    @default(now())
-  updatedAt   DateTime                    @default(now())
+// model ProductEmbedding {
+//   id          String                      @id @default(uuid())
+//   productId   String                      @unique
+//   origin_text String
+//   embedding   Unsupported("vector(1024)")
+//   createdAt   DateTime                    @default(now())
+//   updatedAt   DateTime                    @default(now())
 
-  product Products @relation(fields: [productId], references: [id], onDelete: Cascade)
-}
+//   product Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+// }
 
 model Chats {
   id            String     @id @default(uuid())

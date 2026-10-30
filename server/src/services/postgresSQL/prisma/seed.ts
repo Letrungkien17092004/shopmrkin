@@ -4,22 +4,22 @@ import { ENV } from "../../../config/env";
 
 const prisma = new PrismaClient()
 async function main() {
-    const categories = await prisma.categories.createMany({
-        data: [
-            {
-                name: "Thời trang nam",
-                slug: "thời-trang-nam",
-            },
-            {
-                name: "Thời trang nữ",
-                slug: "thời-trang-nữ",
-            },
-            {
-                name: "Thời trang trẻ em",
-                slug: "thời-trang-trẻ-em",
-            },
-        ]
-    })
+    // const categories = await prisma.categories.createMany({
+    //     data: [
+    //         {
+    //             name: "Thời trang nam",
+    //             slug: "thời-trang-nam",
+    //         },
+    //         {
+    //             name: "Thời trang nữ",
+    //             slug: "thời-trang-nữ",
+    //         },
+    //         {
+    //             name: "Thời trang trẻ em",
+    //             slug: "thời-trang-trẻ-em",
+    //         },
+    //     ]
+    // })
     const adminRole = await prisma.roles.create({
         data: {
             roleName: "administrator",

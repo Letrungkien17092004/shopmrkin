@@ -1,6 +1,3 @@
--- Enable pgvector extension
-CREATE EXTENSION IF NOT EXISTS vector;
-
 -- CreateEnum
 CREATE TYPE "MediaType" AS ENUM ('IMAGE', 'VIDEO');
 
@@ -8,10 +5,16 @@ CREATE TYPE "MediaType" AS ENUM ('IMAGE', 'VIDEO');
 CREATE TYPE "MediaStatus" AS ENUM ('ORPHANED', 'ASSIGNED');
 
 -- CreateEnum
+CREATE TYPE "MediaStorage" AS ENUM ('internal', 'external');
+
+-- CreateEnum
 CREATE TYPE "OrderStatus" AS ENUM ('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED');
 
 -- CreateEnum
 CREATE TYPE "PaymentStatus" AS ENUM ('PENDING', 'PAID', 'FAILED', 'REFUNED');
+
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('USER', 'SYSTEM');
 
 -- CreateTable
 CREATE TABLE "roles" (
@@ -96,7 +99,7 @@ CREATE TABLE "Media" (
     "id" TEXT NOT NULL,
     "fileName" TEXT NOT NULL,
     "filePath" TEXT NOT NULL,
-    "hostname" TEXT NOT NULL,
+    "storage" "MediaStorage" NOT NULL DEFAULT 'internal',
     "media_type" "MediaType" NOT NULL,
     "size" INTEGER NOT NULL,
     "userId" TEXT NOT NULL,
@@ -163,15 +166,27 @@ CREATE TABLE "Payments" (
 );
 
 -- CreateTable
-CREATE TABLE "ProductEmbedding" (
+CREATE TABLE "Chats" (
     "id" TEXT NOT NULL,
-    "productId" TEXT NOT NULL,
-    "origin_text" TEXT NOT NULL,
-    "embedding" vector(1024) NOT NULL,
+    "isExtracted" BOOLEAN NOT NULL DEFAULT false,
+    "extractedData" JSONB NOT NULL DEFAULT '{}',
+    "isSpam" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "ProductEmbedding_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Chats_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Messages" (
+    "id" TEXT NOT NULL,
+    "chatId" TEXT NOT NULL,
+    "role" "Role" NOT NULL,
+    "message" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Messages_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -206,9 +221,6 @@ CREATE UNIQUE INDEX "order_items_orderId_variantId_key" ON "order_items"("orderI
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Payments_transactionId_key" ON "Payments"("transactionId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "ProductEmbedding_productId_key" ON "ProductEmbedding"("productId");
 
 -- AddForeignKey
 ALTER TABLE "roles_permission" ADD CONSTRAINT "roles_permission_roleId_fkey" FOREIGN KEY ("roleId") REFERENCES "roles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -262,4 +274,4 @@ ALTER TABLE "Payments" ADD CONSTRAINT "Payments_userId_fkey" FOREIGN KEY ("userI
 ALTER TABLE "Payments" ADD CONSTRAINT "Payments_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProductEmbedding" ADD CONSTRAINT "ProductEmbedding_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Messages" ADD CONSTRAINT "Messages_chatId_fkey" FOREIGN KEY ("chatId") REFERENCES "Chats"("id") ON DELETE CASCADE ON UPDATE CASCADE;
