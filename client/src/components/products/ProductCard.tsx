@@ -9,53 +9,80 @@ interface ProductCardProps {
     price?: number | null
 }
 
-export default function ProductCard({ imgURL, discount, starPoint, name, price = 1 }: ProductCardProps) {
+export default function ProductCard({ imgURL, discount, starPoint, name, price = 0 }: ProductCardProps) {
+    const finalPrice = discount > 0 ? (price || 0) * ((100 - discount) / 100) : (price || 0);
+
     return (
-        <div className="relative w-full shadow-2xl hover:scale-101 hover:ring-1 hover:ring-green-300 transition overflow-hidden rounded">
-            <div style={{ backgroundImage: `url(${imgURL})` }} className="pt-[100%] bg-center bg-cover">
-            </div>
-            {/* if discount == 0 then hide discount */}
-            {
-                discount > 0 && <>
-                    <div className="absolute left-0 top-4 bg-red-500 text-white text-base px-1">
-                        -{discount} %
+        <div className="group relative flex flex-col w-full h-full bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-emerald-300/80 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+            {/* Image Container */}
+            <div className="relative w-full pt-[100%] bg-slate-100 overflow-hidden">
+                <div
+                    style={{ backgroundImage: `url(${imgURL})` }}
+                    className="absolute inset-0 bg-center bg-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                />
+                {/* Subtle gradient overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                {/* Discount Badge */}
+                {discount > 0 && (
+                    <div className="absolute left-3 top-3 bg-rose-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow-sm">
+                        -{discount}%
                     </div>
-                </>
-            }
-            <div className="w-full">
-                <div className="flex justify-end items-center pr-1">
-                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
-                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
-                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
-                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
-                    <img className="size-4" src="/svg/star-solid-full.svg" alt="product-star" />
-                    <span className="pl-2">{starPoint}</span>
+                )}
+
+                {/* Authentic / In-stock badge */}
+                <div className="absolute right-3 top-3 bg-white/90 backdrop-blur-xs text-emerald-700 text-[11px] font-semibold px-2 py-0.5 rounded-full shadow-xs border border-emerald-100">
+                    Chính hãng
                 </div>
-                <div className="w-full h-12 px-1">
-                    <span className="xl:text-lg line-clamp-2 text-start">{name}</span>
-                </div>
-                <div className="w-full xl:text-lg flex justify-around items-center pb-2">
-                    {/* if discount <=0 then hiden origin price */}
-                    {
-                        discount > 0
-                            ? <>
-                                <span className="font-semibold text-orange-600">
-                                    {formatPrice((price || 0) * ((100 - discount) / 100))}
-                                </span>
-                                <span className="ml-4 font-semibold text-gray-600 line-through">
-                                    {formatPrice(price || 0)}
-                                </span>
-                            </>
-                            : <>
-                                <span className="font-semibold text-orange-600">
-                                    {formatPrice(price || 0)}
-                                </span>
-                            </>
-                    }
-                    <div className="p-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#EA3323"><path d="M440-600v-120H320v-80h120v-120h80v120h120v80H520v120h-80ZM280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM40-800v-80h131l170 360h280l156-280h91L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68.5-39t-1.5-79l54-98-144-304H40Z" /></svg>
+            </div>
+
+            {/* Content Container */}
+            <div className="flex flex-col flex-1 p-3.5 sm:p-4 justify-between gap-2.5">
+                <div className="space-y-1.5">
+                    {/* Rating row */}
+                    <div className="flex items-center justify-between text-xs text-slate-500">
+                        <div className="flex items-center gap-0.5 text-amber-400">
+                            {[...Array(5)].map((_, idx) => (
+                                <svg
+                                    key={idx}
+                                    className={`size-3.5 ${idx < Math.round(starPoint) ? "fill-amber-400" : "fill-slate-200"}`}
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                            ))}
+                            <span className="ml-1 font-medium text-slate-600">{starPoint.toFixed(1)}</span>
+                        </div>
+                        <span className="text-[11px] text-slate-400">Đã bán 100+</span>
                     </div>
 
+                    {/* Product Name */}
+                    <h3 className="text-sm sm:text-base font-semibold text-slate-800 group-hover:text-emerald-600 transition-colors line-clamp-2 min-h-[2.5rem] leading-snug">
+                        {name}
+                    </h3>
+                </div>
+
+                {/* Price & Action */}
+                <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <div className="flex flex-col">
+                        <span className="text-base sm:text-lg font-bold text-rose-600 tracking-tight">
+                            {formatPrice(finalPrice)}
+                        </span>
+                        {discount > 0 && (
+                            <span className="text-xs text-slate-400 line-through">
+                                {formatPrice(price || 0)}
+                            </span>
+                        )}
+                    </div>
+
+                    <div
+                        className="size-9 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center transition-colors shadow-2xs shrink-0"
+                        title="Xem chi tiết sản phẩm"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="size-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>

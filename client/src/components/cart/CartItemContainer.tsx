@@ -9,14 +9,14 @@ interface CartItemContainerProps {
 }
 
 function calcTotalPrice(cart: Cart): number {
-    let total = cart.items.reduce((acc, currItem) => {
+    const total = cart.items.reduce((acc, currItem) => {
         return acc + (currItem.variant.price * currItem.quantity)
     }, 0)
 
     return total
 }
 
-export default function CartItemContainer({ cart, status, error }: CartItemContainerProps) {
+export default function CartItemContainer({ cart, status }: CartItemContainerProps) {
     if (status === "idle" || status === "loading") {
         return <LoadingCart />
     }
@@ -31,29 +31,37 @@ export default function CartItemContainer({ cart, status, error }: CartItemConta
             return <EmptyCart />
         }
 
-        return <>
-            <div className="z-1 absolute right-0 top-[120%] w-lg shadow-[0_4px_12px_rgba(0,0,0,0.3)] rounded-sm bg-white">
-                <ul className="w-full max-h-80 overflow-y-scroll p-2">
-                    {
-                        cart.items.map(item => (
-                            <CartItem
-                                key={item.id}
-                                cartItem={item}
-                            />
-                        ))
-                    }
+        return (
+            <div className="z-30 absolute right-0 top-[125%] w-80 sm:w-96 rounded-2xl border border-slate-200/80 shadow-xl bg-white overflow-hidden">
+                <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                    <span className="text-sm font-bold text-slate-800">Giỏ hàng của bạn</span>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">
+                        {cart.items.length} sản phẩm
+                    </span>
+                </div>
+                <ul className="w-full max-h-80 overflow-y-auto divide-y divide-slate-100 p-2">
+                    {cart.items.map(item => (
+                        <CartItem
+                            key={item.id}
+                            cartItem={item}
+                        />
+                    ))}
                 </ul>
-                <div className="p-2">
-                    <h3 className="p-1 text-end font-semibold text-orange-500">
-                        Tổng: {calcTotalPrice(cart).toLocaleString('vi-VN') + ' đ'}
-                    </h3>
-                    <div className="p-1 flex justify-center">
-                        <span className="p-1 bg-orange-500 text-white rounded hover:brightness-90  cursor-pointer">
-                            Thanh toán
+                <div className="p-4 bg-slate-50 border-t border-slate-100 space-y-3">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium text-slate-500">Tổng tạm tính:</span>
+                        <span className="text-base font-extrabold text-rose-600">
+                            {calcTotalPrice(cart).toLocaleString('vi-VN') + ' ₫'}
                         </span>
                     </div>
+                    <button
+                        type="button"
+                        className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-xs transition cursor-pointer"
+                    >
+                        Tiến hành thanh toán
+                    </button>
                 </div>
             </div>
-        </>
+        )
     }
 }
