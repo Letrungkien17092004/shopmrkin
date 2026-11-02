@@ -104,9 +104,15 @@ export default function ProductTable({ listProduct, createDeleteEventHandler }: 
                                     <div className="inline-flex items-center justify-end gap-2">
                                         <Link
                                             href={`/manager/products/${p.id}`}
-                                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 transition no-underline"
+                                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition no-underline"
                                         >
                                             Chi tiết
+                                        </Link>
+                                        <Link
+                                            href={`/manager/products/${p.id}?edit=true`}
+                                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition no-underline"
+                                        >
+                                            Chỉnh sửa
                                         </Link>
                                         <button
                                             type="button"

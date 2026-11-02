@@ -220,7 +220,7 @@ export default class MediaRepository implements IMediaRepository {
      */
     async updateById(options: {
         where: { id: string },
-        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string }
+        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string | null }
     }): Promise<void> {
         try {
             await prisma.media.update({

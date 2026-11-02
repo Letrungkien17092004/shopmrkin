@@ -15,7 +15,8 @@ import {
     orderRouter,
     paymentRouter,
     assistantRouter,
-    chatRouter
+    chatRouter,
+    recommendRouter
 } from "./routers/index.js"
 
 const PUBLIC_DIR = path.join(process.cwd(), "public")
@@ -62,6 +63,7 @@ app.use("/api", [bodyParser.json(), orderRouter]) // order API
 app.use("/api", [bodyParser.json(), paymentRouter]) // payment API
 app.use("/api", [bodyParser.json(), assistantRouter]) // AI chat API
 app.use("/api", [bodyParser.json(), chatRouter]) // chat API
+app.use("/api", [bodyParser.json(), recommendRouter]) // ML / recommendation data API
 
 
 export default app

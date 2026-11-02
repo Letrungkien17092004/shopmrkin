@@ -79,7 +79,7 @@ export default interface IMediaRepository {
      */
     updateById(options: {
         where: { id: string },
-        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string }
+        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string | null }
     }): Promise<void>
 
     /**

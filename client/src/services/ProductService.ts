@@ -108,15 +108,16 @@ export default class ProductService {
      * @param id 
      * @param options 
      */
-    async updateById(id: string, options: Partial<Omit<Product, "id" | "variants">>): Promise<Product> {
+    async updateById(id: string, options: Partial<Omit<Product, "id" | "variants">> & { categoryId?: number }): Promise<void> {
         try {
             if (this.authService.accessIsExpired()) {
                 await this.authService.refeshAccess()
             }
-            const response = await axios.put<{ product: ProductResponse }>(`${ENV.BACK_END_HOST}/api/product/${id}`,
+            await axios.put<{ message: string }>(`${ENV.BACK_END_HOST}/api/product/${id}`,
                 {
                     name: options.name,
-                    description: options.description
+                    description: options.description,
+                    ...(options.categoryId !== undefined ? { categoryId: options.categoryId } : {})
                 },
                 {
                     headers: {
@@ -125,34 +126,6 @@ export default class ProductService {
                     }
                 }
             )
-            const product = response.data.product
-            const media: Media[] = product.media.map(med => ({
-                id: med.id,
-                fileName: med.fileName,
-                filePath: med.filePath,
-                media_type: med.media_type || 'IMAGE'
-            }))
-            const variants: Variant[] = product.variants.map(v => ({
-                id: v.id,
-                name: v.name,
-                sku: v.sku,
-                productId: v.productId,
-                userId: "",
-                price: v.price,
-                stock: v.stock
-
-            }))
-            return ({
-                id: product.id,
-                name: product.name,
-                product_code: product.product_code,
-                description: product.description,
-                category: product.category,
-                media: media,
-                variants: variants,
-                createdAt: new Date(product.createdAt),
-                updatedAt: new Date(product.updatedAt)
-            })
         } catch (error) {
             throw error
         }

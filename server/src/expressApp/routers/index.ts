@@ -8,6 +8,7 @@ import orderRouter from "./OrderRouter.js";
 import paymentRouter from "./PaymentRouter.js";
 import assistantRouter from "./AssistantRouter.js";
 import chatRouter from "./ChatRouter.js";
+import recommendRouter from "./RecommendRouter.js";
 export {
     authorRouter,
     productRouter,
@@ -18,5 +19,6 @@ export {
     orderRouter,
     paymentRouter,
     assistantRouter,
-    chatRouter
+    chatRouter,
+    recommendRouter
 }

@@ -57,7 +57,7 @@ export default class MediaService {
     updateById = async (
         mediaId: string,
         data: {
-            productId?: string,
+            productId?: string | null,
             status?: "ORPHANED" | "ASSIGNED"
         }): Promise<void> => {
         try {

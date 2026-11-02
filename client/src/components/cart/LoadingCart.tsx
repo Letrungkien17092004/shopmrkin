@@ -2,11 +2,9 @@ import React from "react";
 import Loading from "../waiter/Loading.tsx";
 
 export default function LoadingCart() {
-    return <>
-        <div className="z-1 absolute right-0 top-[120%] w-md h-48 shadow-[0_4px_12px_rgba(0,0,0,0.3)] rounded-sm bg-white">
-            <div className="w-full h-full flex justify-center items-center text-xl font-bold text-red-500">
-                <Loading/>
-            </div>
+    return (
+        <div className="z-30 absolute right-0 top-[125%] w-80 sm:w-96 rounded-2xl border border-slate-200/80 shadow-xl bg-white p-8">
+            <Loading label="Đang tải giỏ hàng..." size="sm" />
         </div>
-    </>
+    )
 }

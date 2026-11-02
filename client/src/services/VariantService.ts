@@ -101,22 +101,22 @@ export default class VariantService {
     }
 
     /**
-     * Update a variant by variant's ID, SKU can't be changed for now
+     * Update a variant by variant's ID
      * @param id 
      * @param options 
      * @returns 
      */
-    async updateById(id: string, options: Partial<Omit<Variant, "id" | "productId">>): Promise<Variant> {
+    async updateById(id: string, options: Partial<Omit<Variant, "id" | "productId">>): Promise<void> {
         try {
             if (this.authService.accessIsExpired()) {
                 await this.authService.refeshAccess()
             }
-            const response = await axios.put<{ variant: VariantResponse }>(`${ENV.BACK_END_HOST}/api/variant/${id}`,
+            await axios.put<{ message: string }>(`${ENV.BACK_END_HOST}/api/variant/${id}`,
                 {
                     name: options.name,
+                    sku: options.sku,
                     price: options.price,
                     stock: options.stock
-
                 },
                 {
                     headers: {
@@ -125,16 +125,6 @@ export default class VariantService {
                     }
                 }
             )
-            const variantData = response.data.variant
-            return {
-                id: variantData.id,
-                name: variantData.name,
-                sku: variantData.sku,
-                price: variantData.price,
-                stock: variantData.stock,
-                productId: variantData.productId,
-                userId: variantData.userId
-            }
         } catch (error) {
             throw error
         }
@@ -142,6 +132,9 @@ export default class VariantService {
 
     async deleteById(id: string): Promise<void> {
         try {
+            if (this.authService.accessIsExpired()) {
+                await this.authService.refeshAccess()
+            }
             const response = await axios.delete(`${ENV.BACK_END_HOST}/api/variant/${id}`,
                 {
                     headers: {

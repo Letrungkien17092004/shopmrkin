@@ -341,7 +341,7 @@ export default class MediaController {
 
             const UpdateSchema = z.object({
                 status: z.enum(["ORPHANED", "ASSIGNED"]).optional(),
-                productId: z.string().optional()
+                productId: z.string().nullable().optional()
 
             })
 

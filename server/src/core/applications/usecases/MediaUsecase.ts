@@ -227,7 +227,7 @@ export default class MediaUsecase implements IMediaUsecase {
      */
     async updateById(options: {
         where: { id: string },
-        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string }
+        data: { status?: "ORPHANED" | "ASSIGNED", productId?: string | null }
     }): Promise<void> {
         try {
             return await this.repo.updateById(options)

@@ -15,3 +15,5 @@ server/public/upload/*
 client/dist/
 client/.next/
 
+notebooks
+

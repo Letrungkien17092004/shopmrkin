@@ -6,16 +6,17 @@ import { CartItem as CartItemType } from "../../types/cart/index.ts";
 import { formatPrice } from "../../utils/index.ts"
 
 interface CartItemProps {
-    key: string,
+    key?: string,
     cartItem: CartItemType
 }
 
 const defaultCartImage = "https://down-vn.img.susercontent.com/file/vn-11134207-820l4-metxmobo5f5wf2@resize_w900_nl.webp";
 
-export default function CartItem({ key, cartItem }: CartItemProps) {
+export default function CartItem({ cartItem }: CartItemProps) {
     const dispatch: AppDispatch = useDispatch()
 
     const decreaseEventHandler = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation()
         const update = async () => {
             if (cartItem.quantity <= 1) {
                 await dispatch(removeCartItem({
@@ -30,17 +31,11 @@ export default function CartItem({ key, cartItem }: CartItemProps) {
                 }))
             }
         }
-
-        update()
-            .then(() => {
-                console.log("decreate item successful")
-            })
-            .catch((err) => {
-                console.error("decreate error")
-            })
-    }, [cartItem])
+        update().catch(() => {})
+    }, [cartItem, dispatch])
 
     const increaseEventHandler = useCallback((e: React.MouseEvent) => {
+        e.stopPropagation()
         const update = async () => {
             await dispatch(updateCartItem({
                 cartId: cartItem.cartId,
@@ -48,55 +43,57 @@ export default function CartItem({ key, cartItem }: CartItemProps) {
                 quantity: cartItem.quantity + 1
             }))
         }
+        update().catch(() => {})
+    }, [cartItem, dispatch])
 
-        update()
-            .then(() => {
-                console.log("decreate item successful")
-            })
-            .catch((err) => {
-                console.error("decreate error")
-            })
-    }, [cartItem])
     return (
-        <li key={key} className="p-2 hover:bg-gray-100 cursor-pointer select-none">
-            <div className="w-full flex">
-                <div className="size-20">
-                    {
-                        cartItem.media
-                            ? <img className="w-full h-full object-contain aspect-square" src={`${cartItem.media.filePath}`} alt={cartItem.variant.name} />
-                            : <img className="w-full h-full object-contain aspect-square" src={defaultCartImage} alt={cartItem.variant.name} />
-                    }
-
+        <li className="p-2.5 rounded-xl hover:bg-slate-50 transition select-none">
+            <div className="w-full flex items-center gap-3">
+                <div className="size-16 rounded-xl border border-slate-200 bg-white overflow-hidden shrink-0">
+                    <img
+                        className="size-full object-contain p-1"
+                        src={cartItem.media ? `${cartItem.media.filePath}` : defaultCartImage}
+                        alt={cartItem.variant.name}
+                    />
                 </div>
-                <div className="pl-2 w-[60%]">
-                    <p title="product name" className="text-sm font-semibold line-clamp-2 text-start">
+                <div className="flex-1 min-w-0 space-y-0.5">
+                    <p title={cartItem.productName} className="text-xs font-bold text-slate-800 line-clamp-1">
                         {cartItem.productName}
                     </p>
-
-                    <p title="variant name" className="text-sm font-light line-clamp-2 text-start truncate">
-                        {cartItem.variant.name}
+                    <p title={cartItem.variant.name} className="text-[11px] font-medium text-slate-500 truncate">
+                        Phân loại: {cartItem.variant.name}
                     </p>
-
-                    <p className="text-sm font-semibold line-clamp-2 text-start truncate text-orange-500">
+                    <p className="text-xs font-extrabold text-rose-600">
                         {formatPrice(cartItem.variant.price)}
                     </p>
                 </div>
-                <div className="ml-2 grow flex justify-center items-center gap-x-3">
-                    <div onClick={decreaseEventHandler} className="cursor-pointer p-1 hover:scale-130 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+                <div className="flex items-center gap-1.5 bg-slate-100 rounded-xl p-1 shrink-0">
+                    <button
+                        type="button"
+                        onClick={decreaseEventHandler}
+                        className="size-6 rounded-lg bg-white text-slate-700 hover:bg-rose-50 hover:text-rose-600 flex items-center justify-center shadow-2xs transition cursor-pointer"
+                        aria-label="Giảm số lượng"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5">
                             <path fillRule="evenodd" d="M4 10a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 10Z" clipRule="evenodd" />
                         </svg>
-                    </div>
-                    <div className="text-base rounded-full font-semibold text-orange-500">
+                    </button>
+                    <span className="min-w-5 text-center text-xs font-bold text-slate-800">
                         {cartItem.quantity}
-                    </div>
-                    <div onClick={increaseEventHandler} className="cursor-pointer p-1 hover:scale-130 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+                    </span>
+                    <button
+                        type="button"
+                        onClick={increaseEventHandler}
+                        className="size-6 rounded-lg bg-white text-slate-700 hover:bg-emerald-50 hover:text-emerald-600 flex items-center justify-center shadow-2xs transition cursor-pointer"
+                        aria-label="Tăng số lượng"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-3.5">
                             <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
                         </svg>
-                    </div>
+                    </button>
                 </div>
             </div>
         </li>
     );
 }
+
