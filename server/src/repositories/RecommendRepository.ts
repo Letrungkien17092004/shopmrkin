@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { Product, Variant, Media, Category, User } from "../core/entities/index.js";
 import { baseExceptionHandler } from "../core/applications/interfaces/repositories/errors.js";
 
 const prisma = new PrismaClient();
@@ -7,6 +8,12 @@ export type ContentBasedProductRecord = {
     id_san_pham: string;
     "Product name": string;
     content: string;
+};
+
+export type SimilarProductRecord = {
+    product: Product;
+    similarity_score: number;
+    updated_at?: Date | null;
 };
 
 export default class RecommendRepository {
@@ -65,6 +72,75 @@ export default class RecommendRepository {
                     id_san_pham: product.id,
                     "Product name": product.name,
                     content: Array.from(contentDetails).join(" ")
+                };
+            });
+        } catch (error) {
+            throw baseExceptionHandler(error);
+        }
+    }
+
+    /**
+     * Lấy danh sách sản phẩm tương đồng theo product_id, sắp xếp từ độ tương đồng cao nhất tới thấp nhất
+     */
+    async getSimilarProductsByProductId(productId: string, limit?: number): Promise<SimilarProductRecord[]> {
+        try {
+            const records = await prisma.productSimilarities.findMany({
+                where: {
+                    product_id: productId
+                },
+                include: {
+                    similarProduct: {
+                        include: {
+                            variants: true,
+                            media: true,
+                            category: true,
+                            user: true
+                        }
+                    }
+                },
+                orderBy: {
+                    similarity_score: "desc"
+                },
+                take: limit
+            });
+
+            return records.map((record) => {
+                const p = record.similarProduct;
+                const media: Media[] = p.media
+                    ? p.media.map(
+                          (pm) =>
+                              new Media({
+                                  ...pm,
+                                  productId: pm.productId ? pm.productId : undefined
+                              })
+                      )
+                    : [];
+
+                const variants: Variant[] = p.variants
+                    ? p.variants.map(
+                          (pv) =>
+                              new Variant({
+                                  ...pv,
+                                  price: Number(pv.price)
+                              })
+                      )
+                    : [];
+
+                const category: Category | null = p.category ? new Category(p.category) : null;
+                const user: User | undefined = p.user ? new User(p.user) : undefined;
+
+                const product = new Product({
+                    ...p,
+                    media,
+                    variants,
+                    category,
+                    user
+                });
+
+                return {
+                    product,
+                    similarity_score: record.similarity_score,
+                    updated_at: record.updated_at
                 };
             });
         } catch (error) {

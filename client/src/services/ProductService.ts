@@ -41,6 +41,14 @@ type GetAllProductResponse = {
     products: ProductResponse[]
 }
 
+type GetSimilarProductsResponse = {
+    product_id: string,
+    products: (ProductResponse & {
+        similarity_score?: number,
+        similarity_updated_at?: string
+    })[]
+}
+
 
 
 const DEFAULT_MEDIA = {
@@ -266,6 +274,54 @@ export default class ProductService {
                 }
             }
             throw error
+        }
+    }
+
+    /**
+     * Retrieve similar products by product's id (sorted from highest to lowest similarity)
+     * @param id
+     * @param limit
+     * @returns
+     */
+    async getSimilarProducts(id: string, limit?: number): Promise<Product[]> {
+        try {
+            const query = limit ? `?limit=${limit}` : ""
+            const response = await axios.get<GetSimilarProductsResponse>(
+                `${ENV.BACK_END_HOST}/api/products/${id}/similar${query}`
+            )
+            const products = response.data.products || []
+
+            return products.map(p => {
+                const media: Media[] = (p.media || []).map(med => ({
+                    id: med.id,
+                    fileName: med.fileName,
+                    filePath: med.filePath,
+                    media_type: med.media_type || 'IMAGE'
+                }))
+                const variants: Variant[] = (p.variants || []).map(v => ({
+                    id: v.id,
+                    name: v.name,
+                    sku: v.sku,
+                    productId: v.productId,
+                    userId: "",
+                    price: v.price,
+                    stock: v.stock
+                }))
+                return {
+                    id: p.id,
+                    name: p.name,
+                    product_code: p.product_code,
+                    description: p.description,
+                    category: p.category,
+                    media: media,
+                    variants: variants,
+                    createdAt: new Date(p.createdAt),
+                    updatedAt: new Date(p.updatedAt)
+                }
+            })
+        } catch (error) {
+            console.log(error)
+            return []
         }
     }
 }

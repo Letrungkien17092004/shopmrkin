@@ -8,5 +8,7 @@ const recommendController = new RecommendController(recommendRepo);
 const recommendRouter = Router();
 
 recommendRouter.get("/ml-data/recommend-system-content-based", recommendController.getContentBasedData);
+recommendRouter.get("/products/:productId/similar", recommendController.getSimilarProducts);
+recommendRouter.get("/product/:id/similar", recommendController.getSimilarProducts);
 
 export default recommendRouter;

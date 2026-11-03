@@ -99,13 +99,9 @@ export default function ProductDetailPage() {
                         setSelectedVariant(productData.variants[0])
                     }
                 }
-                const allProducts = await productService.getAll({
-                    include: { variants: true, media: true }
-                })
-                if (allProducts) {
-                    setRelatedProducts(
-                        allProducts.filter((item) => item.id !== productId).slice(0, 4)
-                    )
+                const similarProducts = await productService.getSimilarProducts(productId)
+                if (similarProducts) {
+                    setRelatedProducts(similarProducts)
                 }
             } catch (err) {
                 console.error("Failed to fetch product detail:", err)
