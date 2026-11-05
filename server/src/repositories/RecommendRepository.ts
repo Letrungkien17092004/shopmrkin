@@ -10,6 +10,13 @@ export type ContentBasedProductRecord = {
     content: string;
 };
 
+export type ItemBasedInteractionRecord = {
+    user_id: string;
+    item_id: string;
+    item_name: string;
+    total_quantity: number;
+};
+
 export type SimilarProductRecord = {
     product: Product;
     similarity_score: number;
@@ -73,6 +80,70 @@ export default class RecommendRepository {
                     "Product name": product.name,
                     content: Array.from(contentDetails).join(" ")
                 };
+            });
+        } catch (error) {
+            throw baseExceptionHandler(error);
+        }
+    }
+
+    /**
+     * Lấy dữ liệu tương tác mua hàng (user - product) phục vụ mô hình Item-Based Recommendation
+     * Columns: ['user_id', 'item_id', 'item_name', 'total_quantity']
+     */
+    async getItemBasedData(): Promise<ItemBasedInteractionRecord[]> {
+        try {
+            const orders = await prisma.orders.findMany({
+                where: {
+                    status: {
+                        not: "CANCELLED"
+                    }
+                },
+                include: {
+                    orderItems: {
+                        include: {
+                            variant: {
+                                include: {
+                                    product: {
+                                        select: {
+                                            id: true,
+                                            name: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const interactionMap = new Map<string, ItemBasedInteractionRecord>();
+
+            for (const order of orders) {
+                const userId = order.userId;
+                for (const orderItem of order.orderItems) {
+                    const product = orderItem.variant?.product;
+                    if (!product) continue;
+
+                    const key = `${userId}__${product.id}`;
+                    const existing = interactionMap.get(key);
+
+                    if (existing) {
+                        existing.total_quantity += orderItem.quantity;
+                    } else {
+                        interactionMap.set(key, {
+                            user_id: userId,
+                            item_id: product.id,
+                            item_name: product.name,
+                            total_quantity: orderItem.quantity
+                        });
+                    }
+                }
+            }
+
+            return Array.from(interactionMap.values()).sort((a, b) => {
+                const userCompare = a.user_id.localeCompare(b.user_id);
+                if (userCompare !== 0) return userCompare;
+                return a.item_id.localeCompare(b.item_id);
             });
         } catch (error) {
             throw baseExceptionHandler(error);

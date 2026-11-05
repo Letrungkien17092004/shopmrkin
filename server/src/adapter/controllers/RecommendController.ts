@@ -38,6 +38,33 @@ export default class RecommendController {
     };
 
     /**
+     * GET /api/ml-data/recommend-system-item-based
+     * Trả về mảng JSON tương ứng với DataFrame ['user_id', 'item_id', 'item_name', 'total_quantity']
+     */
+    getItemBasedData = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const data = await this.recommendRepo.getItemBasedData();
+            res.status(200).json(data);
+            return;
+        } catch (error) {
+            console.log(error);
+            if (error instanceof REPO_ERROR) {
+                if (error.code === REPO_ERROR_CODE.INITIAL) {
+                    res.status(500).json({
+                        message: "Database Error"
+                    });
+                    return;
+                }
+            }
+
+            res.status(500).json({
+                message: "Server Internal Error!"
+            });
+            return;
+        }
+    };
+
+    /**
      * GET /api/products/:productId/similar (hoặc /api/product/:id/similar)
      * Trả về danh sách sản phẩm có độ tương đồng từ cao nhất tới thấp nhất của một sản phẩm
      */
