@@ -20,6 +20,7 @@
     "prisma-studio": "npx prisma studio --schema=./src/services/postgresSQL/prisma/schema.prisma",
     "prisma-reset": "npx prisma migrate reset --skip-seed --schema=./src/services/postgresSQL/prisma/schema.prisma",
     "prisma-seed": "npx tsx ./src/services/postgresSQL/prisma/seed.ts",
+    "product-seed": "npx tsx ./product_seed.ts",
     "show-config": "npx tsx ./src/config/env.ts"
   },
   "keywords": [],
