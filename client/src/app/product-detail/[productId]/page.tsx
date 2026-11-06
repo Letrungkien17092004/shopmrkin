@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
-import { ProductImageSlider } from "@/components/products/index.ts"
+import { ProductImageSlider, RecommendedForYou } from "@/components/products/index.ts"
 import ProductCard from "@/components/products/ProductCard.tsx"
 import Loading from "@/components/waiter/Loading.tsx"
 import { NoticeManager } from "@/components/notifications/index.tsx"
@@ -467,6 +467,8 @@ export default function ProductDetailPage() {
                         </div>
                     </section>
                 )}
+                {/* Recommended For You Section (Item-Based / Fallback) */}
+                <RecommendedForYou limit={4} />
             </div>
         </MainLayout>
     )

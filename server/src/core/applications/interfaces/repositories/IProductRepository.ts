@@ -50,6 +50,14 @@ export default interface IProductRepository {
         include?: IncludeOption
     }): Promise<Product[]>
 
+    count(where?: {
+        product_code?: number,
+        name?: string,
+        description?: string,
+        categoryId?: number,
+        userId?: string
+    }): Promise<number>
+
     /**
      * Finds a single Product by its unique product_code.
      * @param options The search options.

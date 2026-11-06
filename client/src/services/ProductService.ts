@@ -38,7 +38,27 @@ type CreateProductResponse = {
 }
 
 type GetAllProductResponse = {
-    products: ProductResponse[]
+    products: ProductResponse[],
+    pagination?: {
+        total: number,
+        page: number,
+        limit: number,
+        totalPages: number
+    }
+}
+
+export type CategoryItem = {
+    id: number,
+    name: string,
+    slug: string,
+    productCount: number
+}
+
+export type PaginationMeta = {
+    total: number,
+    page: number,
+    limit: number,
+    totalPages: number
 }
 
 type GetSimilarProductsResponse = {
@@ -144,38 +164,69 @@ export default class ProductService {
      * @returns 
      */
     async getAll(options: {
+        categoryId?: number,
+        page?: number,
+        limit?: number,
         include?: {
             user?: boolean,
             variants?: boolean,
-            media?: boolean
+            media?: boolean,
+            category?: boolean
         }
     }): Promise<Product[]> {
+        const result = await this.getPaginated(options)
+        return result.products
+    }
+
+    /**
+     * Find products with category filter and pagination (page, limit)
+     */
+    async getPaginated(options: {
+        categoryId?: number,
+        page?: number,
+        limit?: number,
+        include?: {
+            user?: boolean,
+            variants?: boolean,
+            media?: boolean,
+            category?: boolean
+        }
+    }): Promise<{ products: Product[], pagination: PaginationMeta }> {
         try {
-            var includeQuery = ""
+            const params: string[] = []
+            if (options?.categoryId !== undefined) {
+                params.push(`categoryId=${options.categoryId}`)
+            }
+            if (options?.page !== undefined) {
+                params.push(`page=${options.page}`)
+            }
+            if (options?.limit !== undefined) {
+                params.push(`limit=${options.limit}`)
+            }
             if (options?.include?.user) {
-                includeQuery += "include[user]=true&"
+                params.push("include[user]=true")
             }
             if (options?.include?.variants) {
-                includeQuery += "include[variants]=true&"
+                params.push("include[variants]=true")
             }
             if (options?.include?.media) {
-                includeQuery += "include[media]=true&"
+                params.push("include[media]=true")
             }
-            if (includeQuery.length !== 0) {
-                includeQuery = includeQuery.slice(0, -1)
+            if (options?.include?.category) {
+                params.push("include[category]=true")
             }
-            const response = await axios.get<GetAllProductResponse>(`${ENV.BACK_END_HOST}/api/products?${includeQuery}`)
-            const products = response.data.products
+            const queryString = params.length > 0 ? `?${params.join("&")}` : ""
+            const response = await axios.get<GetAllProductResponse>(`${ENV.BACK_END_HOST}/api/products${queryString}`)
+            const products = response.data.products || []
 
-            return products.map(p => {
-
-                const media: Media[] = p.media.map(med => ({
+            const mappedProducts = products.map(p => {
+                const media: Media[] = (p.media || []).map(med => ({
                     id: med.id,
                     fileName: med.fileName,
                     filePath: med.filePath,
                     media_type: med.media_type || 'IMAGE'
                 }))
-                const variants: Variant[] = p.variants.map(v => ({
+                const variants: Variant[] = (p.variants || []).map(v => ({
                     id: v.id,
                     name: v.name,
                     sku: v.sku,
@@ -183,7 +234,6 @@ export default class ProductService {
                     userId: "",
                     price: v.price,
                     stock: v.stock
-
                 }))
                 return ({
                     id: p.id,
@@ -197,9 +247,34 @@ export default class ProductService {
                     updatedAt: new Date(p.updatedAt)
                 })
             })
+
+            const pagination: PaginationMeta = response.data.pagination || {
+                total: mappedProducts.length,
+                page: options?.page || 1,
+                limit: options?.limit || mappedProducts.length || 12,
+                totalPages: 1
+            }
+
+            return {
+                products: mappedProducts,
+                pagination
+            }
         } catch (error) {
             console.log(error)
             throw new Error("ProductService Error: getData")
+        }
+    }
+
+    /**
+     * Retrieve all categories with product counts
+     */
+    async getCategories(): Promise<CategoryItem[]> {
+        try {
+            const response = await axios.get<{ categories: CategoryItem[] }>(`${ENV.BACK_END_HOST}/api/categories`)
+            return response.data.categories || []
+        } catch (error) {
+            console.log(error)
+            return []
         }
     }
 
@@ -322,6 +397,95 @@ export default class ProductService {
         } catch (error) {
             console.log(error)
             return []
+        }
+    }
+
+    /**
+     * Lấy danh sách "Gợi ý cho bạn" theo Item-Based (từ các sản phẩm trong giỏ hàng hoặc lịch sử mua hàng).
+     * Nếu người dùng chưa tương tác hoặc chưa có dữ liệu tương đồng, tự động lấy tạm từ GET /api/products.
+     */
+    async getRecommendedForYou(options?: {
+        productIds?: string[];
+        cartId?: string;
+        userId?: string;
+        limit?: number;
+    }): Promise<Product[]> {
+        const limit = options?.limit ?? 8
+        try {
+            const params: string[] = [`limit=${limit}`]
+            if (options?.productIds && options.productIds.length > 0) {
+                params.push(`productIds=${options.productIds.join(",")}`)
+            }
+            if (options?.cartId) {
+                params.push(`cartId=${options.cartId}`)
+            }
+            if (options?.userId) {
+                params.push(`userId=${options.userId}`)
+            }
+
+            const response = await axios.get<{ products: ProductResponse[] }>(
+                `${ENV.BACK_END_HOST}/api/recommend/for-you?${params.join("&")}`
+            )
+            const products = response.data.products || []
+
+            if (products.length > 0) {
+                return products.map(p => {
+                    const media: Media[] = (p.media || []).map(med => ({
+                        id: med.id,
+                        fileName: med.fileName,
+                        filePath: med.filePath,
+                        media_type: med.media_type || 'IMAGE'
+                    }))
+                    const variants: Variant[] = (p.variants || []).map(v => ({
+                        id: v.id,
+                        name: v.name,
+                        sku: v.sku,
+                        productId: v.productId,
+                        userId: "",
+                        price: v.price,
+                        stock: v.stock
+                    }))
+                    return {
+                        id: p.id,
+                        name: p.name,
+                        product_code: p.product_code,
+                        description: p.description,
+                        category: p.category,
+                        media: media,
+                        variants: variants,
+                        createdAt: new Date(p.createdAt),
+                        updatedAt: new Date(p.updatedAt)
+                    }
+                })
+            }
+
+            // Fallback: Khi chưa có dữ liệu tương tác, lấy tạm từ GET /api/products
+            const fallback = await this.getPaginated({
+                page: 1,
+                limit,
+                include: {
+                    variants: true,
+                    media: true,
+                    category: true
+                }
+            })
+            return fallback.products
+        } catch (error) {
+            console.log(error)
+            try {
+                const fallback = await this.getPaginated({
+                    page: 1,
+                    limit,
+                    include: {
+                        variants: true,
+                        media: true,
+                        category: true
+                    }
+                })
+                return fallback.products
+            } catch {
+                return []
+            }
         }
     }
 }

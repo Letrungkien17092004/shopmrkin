@@ -29,6 +29,33 @@ export default class CategoryRepository implements ICategoryRepository {
     }
 
     /**
+     * Retrieves all categories with their product count.
+     */
+    async findMany(): Promise<Category[]> {
+        try {
+            const categories = await prisma.categories.findMany({
+                include: {
+                    _count: {
+                        select: { products: true }
+                    }
+                },
+                orderBy: {
+                    id: "asc"
+                }
+            })
+
+            return categories.map(cat => new Category({
+                id: cat.id,
+                name: cat.name,
+                slug: cat.slug,
+                productCount: cat._count.products
+            }))
+        } catch (error) {
+            throw baseExceptionHandler(error)
+        }
+    }
+
+    /**
     * Retrieves a category from the database by its slug.
     *
     * @param slug - The unique slug identifier of the category.

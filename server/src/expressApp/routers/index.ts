@@ -9,6 +9,7 @@ import paymentRouter from "./PaymentRouter.js";
 import assistantRouter from "./AssistantRouter.js";
 import chatRouter from "./ChatRouter.js";
 import recommendRouter from "./RecommendRouter.js";
+import categoryRouter from "./CategoryRouter.js";
 export {
     authorRouter,
     productRouter,
@@ -20,5 +21,6 @@ export {
     paymentRouter,
     assistantRouter,
     chatRouter,
-    recommendRouter
+    recommendRouter,
+    categoryRouter
 }

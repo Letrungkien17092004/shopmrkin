@@ -218,4 +218,176 @@ export default class RecommendRepository {
             throw baseExceptionHandler(error);
         }
     }
+
+    /**
+     * Lấy danh sách sản phẩm gợi ý theo chiến lược Item-Based (dựa trên danh sách productIds trong giỏ hàng hoặc lịch sử mua hàng)
+     * Nếu có nhiều sản phẩm trong giỏ, cộng dồn (SUM) score của các sản phẩm được gợi ý và sắp xếp giảm dần.
+     */
+    async getItemBasedRecommendations(options: {
+        productIds?: string[];
+        cartId?: string;
+        userId?: string;
+        limit?: number;
+    }): Promise<SimilarProductRecord[]> {
+        try {
+            const limit = options.limit ?? 8;
+            const seedProductIdSet = new Set<string>(options.productIds || []);
+
+            // Nếu truyền cartId, lấy các productId đang có trong giỏ hàng
+            if (options.cartId) {
+                const cartItems = await prisma.cartItems.findMany({
+                    where: { cartId: options.cartId },
+                    include: {
+                        variant: {
+                            select: { productId: true }
+                        }
+                    }
+                });
+                for (const ci of cartItems) {
+                    if (ci.variant?.productId) {
+                        seedProductIdSet.add(ci.variant.productId);
+                    }
+                }
+            }
+
+            // Nếu truyền userId mà chưa có sản phẩm nào trong giỏ, lấy từ giỏ hàng hoặc đơn hàng gần nhất của user
+            if (options.userId && seedProductIdSet.size === 0) {
+                const userCart = await prisma.carts.findUnique({
+                    where: { userId: options.userId },
+                    include: {
+                        cartItems: {
+                            include: {
+                                variant: {
+                                    select: { productId: true }
+                                }
+                            }
+                        }
+                    }
+                });
+                if (userCart) {
+                    for (const ci of userCart.cartItems) {
+                        if (ci.variant?.productId) {
+                            seedProductIdSet.add(ci.variant.productId);
+                        }
+                    }
+                }
+
+                if (seedProductIdSet.size === 0) {
+                    const userOrders = await prisma.orders.findMany({
+                        where: {
+                            userId: options.userId,
+                            status: { not: "CANCELLED" }
+                        },
+                        include: {
+                            orderItems: {
+                                include: {
+                                    variant: {
+                                        select: { productId: true }
+                                    }
+                                }
+                            }
+                        },
+                        orderBy: { createdAt: "desc" },
+                        take: 5
+                    });
+                    for (const ord of userOrders) {
+                        for (const oi of ord.orderItems) {
+                            if (oi.variant?.productId) {
+                                seedProductIdSet.add(oi.variant.productId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            const seedProductIds = Array.from(seedProductIdSet);
+            if (seedProductIds.length === 0) {
+                return [];
+            }
+
+            const records = await prisma.itemBasedSimilarities.findMany({
+                where: {
+                    product_id: { in: seedProductIds },
+                    recommended_product_id: { notIn: seedProductIds }
+                },
+                include: {
+                    recommendedProduct: {
+                        include: {
+                            variants: true,
+                            media: true,
+                            category: true,
+                            user: true
+                        }
+                    }
+                }
+            });
+
+            // Cộng dồn (SUM) điểm score cho từng recommended_product_id
+            const aggregatedMap = new Map<
+                string,
+                {
+                    product: Product;
+                    totalScore: number;
+                    updatedAt?: Date | null;
+                }
+            >();
+
+            for (const record of records) {
+                const p = record.recommendedProduct;
+                const existing = aggregatedMap.get(record.recommended_product_id);
+
+                if (existing) {
+                    existing.totalScore += record.score;
+                } else {
+                    const media: Media[] = p.media
+                        ? p.media.map(
+                              (pm) =>
+                                  new Media({
+                                      ...pm,
+                                      productId: pm.productId ? pm.productId : undefined
+                                  })
+                          )
+                        : [];
+
+                    const variants: Variant[] = p.variants
+                        ? p.variants.map(
+                              (pv) =>
+                                  new Variant({
+                                      ...pv,
+                                      price: Number(pv.price)
+                                  })
+                          )
+                        : [];
+
+                    const category: Category | null = p.category ? new Category(p.category) : null;
+                    const user: User | undefined = p.user ? new User(p.user) : undefined;
+
+                    const product = new Product({
+                        ...p,
+                        media,
+                        variants,
+                        category,
+                        user
+                    });
+
+                    aggregatedMap.set(record.recommended_product_id, {
+                        product,
+                        totalScore: record.score,
+                        updatedAt: record.updated_at
+                    });
+                }
+            }
+
+            return Array.from(aggregatedMap.values())
+                .sort((a, b) => b.totalScore - a.totalScore)
+                .slice(0, limit)
+                .map((entry) => ({
+                    product: entry.product,
+                    similarity_score: Number(entry.totalScore.toFixed(6)),
+                    updated_at: entry.updatedAt
+                }));
+        } catch (error) {
+            throw baseExceptionHandler(error);
+        }
+    }
 }

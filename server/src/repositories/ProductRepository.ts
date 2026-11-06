@@ -91,6 +91,7 @@ export default class ProductRepository implements IProductRepository {
 
                     return new Product({
                         ...p,
+                        category: p.category ? new Category(p.category) : null,
                         media: media,
                         variants: variants,
                         productEmbedding: productEmbedding
@@ -105,6 +106,22 @@ export default class ProductRepository implements IProductRepository {
             })
 
             return products.map(p => new Product(p))
+        } catch (error) {
+            throw baseExceptionHandler(error)
+        }
+    }
+
+    async count(where?: {
+        product_code?: number,
+        name?: string,
+        description?: string,
+        categoryId?: number,
+        userId?: string
+    }): Promise<number> {
+        try {
+            return await prisma.products.count({
+                where
+            })
         } catch (error) {
             throw baseExceptionHandler(error)
         }

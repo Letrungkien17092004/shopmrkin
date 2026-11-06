@@ -39,6 +39,25 @@ export default class CategoryUsecase implements ICategoryUsecase {
             })
         }
     }
+    async findMany(): Promise<Category[]> {
+        try {
+            return await this.categoryRepo.findMany()
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.INITIAL
+                        })
+                }
+            }
+            throw new USECASE_ERROR({
+                message: (error as Error).message || "",
+                code: USECASE_ERROR_CODE.UNDEFINED
+            })
+        }
+    }
     async getBySlug(slug: string): Promise<Category | null> {
         try {
             const searchedCategory = await this.categoryRepo.getBySlug(slug)

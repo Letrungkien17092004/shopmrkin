@@ -19,6 +19,7 @@ type ToOutput = {
         username: string,
         role: string
     },
+    categoryId?: number | null,
     category?: string,
     media?: MediaDTO.OutputType[],
     variants?: {
@@ -102,6 +103,7 @@ export default class ProductDTO {
             description: product.description,
             // relation
             user: user,
+            categoryId: product.categoryId,
             category: product.category?.name,
             media: media,
             variants: variants,

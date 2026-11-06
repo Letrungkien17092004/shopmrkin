@@ -1,14 +1,10 @@
-import React, { useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
+import { ProductService, AuthService } from "../../services/index.ts"
+import type { CategoryItem } from "../../services/ProductService.ts"
+import { useProductFilter } from "../../contexts/ProductFilterContext.tsx"
 
-const CATEGORIES = [
-    { id: "all", label: "Tất cả sản phẩm", count: 120 },
-    { id: "phone", label: "Điện thoại", count: 42 },
-    { id: "laptop", label: "Laptop", count: 28 },
-    { id: "pc", label: "Máy tính & PC", count: 19 },
-    { id: "tablet", label: "Máy tính bảng", count: 15 },
-    { id: "men-fashion", label: "Thời trang nam", count: 34 },
-    { id: "women-fashion", label: "Thời trang nữ", count: 29 },
-]
+const authService = new AuthService()
+const productService = new ProductService(authService)
 
 const CONDITIONS = [
     { id: "new", label: "Hàng mới 100%" },
@@ -24,9 +20,31 @@ const PRICE_RANGES = [
 ]
 
 export default function HomeProductFilter() {
-    const [selectedCategory, setSelectedCategory] = useState<string>("all")
+    const { categoryId, changeCategory } = useProductFilter()
+    const [categories, setCategories] = useState<CategoryItem[]>([])
+    const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(true)
     const [selectedConditions, setSelectedConditions] = useState<string[]>(["new"])
     const [selectedPrice, setSelectedPrice] = useState<string>("")
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                setIsLoadingCategories(true)
+                const data = await productService.getCategories()
+                setCategories(data)
+            } catch (err) {
+                console.error("Failed to fetch categories:", err)
+            } finally {
+                setIsLoadingCategories(false)
+            }
+        }
+        fetchCategories()
+    }, [])
+
+    const totalProductCount = useMemo(
+        () => categories.reduce((sum, c) => sum + (c.productCount || 0), 0),
+        [categories]
+    )
 
     const toggleCondition = (id: string) => {
         setSelectedConditions((prev) =>
@@ -35,7 +53,7 @@ export default function HomeProductFilter() {
     }
 
     const handleReset = () => {
-        setSelectedCategory("all")
+        changeCategory(undefined, undefined)
         setSelectedConditions([])
         setSelectedPrice("")
     }
@@ -64,35 +82,69 @@ export default function HomeProductFilter() {
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     Danh mục sản phẩm
                 </h4>
-                <ul className="space-y-1">
-                    {CATEGORIES.map((cat) => {
-                        const active = selectedCategory === cat.id
-                        return (
-                            <li key={cat.id}>
-                                <button
-                                    type="button"
-                                    onClick={() => setSelectedCategory(cat.id)}
-                                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${
-                                        active
-                                            ? "bg-emerald-50 text-emerald-700 font-semibold"
-                                            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                {isLoadingCategories ? (
+                    <div className="space-y-2">
+                        {[...Array(6)].map((_, idx) => (
+                            <div key={idx} className="h-9 bg-slate-100 rounded-xl animate-pulse" />
+                        ))}
+                    </div>
+                ) : (
+                    <ul className="space-y-1 max-h-96 overflow-y-auto pr-1">
+                        <li>
+                            <button
+                                type="button"
+                                onClick={() => changeCategory(undefined, undefined)}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${
+                                    categoryId === undefined
+                                        ? "bg-emerald-50 text-emerald-700 font-semibold"
+                                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                }`}
+                            >
+                                <span>Tất cả sản phẩm</span>
+                                <span
+                                    className={`text-xs px-2 py-0.5 rounded-full ${
+                                        categoryId === undefined
+                                            ? "bg-emerald-100 text-emerald-700"
+                                            : "bg-slate-100 text-slate-500"
                                     }`}
                                 >
-                                    <span>{cat.label}</span>
-                                    <span
-                                        className={`text-xs px-2 py-0.5 rounded-full ${
+                                    {totalProductCount}
+                                </span>
+                            </button>
+                        </li>
+                        {categories.map((cat) => {
+                            const active = categoryId === cat.id
+                            return (
+                                <li key={cat.id}>
+                                    <button
+                                        type="button"
+                                        onClick={() =>
                                             active
-                                                ? "bg-emerald-100 text-emerald-700"
-                                                : "bg-slate-100 text-slate-500"
+                                                ? changeCategory(undefined, undefined)
+                                                : changeCategory(cat.id, cat.name)
+                                        }
+                                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${
+                                            active
+                                                ? "bg-emerald-50 text-emerald-700 font-semibold"
+                                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                                         }`}
                                     >
-                                        {cat.count}
-                                    </span>
-                                </button>
-                            </li>
-                        )
-                    })}
-                </ul>
+                                        <span className="text-left truncate pr-2">{cat.name}</span>
+                                        <span
+                                            className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
+                                                active
+                                                    ? "bg-emerald-100 text-emerald-700"
+                                                    : "bg-slate-100 text-slate-500"
+                                            }`}
+                                        >
+                                            {cat.productCount}
+                                        </span>
+                                    </button>
+                                </li>
+                            )
+                        })}
+                    </ul>
+                )}
             </div>
 
             {/* Price Range section */}

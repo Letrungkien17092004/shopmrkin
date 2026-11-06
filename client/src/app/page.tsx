@@ -5,6 +5,7 @@ import { MainLayout } from "@/components/layout/index.tsx"
 import {
     HomeProductFilter,
     HomeShowProduct,
+    RecommendedForYou,
 } from "@/components/products/index.ts"
 
 const FEATURES = [
@@ -140,6 +141,9 @@ export default function HomePage() {
                         </div>
                     ))}
                 </section>
+
+                {/* Recommended For You Section (Item-Based / Fallback) */}
+                <RecommendedForYou limit={8} />
 
                 {/* Main Content: Sidebar Filter + Product Listing */}
                 <section id="products-section" className="w-full pt-2">

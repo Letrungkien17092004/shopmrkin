@@ -6,6 +6,7 @@ import HomeProductFilteringInfo from "./HomeProductFilteringInfo.tsx";
 import HomeProductSortingOptions from "./HomeProductSortingOptions.tsx";
 import CreateProductForm from "./CreateProductForm.tsx";
 import CreateVariantForm from "./CreateVariantForm.tsx";
+import RecommendedForYou from "./RecommendedForYou.tsx";
 
 export {
     ProductCard,
@@ -15,5 +16,6 @@ export {
     ProductImageSlider,
     HomeProductSortingOptions,
     CreateProductForm,
-    CreateVariantForm
+    CreateVariantForm,
+    RecommendedForYou
 }

@@ -165,6 +165,7 @@ export default class ProductController {
                 description: z.string().optional(),
                 categoryId: z.string().optional(),
                 userId: z.string().optional(),
+                page: z.string().optional(),
                 limit: z.string().optional(),
                 offset: z.string().optional(),
                 // include option
@@ -195,31 +196,60 @@ export default class ProductController {
             })
 
             const queryParsed = QuerySchema.parse(req.query)
+            const parsedPage = queryParsed?.page ? Math.max(1, parseInt(queryParsed.page, 10)) : undefined
+            const parsedLimit = queryParsed?.limit ? Math.max(1, parseInt(queryParsed.limit, 10)) : undefined
+            const parsedOffset =
+                queryParsed?.offset !== undefined
+                    ? Math.max(0, parseInt(queryParsed.offset, 10))
+                    : parsedPage !== undefined && parsedLimit !== undefined
+                        ? (parsedPage - 1) * parsedLimit
+                        : undefined
+
+            const parsedCategoryId =
+                queryParsed?.categoryId && queryParsed.categoryId !== "all" && !Number.isNaN(parseInt(queryParsed.categoryId, 10))
+                    ? parseInt(queryParsed.categoryId, 10)
+                    : undefined
+
             const optionParsed = FindManyOption.parse({
                 where: queryParsed
                     ? {
-                        product_code: queryParsed.product_code ? parseInt(queryParsed.product_code) : undefined,
+                        product_code: queryParsed.product_code ? parseInt(queryParsed.product_code, 10) : undefined,
                         name: queryParsed.name,
                         description: queryParsed.description,
-                        categoryId: queryParsed.categoryId ? parseInt(queryParsed.categoryId) : undefined,
+                        categoryId: parsedCategoryId,
                         userId: queryParsed.userId
                     }
-                    : undefined,
-                limit: queryParsed && queryParsed.limit ? parseInt(queryParsed.limit) : undefined,
-                offset: queryParsed && queryParsed.offset ? parseInt(queryParsed.offset) : undefined,
+                    : {},
+                limit: parsedLimit,
+                offset: parsedOffset,
                 include: queryParsed && queryParsed.include
                     ? {
                         variants: queryParsed.include.variants === "true",
                         media: queryParsed.include.media === "true",
-                        category: queryParsed.include.category === "true",
+                        category: queryParsed.include.category === "true" || true,
                         user: queryParsed.include.user === "true",
                     }
-                    : undefined
+                    : {
+                        category: true
+                    }
             })
 
-            const products = await this.productUsecase.findMany(optionParsed)
+            const [products, total] = await Promise.all([
+                this.productUsecase.findMany(optionParsed),
+                this.productUsecase.count(optionParsed.where)
+            ])
+
+            const currentPage = parsedPage ?? (parsedLimit && parsedOffset !== undefined ? Math.floor(parsedOffset / parsedLimit) + 1 : 1)
+            const totalPages = parsedLimit ? Math.max(1, Math.ceil(total / parsedLimit)) : 1
+
             res.status(200).json({
-                products: ProductDTO.toOutputMany(products, req)
+                products: ProductDTO.toOutputMany(products, req),
+                pagination: {
+                    total,
+                    page: currentPage,
+                    limit: parsedLimit ?? total,
+                    totalPages
+                }
             })
         } catch (error) {
             console.log(error)

@@ -89,6 +89,32 @@ export default class ProductUsecase implements IProductUsecase {
             })
         }
     }
+
+    async count(where?: {
+        product_code?: number,
+        name?: string,
+        description?: string,
+        categoryId?: number,
+        userId?: string
+    }): Promise<number> {
+        try {
+            return await this.productRepo.count(where)
+        } catch (error) {
+            if (error instanceof REPO_ERROR) {
+                switch (error.code) {
+                    case REPO_ERROR_CODE.INITIAL:
+                        throw new USECASE_ERROR({
+                            message: error.message,
+                            code: USECASE_ERROR_CODE.INITIAL
+                        })
+                }
+            }
+            throw new USECASE_ERROR({
+                message: (error as Error).message || "",
+                code: USECASE_ERROR_CODE.UNDEFINED
+            })
+        }
+    }
     
     /**
      * Finds a single Product by its unique product_code.
