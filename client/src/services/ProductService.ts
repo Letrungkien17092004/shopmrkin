@@ -424,7 +424,7 @@ export default class ProductService {
             }
 
             const response = await axios.get<{ products: ProductResponse[] }>(
-                `${ENV.BACK_END_HOST}/api/recommend/for-you?${params.join("&")}`
+                `${ENV.BACK_END_HOST}/api/recommend/hybrid?${params.join("&")}`
             )
             const products = response.data.products || []
 

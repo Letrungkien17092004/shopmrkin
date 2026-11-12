@@ -23,6 +23,14 @@ export type SimilarProductRecord = {
     updated_at?: Date | null;
 };
 
+export type HybridProductRecord = {
+    product: Product;
+    content_score: number;
+    item_score: number;
+    similarity_score: number;
+    updated_at?: Date | null;
+};
+
 export default class RecommendRepository {
     /**
      * Chuyển đổi giá sang dạng keyword text giống notebook tuan-4-content-based.ipynb
@@ -383,6 +391,255 @@ export default class RecommendRepository {
                 .slice(0, limit)
                 .map((entry) => ({
                     product: entry.product,
+                    similarity_score: Number(entry.totalScore.toFixed(6)),
+                    updated_at: entry.updatedAt
+                }));
+        } catch (error) {
+            throw baseExceptionHandler(error);
+        }
+    }
+
+    /**
+     * Lấy danh sách sản phẩm gợi ý theo mô hình Hybrid cho 1 sản phẩm cụ thể (product_id)
+     */
+    async getHybridByProductId(productId: string, limit?: number): Promise<HybridProductRecord[]> {
+        try {
+            const records = await prisma.hybridSimilarities.findMany({
+                where: {
+                    product_id: productId
+                },
+                include: {
+                    recommendedProduct: {
+                        include: {
+                            variants: true,
+                            media: true,
+                            category: true,
+                            user: true
+                        }
+                    }
+                },
+                orderBy: {
+                    score: "desc"
+                },
+                take: limit
+            });
+
+            return records.map((record) => {
+                const p = record.recommendedProduct;
+                const media: Media[] = p.media
+                    ? p.media.map(
+                          (pm) =>
+                              new Media({
+                                  ...pm,
+                                  productId: pm.productId ? pm.productId : undefined
+                              })
+                      )
+                    : [];
+
+                const variants: Variant[] = p.variants
+                    ? p.variants.map(
+                          (pv) =>
+                              new Variant({
+                                  ...pv,
+                                  price: Number(pv.price)
+                              })
+                      )
+                    : [];
+
+                const category: Category | null = p.category ? new Category(p.category) : null;
+                const user: User | undefined = p.user ? new User(p.user) : undefined;
+
+                const product = new Product({
+                    ...p,
+                    media,
+                    variants,
+                    category,
+                    user
+                });
+
+                return {
+                    product,
+                    content_score: record.content_score,
+                    item_score: record.item_score,
+                    similarity_score: record.score,
+                    updated_at: record.updated_at
+                };
+            });
+        } catch (error) {
+            throw baseExceptionHandler(error);
+        }
+    }
+
+    /**
+     * Lấy danh sách sản phẩm gợi ý theo mô hình Hybrid từ bảng hybrid_similarities
+     * Hỗ trợ truyền danh sách productIds, cartId hoặc userId.
+     * Cộng dồn (SUM) điểm score khi có nhiều sản phẩm trong giỏ và sắp xếp từ cao xuống thấp.
+     */
+    async getHybridRecommendations(options: {
+        productIds?: string[];
+        cartId?: string;
+        userId?: string;
+        limit?: number;
+    }): Promise<HybridProductRecord[]> {
+        try {
+            const limit = options.limit ?? 8;
+            const seedProductIdSet = new Set<string>(options.productIds || []);
+
+            if (options.cartId) {
+                const cartItems = await prisma.cartItems.findMany({
+                    where: { cartId: options.cartId },
+                    include: {
+                        variant: {
+                            select: { productId: true }
+                        }
+                    }
+                });
+                for (const ci of cartItems) {
+                    if (ci.variant?.productId) {
+                        seedProductIdSet.add(ci.variant.productId);
+                    }
+                }
+            }
+
+            if (options.userId && seedProductIdSet.size === 0) {
+                const userCart = await prisma.carts.findUnique({
+                    where: { userId: options.userId },
+                    include: {
+                        cartItems: {
+                            include: {
+                                variant: {
+                                    select: { productId: true }
+                                }
+                            }
+                        }
+                    }
+                });
+                if (userCart) {
+                    for (const ci of userCart.cartItems) {
+                        if (ci.variant?.productId) {
+                            seedProductIdSet.add(ci.variant.productId);
+                        }
+                    }
+                }
+
+                if (seedProductIdSet.size === 0) {
+                    const userOrders = await prisma.orders.findMany({
+                        where: {
+                            userId: options.userId,
+                            status: { not: "CANCELLED" }
+                        },
+                        include: {
+                            orderItems: {
+                                include: {
+                                    variant: {
+                                        select: { productId: true }
+                                    }
+                                }
+                            }
+                        },
+                        orderBy: { createdAt: "desc" },
+                        take: 5
+                    });
+                    for (const ord of userOrders) {
+                        for (const oi of ord.orderItems) {
+                            if (oi.variant?.productId) {
+                                seedProductIdSet.add(oi.variant.productId);
+                            }
+                        }
+                    }
+                }
+            }
+
+            const seedProductIds = Array.from(seedProductIdSet);
+            if (seedProductIds.length === 0) {
+                return [];
+            }
+
+            const records = await prisma.hybridSimilarities.findMany({
+                where: {
+                    product_id: { in: seedProductIds },
+                    recommended_product_id: { notIn: seedProductIds }
+                },
+                include: {
+                    recommendedProduct: {
+                        include: {
+                            variants: true,
+                            media: true,
+                            category: true,
+                            user: true
+                        }
+                    }
+                }
+            });
+
+            const aggregatedMap = new Map<
+                string,
+                {
+                    product: Product;
+                    totalContentScore: number;
+                    totalItemScore: number;
+                    totalScore: number;
+                    updatedAt?: Date | null;
+                }
+            >();
+
+            for (const record of records) {
+                const p = record.recommendedProduct;
+                const existing = aggregatedMap.get(record.recommended_product_id);
+
+                if (existing) {
+                    existing.totalContentScore += record.content_score;
+                    existing.totalItemScore += record.item_score;
+                    existing.totalScore += record.score;
+                } else {
+                    const media: Media[] = p.media
+                        ? p.media.map(
+                              (pm) =>
+                                  new Media({
+                                      ...pm,
+                                      productId: pm.productId ? pm.productId : undefined
+                                  })
+                          )
+                        : [];
+
+                    const variants: Variant[] = p.variants
+                        ? p.variants.map(
+                              (pv) =>
+                                  new Variant({
+                                      ...pv,
+                                      price: Number(pv.price)
+                                  })
+                          )
+                        : [];
+
+                    const category: Category | null = p.category ? new Category(p.category) : null;
+                    const user: User | undefined = p.user ? new User(p.user) : undefined;
+
+                    const product = new Product({
+                        ...p,
+                        media,
+                        variants,
+                        category,
+                        user
+                    });
+
+                    aggregatedMap.set(record.recommended_product_id, {
+                        product,
+                        totalContentScore: record.content_score,
+                        totalItemScore: record.item_score,
+                        totalScore: record.score,
+                        updatedAt: record.updated_at
+                    });
+                }
+            }
+
+            return Array.from(aggregatedMap.values())
+                .sort((a, b) => b.totalScore - a.totalScore)
+                .slice(0, limit)
+                .map((entry) => ({
+                    product: entry.product,
+                    content_score: Number(entry.totalContentScore.toFixed(6)),
+                    item_score: Number(entry.totalItemScore.toFixed(6)),
                     similarity_score: Number(entry.totalScore.toFixed(6)),
                     updated_at: entry.updatedAt
                 }));
